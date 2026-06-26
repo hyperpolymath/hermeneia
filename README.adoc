@@ -1,99 +1,189 @@
-// SPDX-License-Identifier: CC-BY-SA-4.0
-// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-// SPDX-FileCopyrightText: 2024-2026 Jonathan D.A. Jewell (hyperpolymath)
-= {{PROJECT_NAME}}
-:toc:
-:toc-placement: preamble
+# Hermeneia
 
-image:https://img.shields.io/badge/OpenSSF-Best_Practices-green?logo=opensourcesecurity[OpenSSF Best Practices,link="https://www.bestpractices.dev/en/projects/new?repo_url=https://{{FORGE}}/{{OWNER}}/{{REPO}}"]
-image:https://img.shields.io/badge/License-MPL_2.0-blue.svg[License: MPL-2.0,link="https://opensource.org/licenses/MPL-2.0"]
-image:https://raw.githubusercontent.com/hyperpolymath/palimpsest-license/main/assets/badges/svg/badge-quantum-safe.svg[Quantum-Safe Provenance,link="https://github.com/hyperpolymath/palimpsest-license/blob/main/v1.0/exhibits/EXHIBIT-B-QUANTUM-SAFE.txt"]
-image:https://img.shields.io/badge/Docs-CC--BY--SA--4.0-blue.svg[Docs: CC-BY-SA-4.0,link="https://creativecommons.org/licenses/by-sa/4.0/"]
-image:https://api.thegreenwebfoundation.org/greencheckimage/{{FORGE}}[Green Web,link="https://www.thegreenwebfoundation.org/green-web-check/?url={{FORGE}}"]
-image:https://img.shields.io/badge/RSR-Rhodium_Standard-9C27B0[Rhodium Standard Repository,link="https://github.com/hyperpolymath/rhodium-standard-repositories"]
-image:https://img.shields.io/badge/Idris-Inside-5E5086?logo=idris&logoColor=white[Idris Inside,link="https://github.com/hyperpolymath/proven"]
+**Hermeneia is a voking language for querying what a particular can become under a use.**
 
-{{PROJECT_DESCRIPTION}}
+It is the query language for **Vocarium**, a trope database of vokeable particulars. Hermeneia does not merely select rows or retrieve records. It calls stored particulars into relation with a purpose, context, use-model, warrant, or challenge.
 
-[IMPORTANT]
-====
-*This file is a template.* You are reading `README.adoc` from the *RSR template repo*
-(or a freshly-cloned copy of it). Run `just init` to replace every `{{PLACEHOLDER}}`
-token with your project's details, then delete this admonition. Until you do, the
-`{{...}}` markers below are intentional placeholders, not content.
-====
+Hermeneia asks:
 
-== What this is
+```text
+Can this particular become an answer here?
+What does it call forth?
+What happens when it crosses context?
+What breaks when it is challenged?
+What previous licence must now be withdrawn?
+```
 
-A new repository scaffolded from the *Rhodium Standard Repository (RSR)* template:
-a batteries-included starting point that ships with CI/CD, machine-readable project
-metadata, an AI-agent gatekeeper protocol, a formally-typed ABI/FFI seam
-(Idris2 + Zig), container and reproducible-build scaffolding, and governance
-infrastructure — all wired and passing the RSR validators on day one.
+## Core idea
 
-Replace this section with a description of *your* project once initialised.
+A normal query language asks:
 
-== Quick start
+```sql
+SELECT records WHERE condition;
+```
 
-[source,bash]
-----
-# 1. Create a repo from this template (or clone it), then from the repo root:
-just init                # interactive bootstrap: fills every {{PLACEHOLDER}}
+Hermeneia asks:
 
-# 2. See the available tasks:
-just                     # lists all phases (build, test, validate, audit, ...)
+```text
+invoke this particular
+under this use-model
+show what is preserved, lost, licensed, or insufficient
+```
 
-# 3. Check the repo still satisfies the RSR shape:
-just validate            # structure + metadata checks
-----
+Hermeneia is therefore not only a retrieval language. It is an **imminence language**: a language for asking what a stored particular is about to count as, become, or disclose under a declared use.
 
-`just init` prompts for the project name, owner, author, licence contact, and the
-other values listed in `.machine_readable/ai/PLACEHOLDERS.adoc`, substitutes them
-across the tree, validates the result, and (if available) runs the `k9-svc` checks.
+## The voke family
 
-== What you get
+Hermeneia is organised around voking operations.
 
-* *Machine-readable metadata* (`.machine_readable/6a2/`) — `STATE`, `META`,
-  `ECOSYSTEM`, `PLAYBOOK`, `AGENTIC`, `NEUROSYM`, `CLADE`, and `anchors/ANCHOR`,
-  in a2ml, so tools and agents can read the project's state and boundaries.
-* *AI gatekeeper protocol* — `0-AI-MANIFEST.a2ml` is the universal entry point that
-  tells an AI agent how to work in this repo before it touches anything.
-* *Typed ABI/FFI seam* — `src/interface/Abi/` (Idris2 type + layout proofs) over
-  `src/interface/ffi/` (Zig implementation), with generated C headers.
-* *CI/CD* — GitHub Actions for quality, security (CodeQL, Scorecard, secret
-  scanning), multi-forge mirroring, and RSR anti-pattern enforcement.
-* *Supply-chain & reproducibility* — container layering (stapeln), Guix shells,
-  SBOM, and signing hooks.
-* *Governance* — `GOVERNANCE.adoc`, `MAINTAINERS.adoc`, `.github/` community health
-  files, and a release `AUDIT.adoc` gate.
+To **voke** is to call a stored particular into a use-relation.
 
-== Repository map
+| Operation   | Meaning                                                  |
+| ----------- | -------------------------------------------------------- |
+| `invoke`    | call a particular into a declared use                    |
+| `evoke`     | call forth neighbouring or latent particulars            |
+| `convoke`   | call multiple particulars together                       |
+| `transvoke` | call a particular across context, bearer, record, or use |
+| `provoke`   | call a particular into challenge or stress-test          |
+| `intervoke` | call between trope paths or candidates                   |
+| `revoke`    | call back or withdraw a previous licence                 |
 
-[cols="1,3"]
-|===
-| Path | What lives there
+Hermeneia does not select rows.
+Hermeneia vokes tropes.
 
-| `0-AI-MANIFEST.a2ml`      | Universal entry point for AI agents (read first).
-| `.machine_readable/`      | Project metadata, policies, contractiles, AI configs.
-| `src/interface/`          | Typed ABI (Idris2) + FFI (Zig) + generated headers.
-| `docs/`                   | Onboarding, status, governance, practice, decisions.
-| `build/`, `Justfile`      | Task orchestration (`just` phases delegate to `build/just/*.just`).
-| `.github/`                | Workflows + community health files.
-| `tests/`, `benches/`      | Test suites and benchmarks.
-|===
+## Example: invoke
 
-== Where to go next
+```hil
+invoke "authentic language"
+under use_model "critical-paraphrase"
+show verdict, loss, warrant
+```
 
-* `EXPLAINME.adoc` — the engineering deep-dive: how the pieces actually work.
-* `AFFIRMATION.adoc` — the dated, signed honesty snapshot of the repo's true state.
-* `AUDIT.adoc` — the release audit gate.
-* `.machine_readable/ai/PLACEHOLDERS.adoc` — the full placeholder reference.
+Possible result:
 
-== Licence
+```text
+verdict: p-insufficient
 
-Code, configuration and scripts are link:LICENSE[Mozilla Public License 2.0]
-(`MPL-2.0`); prose documentation is `CC-BY-SA-4.0`. Both texts live in
-`LICENSES/`, and per-file `SPDX-License-Identifier` headers are authoritative.
-The GitHub-detected licence is MPL-2.0 (the root `LICENSE`). Long-term
-attribution uses Quantum-Safe Provenance — see
-link:https://github.com/hyperpolymath/palimpsest-license/blob/main/v1.0/exhibits/EXHIBIT-B-QUANTUM-SAFE.txt[PMPL Exhibit B].
+loss:
+  quality   Attenuated(6)
+  bearer    Present
+  context   Present
+  record    Present
+
+reason:
+  The paraphrase "real language" preserves a loose ordinary association
+  but loses the theoretical force carried by "authentic".
+```
+
+## Example: evoke
+
+```hil
+evoke around "authentic language"
+within context "de Man / Romantic irony"
+limit quality_loss <= Attenuated(3)
+```
+
+This asks what nearby tropes, claims, quotations, paraphrases, or warrants are resonant with the original particular without exceeding the chosen loss bound.
+
+## Example: convoke
+
+```hil
+convoke [
+  "authentic language",
+  "poetry",
+  "myth",
+  "madness"
+]
+under use_model "critical-reading"
+show constellation
+```
+
+This brings several particulars into a shared interpretive scene.
+
+## Example: transvoke
+
+```hil
+transvoke "authentic language"
+from context "source quotation"
+to context "student paraphrase"
+show path, attenuation, failed_floors
+```
+
+This traces what happens when a trope crosses from one use-context into another.
+
+## Example: provoke
+
+```hil
+provoke "real language"
+against "authentic language"
+under use_model "technical-paraphrase"
+show failure_points
+```
+
+This stress-tests a candidate substitution or interpretation.
+
+## Example: revoke
+
+```hil
+revoke verdict "v_2041"
+because warrant "source_check_failed"
+```
+
+This withdraws a previously licensed answer when its warrant, evidence, or use-model no longer holds.
+
+## Relationship to Vocarium
+
+Hermeneia queries **Vocarium**, the database of vokeable particulars.
+
+```text
+Vocarium holds:
+  tropes
+  transformation paths
+  grades
+  warrants
+  use-models
+  verdicts
+
+Hermeneia asks:
+  what can these particulars become under use?
+```
+
+## Relationship to Haec
+
+Haec records transformations. Hermeneia queries them.
+
+```text
+Haec:
+  attenuate[2] u
+  project[{quality, record}] v
+  fuse[source_quote] x y
+
+Hermeneia:
+  invoke v under use_model "critical-paraphrase"
+  transvoke x from source to essay
+  provoke y against submitted_claim
+```
+
+Haec is the transformation language.
+Hermeneia is the voking language.
+Vocarium is the store.
+
+## Design principle
+
+Hermeneia separates three things that ordinary query languages often collapse:
+
+```text
+retrieved       — the database found it
+interpretable   — it can be meaningfully read under this context
+licensed        — it is p-sufficient under this use-model
+```
+
+A result may be retrieved but not licensed.
+It may be interpretable but insufficient.
+It may be p-sufficient under one use-model and fail under another.
+
+That distinction is the point.
+
+## Status
+
+Hermeneia is an experimental query language for trope-aware, loss-aware, warrant-aware databases. It is intended for work on particularity-preserving computation, interpretive databases, AI-assisted scholarship, evidential reasoning, paraphrase discipline, and transformation-aware knowledge systems.
