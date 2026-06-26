@@ -62,6 +62,7 @@ examples/
 features/
 scripts/
 verification/
+datasets/                  # labelled practice/training corpora (e.g. path-reference-drift); conventional sibling of examples/ and benches/. Records are reference data, not source — exempt from language/scanner gates via .hypatia-ignore where applicable.
 container/                 # may host Containerfile if not at build/
 
 # ─── Tolerated pending follow-up (re-evaluate when item lands) ───────────────
