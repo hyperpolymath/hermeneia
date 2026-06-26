@@ -1,118 +1,567 @@
-// SPDX-License-Identifier: CC-BY-SA-4.0
-// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-= RSR Template Repo - Explainme
-image:https://img.shields.io/badge/License-MPL_2.0-blue.svg[License: MPL-2.0,link="https://opensource.org/licenses/MPL-2.0"]
+# EXPLAINME: Hermeneia
 
-:toc:
-:icons: font
+> The README makes claims. This file backs them up.
 
-This file explains how the key template claims map to real files.
+Hermeneia is an experimental voking / imminence query language for Vocarium.
 
-== Central Session Protocol Authority
+It asks what stored particulars can become under a declared use-model. It is not SQL with mythological names. It is a language for calling trope-shaped records into use, relation, challenge, crossing, comparison, or withdrawal.
 
-Claim:
-Session protocols are centrally maintained and not duplicated in this template.
+## Contents
 
-How this is implemented:
+1. What the README claims
+2. Core claim: Hermeneia is a voking language
+3. Core claim: Hermeneia is an imminence language
+4. Core claim: Hermeneia queries use, not only data
+5. Core claim: Hermeneia separates retrieval from licence
+6. Core claim: Hermeneia has a family of voke operations
+7. Relationship to Vocarium
+8. Relationship to Haec
+9. Evidence boundary
+10. What Hermeneia is not
+11. Falsifiability and failure modes
+12. Next receipts needed
 
-* The local dispatcher (`session/dispatch.sh`) maps canonical commands to central
-  protocol paths in `standards/session-management-standards`.
-* Local files (`session/custom-checks.k9`, `session/local-hooks.sh`,
-  `coordination.k9`) are integration-only.
+---
 
-Caveat:
+## 1. What the README claims
 
-* If `SESSION_STANDARDS_DIR` is unset and no adjacent standards checkout exists,
-  the dispatcher records the command but cannot resolve central checklist paths.
+The README should claim only this much:
 
-== Canonical Command Surface
+> Hermeneia is an experimental query language for voking stored particulars from Vocarium under declared use-models.
 
-Claim:
-Template bindings align to one canonical command model.
+It should not claim:
 
-How this is implemented:
+> Hermeneia solves interpretation.
 
-* `Justfile` provides thin aliases (`intake-repo`, `checkpoint-change`,
-  `verify-maintenance`, `verify-substantial`, `verify-release`, `close-planned`,
-  `close-urgent`, `recover-repo`, `handover-*`).
-* Every alias calls `session/dispatch.sh` with canonical verb-object pairs.
+or:
 
-Caveat:
+> Hermeneia automatically knows what things mean.
 
-* Recipes are wrappers only. They do not replace protocol content from
-  the central standards repo.
+or:
 
-== Runtime State Is Local
+> Hermeneia replaces human judgement.
 
-Claim:
-Session state is per-repository runtime output, not standards text.
+Hermeneia makes interpretive calls explicit enough to inspect, check, and contest.
 
-How this is implemented:
+---
 
-* `session/dispatch.sh` writes command and continuity-core capture stubs to
-  `.session/LAST-CANONICAL-COMMAND.md` in the target repository path.
+## 2. Core claim: Hermeneia is a voking language
 
-Caveat:
+### README claim
 
-* Runtime files are intentionally lightweight and require human/agent completion.
+Hermeneia does not merely select rows. It vokes tropes.
 
-== Template Token Policy
+### What this means
 
-Claim:
-Placeholders are explicit template content until initialization.
+To voke is to call a stored particular into a use-relation.
 
-How this is implemented:
+The root is useful because it points to a family of operations:
 
-* `README.adoc` and bootstrap recipes keep `{{TOKEN}}` placeholders visible.
-* `just init` performs token replacement.
+```text
+invoke    — call into use
+evoke     — call forth resonance
+convoke   — call together
+transvoke — call across context or use
+provoke   — call into challenge
+intervoke — call between paths
+revoke    — call back / withdraw licence
+```
 
-Caveat:
+Hermeneia’s query act is therefore not just:
 
-* Uninitialized placeholders must not be treated as project-specific truth.
+```text
+find matching records
+```
 
-== Dependency Updates (Dependabot)
+but:
 
-Claim:
-Dependency bumps land fast and safely, without manual chasing.
+```text
+call this particular into this use and show whether it can answer here
+```
 
-How this is implemented:
+### Receipts to look for
 
-* `dependabot.yml` watches the Dependabot-supported ecosystems the estate
-  actually uses: `github-actions`, `cargo`, `mix` (Elixir), `docker`.
-* `dependabot-automerge.yml` auto-merges *every* bump (patch/minor/major,
-  security or routine) **once the required checks are green** — a broken bump
-  fails CI and stays open (you get an email); it never lands on a red `main`.
+A mature repository should define the core voke operations in a grammar or language reference:
 
-Caveat:
+```text
+docs/syntax.md
+docs/voke-operations.md
+grammar/hermeneia.ebnf
+examples/invoke.hil
+examples/provoke.hil
+examples/transvoke.hil
+```
 
-* Dependabot has **no Deno or Bun ecosystem**, and `pnpm` only rides under the
-  `npm` ecosystem (itself banned). For this Deno-first estate Dependabot cannot
-  watch the runtime dependencies; the `npm`/`pip` entries are retained only for
-  transitional/legacy manifests and are otherwise inert. Deno dependency
-  currency is managed via `deno.json`/`deno.lock`, not Dependabot.
-* Do **not** add Dependabot as a ruleset *bypass* actor: that lets bumps skip
-  the required checks (secret-scanning, SAST), removing the safety gate and the
-  "it broke" signal. Auto-merge-on-green gives fast merges without it.
+### Caveat
 
-== Julia Registry Packages — Standalone Repo Requirement
+If the current implementation only has one search command, the README should say:
 
-Claim:
-If this template is used to create a Julia package, it must remain a standalone repository registered with the Julia package registry.
+> Hermeneia is designed as a voking language.
 
-How this is implemented:
+not:
 
-* Julia's package registry (General.jl or other) expects each package to be a standalone GitHub repository with `Project.toml` at the repository root.
-* Installation via `Pkg.add()`, dependency resolution, and automated CI/CD all depend on this canonical structure.
+> Hermeneia implements the full voke family.
 
-Caveat:
+---
 
-* Do NOT move this repository into a monorepo or subdirectory, as this breaks registry registration and package discoverability.
-* Julia packages published to a registry must each remain a standalone top-level repository (registry registration and package discovery require it).
-* Non-registry Julia packages can be organized differently if they are not published to any registry.
+## 3. Core claim: Hermeneia is an imminence language
 
+### README claim
 
-== License
+Hermeneia asks what a particular is about to become under a use.
 
-This project is licensed under the Mozilla Public License, v. 2.0. See the `LICENSE` file for details.
+### What this means
 
-SPDX-License-Identifier: CC-BY-SA-4.0
+A database record is not automatically an answer. A stored trope becomes answer-like only when brought under:
+
+```text
+a purpose
+a context
+a use-model floor
+a warrant
+a requested response role
+```
+
+Hermeneia queries the moment before answerhood.
+
+It asks:
+
+```text
+Can this trope become evidence?
+Can this paraphrase become a submitted claim?
+Can this quotation become an interpretation?
+Can this AI-generated sentence become evidence of student understanding?
+```
+
+This is what “imminence” means here: not mystical futurity, but the threshold at which a stored particular is about to count as something for a use.
+
+### Receipts to look for
+
+Hermeneia should eventually produce outputs that include not just records, but response roles:
+
+```text
+can become:
+  evidence
+  paraphrase
+  loose gloss
+  candidate claim
+  warrant
+  failed substitution
+```
+
+### Caveat
+
+Do not overclaim. Hermeneia does not make the future happen. It checks whether a particular can be licensed as a response under a declared use-model.
+
+---
+
+## 4. Core claim: Hermeneia queries use, not only data
+
+### README claim
+
+Hermeneia queries particulars under use-models.
+
+### What this means
+
+The same trope may pass under one use-model and fail under another.
+
+Example:
+
+```text
+"real language"
+```
+
+may be sufficient as:
+
+```text
+a loose study note
+```
+
+but insufficient as:
+
+```text
+a technical paraphrase of "authentic language"
+```
+
+Hermeneia must therefore make the use-model explicit.
+
+Example shape:
+
+```text
+invoke "real language"
+against "authentic language"
+under use_model "critical-paraphrase"
+show verdict, loss, warrant
+```
+
+### Receipts to look for
+
+There should be examples where changing the use-model changes the verdict.
+
+Minimum example set:
+
+```text
+examples/use-models/casual-note.json
+examples/use-models/critical-paraphrase.json
+examples/results/same-candidate-different-verdicts.json
+```
+
+### Caveat
+
+If the query language does not yet support explicit use-models, the core claim is still design intent, not implementation evidence.
+
+---
+
+## 5. Core claim: Hermeneia separates retrieval from licence
+
+### README claim
+
+Hermeneia distinguishes:
+
+```text
+retrieved
+interpretable
+licensed
+```
+
+### What this means
+
+A normal query result can encourage false confidence. Hermeneia should refuse that collapse.
+
+A candidate can be:
+
+```text
+retrieved: yes
+interpretable: yes
+licensed: no
+```
+
+This is central to the system.
+
+Example:
+
+```text
+"croaked" may be retrieved as a lexical neighbour of "passed away".
+
+It may be interpretable as death-related.
+
+It is not licensed for a funeral-condolence use-model.
+```
+
+### Receipts to look for
+
+Hermeneia output examples should show:
+
+```text
+verdict
+loss-shape
+failed floor
+reason
+missing warrant
+```
+
+not just a ranked list of results.
+
+### Caveat
+
+If Hermeneia only returns matches, it has not yet earned the claim that it is a licensing-aware query language.
+
+---
+
+## 6. Core claim: Hermeneia has a family of voke operations
+
+### README claim
+
+Hermeneia’s operations are organised around modes of call.
+
+### Canonical operations
+
+#### invoke
+
+Call a particular into a declared use.
+
+```text
+invoke "authentic language"
+under use_model "critical-paraphrase"
+show verdict, loss, warrant
+```
+
+#### evoke
+
+Call forth neighbouring or latent particulars.
+
+```text
+evoke around "authentic language"
+within context "de Man / rhetoric"
+limit quality_loss <= Attenuated(3)
+```
+
+#### convoke
+
+Call several particulars together.
+
+```text
+convoke [
+  "authentic language",
+  "poetry",
+  "myth",
+  "madness"
+]
+under use_model "critical-reading"
+show constellation
+```
+
+#### transvoke
+
+Call a particular across context, bearer, record, or use.
+
+```text
+transvoke "authentic language"
+from context "source quotation"
+to context "student paraphrase"
+show path, loss, failed_floors
+```
+
+#### provoke
+
+Call a candidate into challenge.
+
+```text
+provoke "real language"
+against "authentic language"
+under use_model "technical-paraphrase"
+show failure_points
+```
+
+#### intervoke
+
+Call between trope paths or candidates.
+
+```text
+intervoke path "quote-to-paraphrase"
+with path "quote-to-summary"
+show divergence
+```
+
+#### revoke
+
+Call back or withdraw a previous licence.
+
+```text
+revoke verdict "v_2041"
+because warrant "source_check_failed"
+```
+
+### Caveat
+
+These operations may begin as design vocabulary before they are all implemented. The README should mark the implemented subset clearly.
+
+---
+
+## 7. Relationship to Vocarium
+
+### README claim
+
+Hermeneia queries Vocarium.
+
+### What this means
+
+Vocarium stores:
+
+```text
+tropes
+paths
+grades
+warrants
+use-models
+verdicts
+```
+
+Hermeneia calls those records into use.
+
+Hermeneia should not be responsible for long-term storage. Vocarium should not be responsible for interpreting every query. The boundary matters.
+
+```text
+Vocarium = storage of vokeable particulars
+Hermeneia = query acts over those particulars
+```
+
+### Receipts to look for
+
+There should eventually be a fixture where:
+
+```text
+Vocarium record → Hermeneia query → Hermeneia result
+```
+
+is visible end to end.
+
+---
+
+## 8. Relationship to Haec
+
+### README claim
+
+Haec transforms; Hermeneia queries.
+
+### What this means
+
+Haec records transformation paths such as:
+
+```text
+attenuate[2] u
+project[{quality, record}] v
+fuse[source_quote] x y
+```
+
+Hermeneia asks whether those transformed particulars can be used.
+
+Example:
+
+```text
+Haec:
+  "authentic language" → "real language"
+  grade: quality = Attenuated(6)
+
+Hermeneia:
+  invoke transformed trope
+  under use_model "critical-paraphrase"
+  verdict: p-insufficient
+```
+
+### Caveat
+
+Hermeneia should not duplicate Haec’s transformation effects as query verbs. Haec effects and Hermeneia vokes are different layers.
+
+```text
+Haec effects:
+  preserve / project / collapse / detach / attenuate / fuse
+
+Hermeneia vokes:
+  invoke / evoke / convoke / transvoke / provoke / intervoke / revoke
+```
+
+---
+
+## 9. Evidence boundary
+
+Hermeneia may currently be one of several things:
+
+```text
+conceptual language design
+grammar draft
+parser prototype
+query planner
+Vocarium-integrated query runner
+checker-integrated language
+```
+
+The README should say which one is true.
+
+Do not claim:
+
+```text
+production query engine
+complete hermeneutic calculus
+automated interpretation
+verified query semantics
+```
+
+unless the repository contains direct evidence.
+
+The honest public framing is:
+
+> Hermeneia is an experimental voking query language for asking what stored particulars can become under declared use-models.
+
+---
+
+## 10. What Hermeneia is not
+
+Hermeneia is not:
+
+```text
+SQL with poetic verbs
+a general-purpose search engine
+a thesaurus
+a semantic oracle
+a truth engine
+a replacement for human interpretation
+a proof that an answer is good
+```
+
+Hermeneia is a language for making the interpretive call explicit and inspectable.
+
+It can expose:
+
+```text
+loss
+warrant
+floor
+verdict
+missing evidence
+failed role
+```
+
+It cannot remove the need for judgement.
+
+---
+
+## 11. Falsifiability and failure modes
+
+Hermeneia’s claims fail if:
+
+1. Queries do not require or expose use-models.
+2. Results are only ranked matches, not verdict-bearing candidates.
+3. The same candidate cannot pass under one use-model and fail under another.
+4. The language cannot show what was lost.
+5. Voke operations collapse into vague synonyms for search.
+6. `provoke` cannot produce useful failure maps.
+7. `revoke` cannot withdraw earlier licences.
+8. The system hides O2 obligations instead of surfacing them.
+9. Haec effects and Hermeneia vokes are mixed into one confused layer.
+
+A useful hard test:
+
+```text
+"passed away" → "croaked"
+under use_model "funeral-condolence"
+```
+
+Hermeneia should not merely retrieve both as death-related expressions. It should show why the candidate is not licensed under that use.
+
+---
+
+## 12. Next receipts needed
+
+Recommended next evidence items:
+
+```text
+1. A minimal Hermeneia grammar.
+2. A voke operation table with implemented / planned status.
+3. One invoke example that checks a Vocarium record against a use-model.
+4. One provoke example that shows why a candidate fails.
+5. One transvoke example that traces a particular across contexts.
+6. One revoke example that withdraws a verdict after warrant failure.
+7. JSON result shape:
+   query
+   candidates
+   loss-shape
+   floor
+   verdict
+   reasons
+   missing warrants
+8. A design note separating:
+   retrieved
+   interpretable
+   licensed
+9. A no-overclaiming status table:
+   Designed / Parsed / Planned / Implemented / Tested / Integrated.
+```
+
+Until those receipts exist, the safe claim is:
+
+> Hermeneia is a proposed voking query language for trope-aware databases.
+
+Once they exist, the stronger claim becomes:
+
+> Hermeneia is an implemented query layer for calling Vocarium records into use-modelled interpretation, challenge, crossing, and revocation.
