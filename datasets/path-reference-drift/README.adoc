@@ -1,0 +1,96 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Path-reference drift — practice dataset
+:toc: macro
+:toclevels: 2
+
+A labelled false-positive / true-positive corpus for classifying
+`src/<dir>/` path references in documentation. It is a worked example of a
+*trope* corpus: the same surface string (`src/<dir>/`) is read in several
+rhetorical modes, and only some of those modes denote a real, dangling local
+path. The dataset records, per finding, which mode applies and which decidable
+*discriminants* separate genuine drift from its look-alikes.
+
+toc::[]
+
+== Provenance
+
+Derived from Hypatia rule *SD022* ("stale `src/<dir>/` reference after a
+directory rename") run against the `hyperpolymath/hypatia` tree. SD022's
+premise — _a doc mentions `src/<dir>/` and no such directory exists, therefore
+a rename left the doc stale_ — is sound for a single-crate workspace but
+over-fires in a polyglot, multi-crate, cross-repo estate.
+
+The merged source lives in `hyperpolymath/hypatia` at
+`.audittraining/path-reference-drift/`; this directory is a faithful copy seeded
+into Hermeneia so the corpus can be voked as trope data.
+
+== Files
+
+[cols="1,3"]
+|===
+| File | Contents
+
+| `path-reference-drift.dataset.jsonl`
+| 22 labelled records, one JSON object per line (see schema below).
+
+| `TYPOLOGY.md`
+| The discriminant set, the typology (9 types), the tropology (rhetorical
+  modes), and the corrected decision procedure.
+|===
+
+== Counts
+
+* 22 findings total (20 SD022 + 1 workflow audit + 1 git-state)
+* By verdict: *17 false-positive · 3 true-positive · 1 prospective · 1 environmental*
+* 13 SD022 FPs are cleared by the corrected rule (structural); 6 are real doc
+  fixes (2 of them genuine `src/rust/` drift); the 1 prospective path is left
+  annotated.
+
+== Record schema
+
+Each line of `path-reference-drift.dataset.jsonl` is one object:
+
+[cols="1,3"]
+|===
+| Field | Meaning
+
+| `id` | Stable finding id (e.g. `sd022-14`, `wf-01`, `gs-01`).
+| `rule` | Originating rule (`structural_drift/SD022`, `workflow_audit/missing_timeout_minutes`, `git_state/GS007`).
+| `file` | Repo-relative path of the citing file.
+| `dir_token` | The `<dir>` captured after `src/` (null when not a path finding).
+| `lines` | Line number(s) of the reference (null when not line-scoped).
+| `raw_text` | The exact text that triggered the finding.
+| `context_kind` | Where the string sits: `manifest_field`, `code_comment`, `example_command`, `prose_inline`, `table_field`, `list_inline`, etc.
+| `discriminants` | Object of decidable features (see below).
+| `trope` | The rhetorical mode of the reference (the tropology).
+| `type` | What the finding _is_ (the typology — one of 9 types).
+| `verdict` | `FALSE_POSITIVE` / `TRUE_POSITIVE` / `PROSPECTIVE` / `ENVIRONMENTAL`.
+| `recommended_action` | What to do (e.g. `rule:skip_corpus`, `rule:resolve_relative`, `fix_doc`, `leave:planned`).
+| `note` | Human rationale for the label.
+|===
+
+=== `discriminants` object
+
+[cols="1,3"]
+|===
+| Key | Question
+
+| `resolves_as_src_dir_anywhere` | Does any real dir match `**/src/<dir>` or root `src/<dir>`?
+| `file_relative_dir_exists` | Does `<dir-of-citing-file>/src/<dir>` exist?
+| `text_prefix` | What path segment precedes `src/<dir>` in the line?
+| `prefix_first_segment` | The leading segment of that prefix.
+| `prefix_is_local_topdir` | Is that leading segment a real top-level dir of _this_ repo?
+| `prefixed_path_exists` | Does `<prefix>/src/<dir>` exist?
+| `doc_in_corpus_dir` | Is the citing file under an exempt corpus (`.audittraining/`, `test*/`, fixtures)?
+|===
+
+See `TYPOLOGY.md` for the full typology, tropology, and the corrected decision
+procedure that the discriminants drive.
+
+== Scanner note
+
+This directory is itself a training corpus of illustrative `src/<dir>/`
+strings — the textbook `FP_corpus` case the dataset documents. It is exempted
+from Hypatia's SD022 rule via the repository `.hypatia-ignore`, so importing the
+corpus does not re-introduce the very false positives it catalogues.
