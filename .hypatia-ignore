@@ -24,3 +24,13 @@
 # and third_party/ carve-outs. Scaffolded repos inherit this file, so the
 # exemption travels with the template.
 structural_drift/SD022:docs-template/
+
+# ─── datasets/path-reference-drift/ is a labelled SD022 corpus ───────────
+#
+# This directory is the path-reference-drift practice dataset: a labelled
+# FP/TP corpus of `src/<dir>/` references seeded from hypatia's SD022 rule
+# (.audittraining/path-reference-drift/). Every record's `raw_text` is an
+# illustrative path string by design, so SD022 would re-flag the very
+# false positives the corpus catalogues — the textbook `FP_corpus` case the
+# dataset itself documents (`doc_in_corpus_dir` / `rule:skip_corpus`).
+structural_drift/SD022:datasets/path-reference-drift/
