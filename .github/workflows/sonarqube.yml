@@ -2,7 +2,7 @@
 # SonarQube Cloud (SonarCloud) static analysis. Analysis scope + exclusions live
 # in sonar-project.properties. Requires the SONAR_TOKEN repository secret
 # (Settings -> Secrets and variables -> Actions) and a SonarCloud project:
-# https://sonarcloud.io/project/overview?id=hyperpolymath_rsr-template-repo
+# https://sonarcloud.io/project/overview?id=hyperpolymath_hermeneia
 # Mirrors the boj-server arrangement.
 name: SonarQube
 on:
@@ -21,12 +21,20 @@ jobs:
     name: SonarQube
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      # Lift the secret to job scope so the step `if:` below can gate on it.
+      # Without a provisioned SONAR_TOKEN the CLI scanner cannot authenticate
+      # (exit 3); SonarCloud's server-side automatic analysis still runs and
+      # reports the quality gate, so the redundant CI scan is skipped rather
+      # than failing the job. Provisioning the SONAR_TOKEN secret activates it.
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0   # full history for accurate new-code detection
       - name: SonarQube Scan
+        if: env.SONAR_TOKEN != ''
         uses: SonarSource/sonarqube-scan-action@713881670b6b3676cda39549040e2d88c70d582e # v8.2.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
