@@ -1,64 +1,58 @@
 # SPDX-License-Identifier: MPL-2.0
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
-# STATE.a2ml — Project state checkpoint (META-TEMPLATE)
-#
-# This is the STATE file for rsr-template-repo itself.
-# When consumed by a new project, replace {{PLACEHOLDER}} tokens
-# and customize sections below for the target project.
+# STATE.a2ml — Project state checkpoint for hermeneia.
 
 [metadata]
-project = "rsr-template-repo"
-version = "0.2.0"
-last-updated = "2026-02-28"
+project = "hermeneia"
+version = "0.1.0"
+last-updated = "2026-06-26"
 status = "active"  # active | paused | archived
 
 [project-context]
-name = "rsr-template-repo"
-purpose = "Canonical RSR-compliant repository template providing scaffolding for all hyperpolymath projects — including CI/CD, AI manifests, ABI/FFI standards, container ecosystem, and governance infrastructure."
-completion-percentage = 95
+name = "hermeneia"
+purpose = "An experimental voking / imminence query language for Vocarium. Hermeneia calls trope-shaped stored particulars into a declared use-relation (invoke / evoke / convoke / transvoke / provoke / intervoke / revoke) and reports what is preserved, lost, licensed, or insufficient under a use-model. It separates the retrieved from the interpretable from the licensed."
+# Early/experimental estimate, not a verified figure. Per EXPLAINME §9, the
+# evidence boundary (conceptual design vs grammar draft vs parser prototype vs
+# Vocarium-integrated runner) is itself an open receipt; see §12 next-actions.
+completion-percentage = 20
 
 [position]
-phase = "maintenance"      # design | implementation | testing | maintenance | archived
-maturity = "production"    # experimental | alpha | beta | production | lts
+phase = "design"           # design | implementation | testing | maintenance | archived
+maturity = "experimental"  # experimental | alpha | beta | production | lts
 
 [route-to-mvp]
+# Milestones sourced from EXPLAINME §12 "Next receipts needed" — the honest
+# evidence still owed before the stronger "implemented query layer" claim holds.
 milestones = [
-  { name = "Phase 0: Core scaffolding (justfile, CI/CD, .machine_readable)", completion = 100 },
-  { name = "Phase 1: ABI/FFI standard (Idris2/Zig templates)", completion = 100 },
-  { name = "Phase 1b: AI Gatekeeper Protocol (0-AI-MANIFEST.a2ml)", completion = 100 },
-  { name = "Phase 1c: TOPOLOGY.md standard and guide", completion = 100 },
-  { name = "Phase 1d: Maintenance gate (axes, checklist, approach)", completion = 100 },
-  { name = "Phase 1e: Trustfile / contractiles", completion = 100 },
-  { name = "Phase 2: Container ecosystem templates (stapeln)", completion = 100 },
-  { name = "Phase 3: Multi-forge sync hardening", completion = 0 },
-  { name = "Phase 4: Guix reproducible shells", completion = 50 },
+  { name = "Minimal Hermeneia grammar", completion = 0 },
+  { name = "Voke-operation table with implemented/planned status", completion = 0 },
+  { name = "invoke example checking a Vocarium record against a use-model", completion = 0 },
+  { name = "provoke example showing why a candidate fails", completion = 0 },
+  { name = "transvoke example tracing a particular across contexts", completion = 0 },
+  { name = "revoke example withdrawing a verdict after warrant failure", completion = 0 },
+  { name = "JSON result shape (query/candidates/loss-shape/floor/verdict/reasons/missing-warrants)", completion = 0 },
+  { name = "Design note separating retrieved / interpretable / licensed", completion = 0 },
+  { name = "No-overclaim status table (Designed/Parsed/Planned/Implemented/Tested/Integrated)", completion = 0 },
 ]
 
 [blockers-and-issues]
-# No active blockers
+# No blockers recorded.
 
 [critical-next-actions]
 actions = [
-  "Container templates complete — test with `just container-init`",
-  "Validate container templates across wolfi-base and static Chainguard images",
-  "Harden multi-forge sync for GitLab/Bitbucket mirroring edge cases",
-  "Expand Guix development shell templates",
+  "Settle the evidence boundary (EXPLAINME §9): state which of design / grammar draft / parser prototype / query runner is currently true.",
+  "Produce a minimal grammar and a voke-operation table marking the implemented subset.",
+  "Add end-to-end fixture: Vocarium record → Hermeneia query → verdict-bearing result.",
+  "Add use-model fixtures where changing the use-model changes the verdict.",
 ]
 
 [maintenance-status]
 last-run-utc = "never"
-last-report = "docs/reports/maintenance/latest.json"
 last-result = "unknown"  # unknown | pass | warn | fail
 open-warnings = 0
 open-failures = 0
 
 [ecosystem]
-part-of = ["RSR Framework", "stapeln ecosystem"]
-depends-on = ["stapeln", "selur-compose", "cerro-torre", "svalinn", "vordr", "k9-svc"]
-
-# ---------------------------------------------------------------------------
-# NOTE FOR CONSUMERS: When using this template to create a new repo, reset
-# the fields above to your project's values and replace all {{PLACEHOLDER}}
-# tokens. The milestones above describe the TEMPLATE's evolution, not yours.
-# ---------------------------------------------------------------------------
+part-of = ["hyperpolymath voking stack"]
+depends-on = ["vocarium", "haec"]

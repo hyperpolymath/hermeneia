@@ -3,24 +3,24 @@
 # See: https://github.com/hyperpolymath/gv-clade-index
 
 [identity]
-uuid = "a5ea1382-a34c-5334-8a46-a2ebe904c810"
+uuid = "0db0aa5a-e193-556f-b178-a920784df715"
 primary-forge = "github"
 primary-owner = "hyperpolymath"
-canonical-name = "rsr-template-repo"
-prefixed-name = "rm-rsr-template-repo"
+canonical-name = "hermeneia"
+prefixed-name = "vk-hermeneia"
 
 [clade]
-primary = "rm"
+primary = "vk"
 secondary = ["gv"]
-assigned = "2026-03-16"
-rationale = ""
+assigned = "2026-06-26"
+rationale = "vk = the voking / trope family: Hermeneia (voking query language) + Haec (transformation language) + Vocarium (store of vokeable particulars). gv (secondary) registers it as estate-canon-conforming. uuid = UUIDv5(URL, \"github.com/hyperpolymath/hermeneia\")."
 
 [forges]
-github = "hyperpolymath/rsr-template-repo"
-gitlab = "hyperpolymath/rsr-template-repo"
-bitbucket = "hyperpolymath/rsr-template-repo"
+github = "hyperpolymath/hermeneia"
+gitlab = "hyperpolymath/hermeneia"
+bitbucket = "hyperpolymath/hermeneia"
 
 [lineage]
 type = "standalone"
-parent = "RSR template — scaffold for new repos"
-born = "2026-03-16"
+parent = "hyperpolymath voking stack — Vocarium (store) + Haec (transformation language)"
+born = "2026-06-26"
