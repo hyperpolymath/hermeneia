@@ -11,7 +11,7 @@ updates:
       interval: "weekly"
     groups:
       actions:
-        patterns:
+        patterns: 
           - "*"
 
   # Rust/Cargo
