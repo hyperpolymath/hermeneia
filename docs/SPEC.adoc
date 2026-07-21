@@ -1,0 +1,319 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+
+= Hermeneia — Applied Specification
+:toc: left
+:toclevels: 3
+:sectnums:
+:icons: font
+
+[abstract]
+This document specifies how Hermeneia binds to the rest of the trope stack: what
+it delegates, what it owns, and what it requires of a store. It is the *applied*
+counterpart to `THEORY.adoc`, which states the contribution independently of any
+implementation. Where the two disagree, `THEORY.adoc` states the intent and this
+document states the mechanism.
+
+Everything asserted here about a sibling repository was read from that
+repository's source on 2026-07-21 and is cited by path. Where a claim could not
+be verified, it is marked *UNVERIFIED* rather than assumed.
+
+== Position in the stack
+
+[source,text]
+----
+trope-particularity-workbench   normative vocabulary (effects, residual, verdict)
+trope-checker                   the decidable core; Idris2 reference + Rust fast core
+haec                            transformation language; emits Trope IR
+vocarium                        the store of vokeable particulars
+hermeneia                       the voking / query language        <-- this repo
+----
+
+Hermeneia sits at the *query layer*. The chain is
+`Vocarium (store) → Hermeneia (voke)` and
+`Haec (transform) → Hermeneia (query over transformed particulars)`.
+
+== The integration contract
+
+=== The checker CLI
+
+`trope-checker` ships a real, runnable executable. Verified from
+`trope-checker/src/idris2/Main.idr`:
+
+[source,text]
+----
+tropecheck <ir.json>
+
+stdout   p-sufficient
+       | p-insufficient\twitness=<edge-id>\tcoord=<coordinate>
+       | p-insufficient\t(no witness)
+       | validation-fault\t<msg>
+       | io-error\t<msg>
+       | usage: tropecheck <ir.json>
+
+exit     0  p-sufficient
+         1  p-insufficient
+         2  validation-fault
+         3  io error
+        64  usage
+----
+
+A second implementation, `tropecheck-rs`
+(`trope-checker/src/rust/`), is a dependency-free Rust binary validated against
+the Idris2 reference through the same conformance corpus. It presents the same
+CLI contract.
+
+[IMPORTANT]
+====
+*The CLI cannot produce the full loss vector.*
+
+`README.adoc` shows `show verdict, loss, warrant` rendering a four-line
+per-dimension vector (`quality Attenuated(6)`, `bearer Present`, …). The CLI
+does not emit this, and cannot be made to without changing `trope-checker`.
+
+The gap is larger than it looks. `Checker.Check.check` returns
+`Insufficient (List String) (Maybe (String, String))` — it computes *every*
+violated coordinate. `Main.idr` then discards that list, printing only the
+single witness edge and coordinate. So the CLI is strictly lossier than the
+checker's own verdict type.
+
+Consequences, which the implementation plan honours:
+
+* Slice v1 renders `verdict` with `witness` and `coord`. It does *not* render
+  `show loss`.
+* Rendering the full vector requires either (a) computing the accumulated grade
+  locally, or (b) extending the checker's output. Both are deferred, and (b) is
+  the better contribution — it surfaces data the checker already has. See
+  <<algebra>>.
+====
+
+=== Trope IR v0.2
+
+Input is *Trope IR v0.2*. The schema is present in two repositories and they are
+**byte-identical after normalisation** (verified by structural diff on
+2026-07-21):
+
+* `trope-checker/schemas/trope-ir.schema.json`
+* `haec/design/trope-ir.schema.json`
+
+Top level requires `version`, `profile`, `nodes`, `edges`, `use_model`.
+
+[source,text]
+----
+{ "version": "0.2",
+  "profile": "prevent",
+  "nodes":  [ { "id", "type": Trope|Floating|Codomain, "present": [field…] } ],
+  "edges":  [ { "id", "effect", "inputs": [nodeId…], "output": nodeId,
+                "grade": { "fate": {quality,bearer,context,record}, "bond", "merge" } } ],
+  "use_model": { "output": nodeId, "floor": { … partial … } } }
+----
+
+Two constraints matter for the emitter, both read from the schema's conditional
+`allOf`:
+
+* `edge.inputs` has `maxItems: 2` globally.
+* `effect: "fuse"` requires *exactly* two inputs and a `Fused` merge carrying a
+  `tau` label; **every other effect requires exactly one input**.
+
+The `prevent` profile makes the deceptive elements (`Falsified`, `Misbound`,
+`Conflated`) unrepresentable at the IR boundary — the schema rejects them
+(`trope-checker/tests/conformance/schema-invalid/`). Hermeneia therefore cannot
+emit a deceptive grade even by accident, which is the intended seal.
+
+=== The use-model *is* the floor
+
+This is the load-bearing identification, and it is what makes the binding
+tractable. In `Checker.Ir.Floor` every coordinate is `Maybe` — an absent
+coordinate imposes no demand. A use-model, on the wire, is exactly
+`{ output, floor }`.
+
+So `under use_model "critical-paraphrase"` resolves to a partial demand vector,
+and the verdict is the single comparison `floor ⊑ acc(output)`.
+
+== What Hermeneia must not do [[algebra]]
+
+[CAUTION]
+====
+*Hermeneia must not reimplement the grade algebra.*
+
+The algebra is proved in Idris2 (with Lean and Agda artefacts alongside) inside
+`trope-checker`. A fresh Rust reimplementation would fork the exact semantics
+the whole design exists to protect, and no test suite would reliably catch the
+drift. This is ruled out permanently, not deferred.
+====
+
+There is a real tension, and it should be stated rather than glossed. `evoke`'s
+`limit quality_loss <= Attenuated(3)` is a bound in the *same* retention order,
+and bounded traversal needs `gradeCompose` and `gradeLte` per candidate. Three
+doors:
+
+[cols="1,3,2",options="header"]
+|===
+| Door | Mechanism | Status
+
+| (a) Shell out per candidate
+| One `tropecheck` process per neighbour
+| *Adopted for now.* Correct by construction. At seed-corpus scale (the README
+  example; tens of records) the process cost is irrelevant.
+
+| (b) Link the Rust core
+| Add a `[lib]` target to `tropecheck-rs` and depend on it
+| *Deferred.* Almost certainly the eventual answer — it shares validated source
+  rather than forking it. But it modifies another repository and is not needed
+  yet.
+
+| (c) Reimplement in Rust
+| Port the algebra into `hermeneia-core`
+| *Rejected permanently.* Forks the semantics.
+|===
+
+The reason this decision is safe to defer is that it lives entirely behind one
+trait. `hermeneia-core` never touches the algebra: for `invoke`/`provoke`/
+`intervoke` it emits a DAG and the checker composes internally
+(`Check.accFuel`); for `evoke`/`convoke` the loss-bounded filtering happens
+inside a `StoreProvider` implementation, not the planner. At Vocarium scale,
+Vocarium implements the trait and owns that cost.
+
+[NOTE]
+====
+A C ABI is *not* an available door. `trope-checker/src/interface/Abi/` is
+rsr-template residue — it declares `rsr_init`, `rsr_process`, `rsr_get_error`
+against `librsr`, and carries the comment `Simplified for template`. There is no
+exported ABI for the grade algebra.
+====
+
+== The division of labour
+
+Only three of the seven voking operations need a verdict at all. This is what
+makes Hermeneia a language rather than a wrapper around a checker.
+
+[cols="1,2,3",options="header"]
+|===
+| Operation | Owner | What happens
+
+| `invoke`
+| core → checker
+| plan → store lookup → compose path → emit IR → `tropecheck` → render verdict
+
+| `provoke`
+| core → checker
+| as `invoke`, adversarially: substitute the candidate, report failure points
+
+| `intervoke`
+| core → checker
+| compare candidate paths; one checker call per branch, then order the results
+
+| `evoke`
+| store
+| neighbourhood traversal within a loss bound. No checker.
+
+| `convoke`
+| store
+| constellation over several particulars. No checker.
+
+| `transvoke`
+| core
+| path composition over Haec edges; checker only if a verdict is requested
+
+| `revoke`
+| core
+| licence-state mutation over the warrant graph. No checker.
+|===
+
+Hermeneia owns query planning, store traversal, path composition, and licence
+state. `trope-checker` owns the grade algebra and nothing else.
+
+== The store seam
+
+No trope corpus exists anywhere yet — `vocarium` is scaffolding, as is `haec`.
+Hermeneia therefore ships its own store behind a narrow trait, so that Vocarium
+can be substituted without the planner changing.
+
+[source,rust]
+----
+pub trait StoreProvider {
+    fn get(&self, id: &TropeId) -> Result<Trope>;
+    fn find(&self, quality: &str, ctx: Option<&str>) -> Result<Vec<Trope>>;
+    /// Bounded neighbourhood. The bound is in the retention order, so the
+    /// implementation owns the algebra cost (see <<algebra>>).
+    fn neighbours(&self, id: &TropeId, max_loss: Delta) -> Result<Vec<Trope>>;
+    fn paths(&self, from: &TropeId, to: &TropeId) -> Result<Vec<Path>>;
+    /// Resolves a named use-model to its partial demand vector (the floor).
+    fn use_model(&self, name: &str) -> Result<UseModel>;
+}
+----
+
+The seed corpus is the README's own worked example — de Man, "authentic
+language", `critical-paraphrase` — so that the documentation and the tests are
+one artefact and cannot drift apart.
+
+=== What Vocarium must eventually supply
+
+Stated now so that Vocarium can be built against it rather than retrofitted:
+
+. Particulars addressable by stable id, each with the four fields
+  Φ = {quality, bearer, context, record}.
+. Transformation edges carrying a *declared grade* — Vocarium stores grades, it
+  does not compute them; Haec produces them.
+. Named use-models resolving to partial floors.
+. Warrants, and the edges that make a warrant support a verdict — without which
+  `revoke` has no graph to contract over.
+. Verdict records with stable ids, so that `revoke verdict "v_2041"` can name one.
+
+== Validation strategy
+
+`trope-checker/tests/conformance/` is a ready-made golden corpus:
+`cases.json` names each fixture with its expected verdict and, for insufficient
+cases, the expected `witness` and `witness_coordinate`.
+
+Hermeneia's IR emitter is validated by *round-trip against that corpus*: for each
+fixture, an equivalent Hermeneia query must emit IR that the checker judges with
+the same verdict, witness, and coordinate. This tests the emitter against the
+same oracle that validates the Rust fast core against the Idris2 reference,
+which is the strongest available guarantee short of a proof.
+
+Schema validation is separate and prior: emitted IR must validate against
+`trope-ir.schema.json` before it is ever handed to the checker, so that a
+malformed emission is a Hermeneia bug rather than a `validation-fault` exit.
+
+== Implementation layout
+
+[source,text]
+----
+src/hermeneia-syntax/    .hil lexer, parser, AST
+src/hermeneia-core/      voke operations, planner, licence state
+src/hermeneia-store/     StoreProvider trait + JSONL stub + seed corpus
+src/hermeneia-ir/        Trope IR v0.2 emitter, schema-validated
+src/hermeneia-cli/       `hermeneia query …`, invokes tropecheck
+verification/proofs/idris2/Voke/   voke algebra laws
+----
+
+=== Slice v1
+
+One command, end to end:
+
+[source,hil]
+----
+invoke "authentic language"
+under use_model "critical-paraphrase"
+show verdict
+----
+
+parse → plan → seed-store lookup → compose path → emit Trope IR v0.2 →
+schema-validate → `tropecheck` → render verdict with witness and coordinate.
+
+`show loss` is deliberately *not* in slice v1; see the contract note above.
+
+Then widen in cost order: `evoke` and `convoke` (store-only, no checker), then
+`transvoke`, `provoke`, `intervoke`, and finally `revoke` with its warrant graph.
+
+== Open questions
+
+. *The loss vector.* Extending `tropecheck` to emit the violated-coordinate list
+  it already computes would let `show loss` be honest. This is an upstream
+  contribution to `trope-checker`, to be proposed rather than taken.
+. *Grade provenance.* Hermeneia never computes a grade; it composes declared
+  ones. Whether a declared δ of 6 is *correct* for a given paraphrase is outside
+  the system, and `THEORY.adoc` §8 says so.
+. *`revoke` persistence.* Licence state must outlive a process for revocation to
+  mean anything. Where it lives — Vocarium or Hermeneia — is unsettled.
