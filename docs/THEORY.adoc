@@ -1,0 +1,284 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Retrieved, Interpretable, Licensed: the Theory of a Voking Query Language
+:revdate: 2026-07-21
+:sectnums:
+:stem: latexmath
+
+[abstract]
+== Abstract
+
+Every deployed query language answers one question — _which stored items match?_ — and leaves two others unasked: _can this item be meaningfully read in the present context?_ and _is the use licensed, given what has been lost between the original record and the item in hand?_ In practice the three collapse into one, and the collapse has a cost: in evidential reasoning and AI-assisted scholarship, "the system retrieved it" is routinely treated as "the system licensed it." This paper presents the theory of Hermeneia, an experimental query language in which the three questions are kept formally distinct. Its semantic core is a small, machine-checked algebra: every transformation of a stored particular carries a six-coordinate _grade_ recording what kind of loss it inflicted; grades compose associatively along transformation paths, the fidelity coordinate by tropical addition over stem:[\mathbb{N}\cup\{\infty,\top\}]; a declared _use-model_ is a partial demand vector — a _floor_ — over the same coordinates; and an answer is _licensed_ (p-sufficient) exactly when the floor lies below the accumulated grade in a componentwise retention order. Licensing thereby becomes a decidable order-theoretic question rather than a matter of judgement. Around this core sit seven _voking_ operations, of which one — `revoke`, licence withdrawal as contraction over a warrant graph — has no analogue in any existing query language known to us. The contribution claimed is the conjunction, not any single ingredient: the trichotomy of retrieved, interpretable, and licensed, made operational in one small algebra.
+
+== Introduction
+
+A query language is an instrument for asking a store what it contains. SQL asks it of tables, SPARQL of graphs, Datalog of relations closed under rules. In each case the shape of the answer is the same: a set of items satisfying a condition. The condition may be arbitrarily sophisticated; the _status_ of the answer is not. An item is in the result or it is not, and being in the result is the only endorsement the system offers.
+
+That single endorsement silently conflates three claims of very different strength:
+
+Retrieved:: the store found the item; it satisfies the stated condition.
+Interpretable:: the item can be meaningfully read in the present context — enough of its original character survives whatever processing produced it that a reader can tell what it is _of_ and _about_.
+Licensed:: the present use is entitled to rest on the item — the loss between the original record and the item in hand is within the tolerance this use declared it could bear.
+
+For many uses the conflation is harmless. But there is a growing class of uses where it is exactly the failure mode. A paraphrase pipeline retrieves a sentence that has passed through three summarisations and quotes it as though it carried the theoretical force of the original. A retrieval-augmented system surfaces a scanned letter whose compression discarded an unknown amount of detail, and an argument is built on a stroke the scan may not faithfully contain. An evidential chain rests on a measurement long ago collapsed to a yes/no checkbox, and downstream reasoning treats the checkbox as the measurement. In each case the item was genuinely retrieved, arguably interpretable, and not licensed for the use to which it was put — and no layer of the system could notice, because no layer had the vocabulary for the difference.
+
+The consequence is worth stating plainly. In AI-assisted scholarship and evidential reasoning as currently practised, _the retrieval system's answer is treated as an epistemic endorsement it never made_. The system said "this matches your pattern"; the workflow heard "this will bear your weight."
+
+Hermeneia is a query language designed around the missing vocabulary. Its unit of storage is a _particular_ — a property-instance with a bearer, a context, and a provenance record — rather than a bare value; its unit of query is not selection but _voking_: calling a stored particular into relation with a declared use and asking what it can become there. The primitive question is not "what rows match?" but "can this particular become an answer here, at what loss, under what warrant, with what evidence still missing?" The answer is a _verdict_, computed rather than judged: the paper's central claim is that "is this answer licensed?" reduces to one decidable order comparison in a small graded algebra whose laws are machine-checked.footnote:[The algebra and its laws — associativity, units, monotonicity, coherence — are formalised and totality-checked in a dependently typed proof development maintained alongside the language specification. Nothing in this paper depends on that development; it is cited only as evidence that the laws hold as stated.]
+
+Section 3 positions the design against its neighbours, each of which captures one axis of the problem. Section 4 states the contribution. Section 5 gives the semantics, with a worked example. Section 6 presents the seven voking operations. Section 7 treats `revoke` — licence withdrawal as contraction over a warrant graph — at length, since it is the operation with no precedent in query languages. Section 8 is honest about limitations.
+
+== Related work and position
+
+No single ingredient here is unprecedented. Each neighbouring tradition captures one axis and misses the conjunction; the point of this section is to say precisely which, and precisely what is missed.
+
+*Retrieval languages.* SQL descends from the relational model <<codd70>>; SPARQL and Datalog generalise the pattern to graphs and recursive rules. All three answer _retrieved_ superbly and have nothing to say about the other two claims: a result set carries no record of what was lost in producing its members, no notion of a use against which the loss might be measured, and no verdict beyond membership. This is the design, not a defect — but it is why every system built on them must reconstruct licensing informally, if at all.
+
+*Provenance systems.* The provenance literature is the nearest large body of work. Why- and where-provenance <<buneman01>> record _which_ source items contributed to a result; PROV-O <<provo>> standardises a vocabulary for recording _how_ an artefact came to be. Semiring provenance <<gkt07>> goes furthest: it annotates every result of a positive relational query with a commutative-semiring element, computed compositionally from source annotations, so that one framework specialises to lineage, counting, trust, and access levels. Structurally this is the closest neighbour of all — results carrying algebraic annotations that compose along the derivation — and the debt should be acknowledged plainly.
+
+The differences are three, and they are load-bearing. First, _what the annotation measures_: a provenance polynomial describes the derivation — which combinations of source tuples yield the result — whereas a grade describes what the derivation _did to the particular_: how much of its being-this-one-in-this-situation survived, along six named coordinates. One can read a provenance polynomial and learn nothing about whether the result still carries the fidelity its use requires. Second, _the demand side_: semiring provenance has no counterpart of the floor — no construct by which a use declares the minimum annotation it will accept and receives a verdict. Annotations inform; they do not license. Third, _the deceptive elements_: the grade algebra reserves, in each coordinate, an element for _deceptive_ loss (a falsified value, a misbound bearer, an unlabelled merge) that is absorbing under composition and fails every honest demand — a veridicality axis with no semiring analogue. Hermeneia can be glossed as "provenance where the annotation measures retained particularity and is checked against a declared demand" — the gloss shows both the kinship and the gap.
+
+*Belief revision.* The AGM theory of belief change <<agm85>> supplies the other essential neighbour: contraction, the rational removal of a belief together with its support, governed by postulates of minimal change. Hermeneia's `revoke` is a contraction operation, and Section 7 takes the comparison seriously. The short version: AGM contracts _beliefs_ from a deductively closed set; `revoke` withdraws _licences_, which are use-relative and graded, so withdrawal is neither the removal of an item nor of a proposition, and minimal change is answered by recomputation in the grade order rather than by choice among remainder sets.
+
+*Information-flow control.* Lattice-model security <<denning76>> attaches ordered labels to data, propagates them monotonically, and forbids improper flows. The formal skeleton — ordered annotations, monotone propagation, a comparison gating an action — is visibly shared with the grade algebra. The axis it measures, however, is confidentiality: who may see a value. Grades measure interpretive fidelity: what a value may still be taken _as_. A label answers "may this flow there?"; a grade answers "may this count as that, here?" The machinery rhymes; the subject matter does not overlap.
+
+*Fuzzy and probabilistic databases.* Fuzzy set theory <<zadeh65>> and probabilistic databases <<suciu11>> attach degrees to results — membership and probability of truth respectively. These are degrees of a different thing. A tuple with probability 0.93 is _probably a fact_; a particular with quality-fate Attenuated(3) is _certainly the residue of a fact, with a bounded amount of its individuating content gone_. A probabilistic database with perfect certainty can still serve an unlicensed answer; a heavily attenuated particular can still be certainly what it is. Degree of truth and degree of particularity retained are orthogonal.
+
+*Graded type systems.* Formally, the grade algebra is a graded monoid of the kind used in graded monads and coeffect systems <<katsumata14>> <<petricek14>>, and the verdict has the flavour of checking a produced grade against a demanded one. Tropes as abstract particulars are established metaphysics <<williams53>> <<campbell90>>. The theoretical machinery is deliberately unoriginal; what is claimed is its fit to this problem.
+
+The position, then: retrieval languages have the store but no loss and no demand; provenance systems annotate derivation rather than retained particularity, and have no floor; belief revision has withdrawal but no grades and no uses; information-flow has ordered labels for the wrong axis; uncertain databases grade truth rather than particularity. Each misses the conjunction. The conjunction is the contribution.
+
+== The contribution
+
+Stated sharply, Hermeneia contributes:
+
+. *The trichotomy as a formal distinction.* _Retrieved_, _interpretable_, and _licensed_ are given distinct formal correlates: membership in a result of traversal; a grade above the deceptive and degenerate elements of the algebra; and p-sufficiency against a declared floor. A result may hold any combination of the three statuses, and the language reports which.
+. *Use-models as partial demand vectors.* A use-model is not a description, a tag, or a policy document: it _is_ a partial vector of minimum demands over the six grade coordinates. This identification is the paper's spine, because it is what makes licensing computable: a use enters the system only through its floor, and the floor lives in the same order as the grades.
+. *Licensing as a decidable order comparison.* An answer is licensed exactly when stem:[\mathrm{floor}(U) \sqsubseteq \mathrm{acc}(v)] — the declared floor lies below the grade accumulated along the answer's transformation history, in a componentwise retention order. Both sides are finite data; the comparison is decidable; failure comes with a witness naming the coordinate and edge responsible.
+. *Licence withdrawal as a first-class operation.* `revoke` contracts the set of standing licences over a warrant graph when a warrant fails, with semantics that recompute rather than choose (Section 7).
+
+Equally important is what is _not_ claimed. The algebra does not decide whether a grade annotation is true of the transformation it describes; it composes declared grades soundly and compares them honestly (Section 8). No single ingredient — graded monoids, tropical semirings, componentwise orders, contraction — is novel. The claim is that this conjunction, organised as a query language, is new and useful.
+
+== Semantics
+
+=== Particulars and grades
+
+The stored objects are _particulars_: property-instances in the trope-theoretic sense — _this_ quality, here, borne by _this_ bearer <<williams53>> <<campbell90>> — enriched with four fields,
+
+[stem]
+++++
+\Phi = \{\mathsf{quality}, \mathsf{bearer}, \mathsf{context}, \mathsf{record}\},
+++++
+
+carrying respectively the situated quality itself, the entity it is a quality of, the situation individuating it, and an honest provenance of how the record came to be.
+
+Particulars are transformed — paraphrased, projected, compressed, merged — and every transformation carries a _grade_: a record of what it did, in kind and not merely in amount. A grade has six coordinates:
+
+[stem]
+++++
+g = (f_{\mathsf{quality}},\; f_{\mathsf{bearer}},\; f_{\mathsf{context}},\; f_{\mathsf{record}},\; \mathit{bond},\; \mathit{merge})
+++++
+
+— a _field-fate_ for each of the four fields, a _bond_ coordinate for the integrity of the quality–bearer tie, and a _merge_ coordinate for cardinality and its honesty.
+
+*Field fates.* A fate says what survived of one field: `Present` — survives faithfully; `Attenuated(δ)` — survives with fidelity degraded by δ; `Predicated` — survives only as the value of a predicate over it (the checkbox); `Dropped` — withheld entirely; `Falsified` — the deceptive dual, a value asserted faithful that is in fact false. The fidelity index δ ranges over stem:[\mathbb{N} \cup \{\infty, \top\}]: finite δ is a quantified loss; stem:[\infty] is total quantified loss; stem:[\top] is loss of _unknown_ amount — the honest answer when loss is real but unbounded or unmeasured.
+
+*Bond.* `Intact` (bearer present, tie holds) above `Withheld` (bearer dropped by projection, tie recoverable in principle) above `Severed` (tie cut, quality asserted free-standing) above `Misbound` — the deceptive dual, a quality presented as borne by a bearer that is not its bearer.
+
+*Merge.* `Single` (no merge) above `Fused` (two blended into one, labelled by provenance, plurality recoverable) above `Conflated` — the deceptive collapse, unlabelled, plurality irrecoverable.
+
+Each coordinate thus contains exactly one _deceptive_ element — `Falsified`, `Misbound`, `Conflated` — at the bottom of its order. A coherence condition (HC-4) ties two coordinates together: `Intact` and `Misbound` are well-formed only where the bearer field is present; `Withheld` and `Severed` only where it is absent. Grades violating this are unrepresentable at the interchange boundary.
+
+The _unit grade_ is
+
+[stem]
+++++
+\varepsilon = (\mathsf{Present}, \mathsf{Present}, \mathsf{Present}, \mathsf{Present}, \mathsf{Intact}, \mathsf{Single}),
+++++
+
+the grade of a transformation that loses nothing.
+
+=== Composition: the tropical structure
+
+Sequencing two transformations composes their grades by stem:[\triangleright], defined componentwise. On the fidelity index the operation is _tropical addition_ — the additive accumulation of loss familiar from the min-plus semiring, extended with two absorbing tops:
+
+[source,text]
+----
+δ₁ ⊕ δ₂ = δ₁ + δ₂   (both finite)      losses add
+δ  ⊕ ∞  = ∞  ⊕ δ = ∞                   total loss absorbs finite loss
+δ  ⊕ ⊤  = ⊤  ⊕ δ = ⊤                   unknown loss absorbs everything
+----
+
+so that `Attenuated(δ₁) ▷ Attenuated(δ₂) = Attenuated(δ₁ ⊕ δ₂)`. On the fates more broadly, `Present` is the unit; `Dropped` absorbs honest continuations (nothing further can be lost from nothing); collapse to `Predicated` subsumes prior fidelity loss; and the deceptive `Falsified` is a _two-sided zero_ — in particular, an upstream `Dropped` does not erase a downstream lie. Bond and merge compose by the meet on their honest chains with the deceptive element absorbing. Three laws matter and are machine-checked over the full carrier:
+
+L1 (associativity):: stem:[(g_1 \triangleright g_2) \triangleright g_3 = g_1 \triangleright (g_2 \triangleright g_3)].
+L2 (unit):: stem:[\varepsilon \triangleright g = g = g \triangleright \varepsilon].
+L4 (monotonicity):: stem:[\triangleright] is monotone in each argument with respect to the retention order below; composing after more loss never yields more retention.
+
+L1 and L2 make grades a monoid; L4 makes verdicts stable under refinement of a pipeline's description. Absorption of the deceptive elements has a moral reading: once a merge is unlabelled or a value falsified, _no further processing can compose it away_. Deception is not laundered by subsequent honest work.
+
+=== The retention order
+
+Define stem:[x \sqsubseteq y] to mean "stem:[y] retains at least as much particularity as stem:[x]". On grades this is the componentwise product order. On each fate coordinate it is a chain:
+
+[stem]
+++++
+\mathsf{Falsified} \sqsubset \mathsf{Dropped} \sqsubset \mathsf{Predicated} \sqsubset \mathsf{Att}(\top) \sqsubset \mathsf{Att}(\infty) \sqsubset \cdots \sqsubset \mathsf{Att}(1) \sqsubset \mathsf{Present},
+++++
+
+with the fidelity segment ordered so that retention _decreases_ as loss grows: stem:[\mathsf{Att}(0) \sqsupset \mathsf{Att}(1) \sqsupset \cdots \sqsupset \mathsf{Att}(\infty) \sqsupset \mathsf{Att}(\top)], and `Attenuated(0)` identified with `Present` at normalisation.
+
+Two placements deserve comment. `Predicated` sits _below every attenuation_: a use that needs the quality itself, however degraded, rightly rejects the checkbox. And stem:[\top] — unknown loss — is _below_ stem:[\infty] — total loss. This looks odd until one asks what the order is for: it exists to be compared against demands, and a demand met by "everything was lost" is one that tolerated arbitrary loss, whereas "an unknown amount was lost" cannot be certified to meet _any_ quantified tolerance. Unknown satisfies no bound, so it is the bottom of the fidelity segment — the honest answer for unbounded recursion, treated as the weakest possible warrant, which is what it is.
+
+The order is decidable: every coordinate is finite except fidelity, which is a decidable linear order.
+
+=== Use-models, floors, and licensing
+
+Here is the paper's spine. _A use-model is a partial demand vector over the grade coordinates._ Formally a use-model stem:[U] declares a _floor_: a record assigning to each of the six coordinates an _optional_ minimum,
+
+[stem]
+++++
+\mathrm{floor}(U) : \prod_{c \,\in\, \text{coords}} \; \mathsf{Maybe}\;(\text{carrier of } c).
+++++
+
+Partiality is load-bearing. An absent coordinate imposes _no demand_: a use that cares only about quality fidelity says nothing about, and is never failed by, the record field. Use-models are thereby cheap to declare and declare exactly what they mean — unstated demands default to neither extreme.
+
+Answers arrive with histories: a directed acyclic graph whose nodes are particulars and whose edges are graded transformations. The _accumulated grade_ of a node stem:[v] is defined backwards over this DAG:
+
+[stem]
+++++
+\mathrm{acc}(v) =
+\begin{cases}
+\varepsilon & v \text{ a root (an original record)}\\[2pt]
+\mathrm{acc}(u) \triangleright g_e & e : u \to v \text{ with grade } g_e\\[2pt]
+\bigl(\mathrm{acc}(u_1) \sqcap \mathrm{acc}(u_2)\bigr) \triangleright g_e & e : (u_1, u_2) \to v \text{ a fuse,}
+\end{cases}
+++++
+
+where stem:[\sqcap] is the componentwise meet: a fused particular is credited with no more retention, in any coordinate, than its worse-retaining constituent.
+
+The verdict is then a single comparison. An answer stem:[v] is *p-sufficient* — _licensed_ — for use-model stem:[U] exactly when
+
+[stem]
+++++
+\mathrm{floor}(U) \;\sqsubseteq\; \mathrm{acc}(v),
+++++
+
+read coordinatewise, absent coordinates vacuously satisfied. Otherwise the verdict is *p-insufficient*, reported with the violated coordinates and a _witness_: an edge at which the accumulated grade already violates the floor in one of them — the place to repair, not merely the fact that repair is needed. Both sides of the comparison are finite data; the verdict is decidable and total. By L4 it is also conservative in the right direction: declaring _more_ loss can only move verdicts from licensed to unlicensed, never the reverse.
+
+This is what "licensing as an order-theoretic question" means concretely. The judgement-laden work — deciding how much loss a use can bear, and grading what a transformation did — is pushed to the declarations, where it is visible, contestable, and revisable. What remains at query time is arithmetic.
+
+=== A worked example: the attenuated letter
+
+.The attenuated letter
+====
+A handwritten letter is scanned under heavy compression. The archivist honestly cannot say which strokes were lost — only that losses occurred. The single edge `attenuate : letter → scan` therefore carries fate `Attenuated(⊤)` on every field: real loss, unknown amount. Bond `Intact`, merge `Single`.
+
+A scholar's use-model declares one demand: `quality ⊒ Attenuated(5)` — tolerate a quantified quality loss of up to 5, care about nothing else.
+
+The letter is a root, so stem:[\mathrm{acc}(\mathsf{letter}) = \varepsilon] and stem:[\mathrm{acc}(\mathsf{scan}) = \varepsilon \triangleright g = g]: quality fate `Attenuated(⊤)`. The verdict asks whether stem:[\mathsf{Att}(5) \sqsubseteq \mathsf{Att}(\top)] — does the scan retain at least as much as a loss-of-5 residue? It does not: stem:[\top] lies below every finite loss in the retention order. Verdict: *p-insufficient*, violated coordinate `quality`, witness: the `attenuate` edge.
+====
+
+It is worth pausing on why this is the _right_ answer and not a limitation. The scholar asked for a certified bound; the record honestly contains none. Returning the scan as licensed would convert "we don't know how much was lost" into "no more than 5 was lost" — manufacturing a warrant out of ignorance. The tropical order refuses the conversion structurally: stem:[\top] satisfies no finite floor, and absorption guarantees it survives any downstream composition, so honest ignorance can never be laundered into a quantified certification. The scan remains _retrieved_ and, cautiously, _interpretable_; it is not _licensed_ for a use that declared a quantified tolerance. And the verdict names its own remedy: re-scan the letter, obtain a measured bound for the existing scan, or revise the use-model to one that does not demand what the evidence cannot supply.
+
+== The voke family
+
+Hermeneia's operations are organised around _voking_: calling a stored particular into a use-relation. There are seven. Three are _verdict operations_ — they take a declared use-model and return a verdict computed by the semantics of Section 5. Four are _traversal or state operations_ — they explore the store's graph or modify the standing licences, and return no verdict of their own. The signatures are semantic, not concrete syntax; stem:[P] ranges over particulars, stem:[U] over use-models, stem:[C] over contexts.
+
+*Verdict operations.*
+
+`invoke` stem:[: P \times U \to \mathsf{Verdict}]::
+The fundamental act: call a particular into a declared use. Returns the verdict, the accumulated loss by coordinate, the warrant the verdict rests on, and — on failure — the violated coordinates with witness edges, i.e. the missing evidence. `invoke` is where the trichotomy separates: retrieval found the particular, the grade shows whether it is above the deceptive floor, the verdict says whether the use is licensed.
+
+`provoke` stem:[: P_{\mathit{cand}} \times P \times U \to \mathsf{Verdict}]::
+Call a candidate into _challenge_ against a particular under a use-model: does this candidate substitution survive being measured against the original under this use? Returns the failure points. The typical client is paraphrase discipline: test "real language" against "authentic language" under a technical use-model and receive the coordinates at which the substitution fails.
+
+`intervoke` stem:[: \{P_1, \dots, P_n\} \times U \to \mathsf{Verdict}^n]::
+Call _between_ candidates or trope paths: comparative verdicts under one use-model, ranking alternatives by where and how badly each fails — "which of these witnesses will bear the most weight here?"
+
+*Traversal and state operations.*
+
+`evoke` stem:[: P \times C \times \mathrm{bound} \to \mathcal{P}(P)]::
+Call forth neighbouring or latent particulars: traversal within a context, filtered by a retention bound (say, everything reachable without exceeding quality loss `Attenuated(3)`). No use-model, no verdict: `evoke` answers _retrieved-and-nearby_, the bound serving as a coarse interpretability filter.
+
+`convoke` stem:[: \{P_1, \dots, P_n\} \to \mathsf{Constellation}]::
+Call multiple particulars _together_ into a shared interpretive scene, exposing their mutual relations and joint grades. It assembles material for judgement; it does not judge.
+
+`transvoke` stem:[: P \times C_{\mathit{from}} \times C_{\mathit{to}} \to \mathsf{PathReport}]::
+Call a particular _across_ — from one context, bearer, record, or use to another — tracing the path, its accumulated attenuation, and which floors would fail along the way. The exploratory dual of `invoke`: it does not license the crossing, it shows what the crossing costs.
+
+`revoke` stem:[: \mathsf{VerdictId} \times \mathsf{Reason} \to \mathsf{Contraction}]::
+Withdraw a previously issued licence. Alone in the family, `revoke` modifies standing state — the licences in force — rather than computing over the store. Treated at length next.
+
+The division of labour is deliberate. Traversal operations may freely over-collect: returning an unlicensed particular from `evoke` costs nothing, because nothing downstream may treat it as licensed without an `invoke`. Verdict operations are the only gate through which _licensed_ can be asserted, and only as the order comparison of Section 5.
+
+== `revoke` and warrant
+
+Query languages have no verb for taking an answer back. A result set, once returned, has no further career: the language records neither that anything rested on it nor what should happen if its ground gives way. Deletion is not withdrawal — deleting a row does not visit the conclusions built on it — and view maintenance propagates _data_ changes, not changes in _entitlement_. `revoke` is the claim that withdrawal deserves language-level semantics.
+
+=== Warrants and the warrant graph
+
+Every p-sufficient verdict rests on grounds. Concretely, a verdict's _warrant_ is the set of assumptions its computation consumed: the grade annotations on the edges of the answer's transformation history (each a claim that a transformation lost only so much), the identity and floor of the use-model, and any auxiliary evidence the store holds for those claims — a source check, a measurement, an attestation. The system therefore maintains a _warrant graph_: a directed graph in which warrant elements support verdicts, and verdicts may in turn function as warrant elements for further verdicts — as when a licensed paraphrase is itself invoked, downstream, as the input of another use. A standing licence is a p-sufficient verdict whose warrant is intact.
+
+`revoke` takes a verdict or a warrant element, and a reason — `revoke verdict v_2041 because warrant source_check_failed` — and performs a _contraction_: it removes the failed element, then determines the fate of every licence whose warrant transitively included it.
+
+=== The semantics of contraction
+
+The crucial design decision is that the fate of an affected licence is _recomputed, not chosen_. When a warrant element fails, there are three cases, and the grade algebra decides among them:
+
+. *The element was load-bearing and irreplaceable* — say, the only attestation of an edge's grade; with it gone, the edge's honest grade is unknown. The edge is re-graded conservatively (fidelity stem:[\top], or the coordinate's honest bottom, as the failure dictates), the accumulated grade recomputed, the floor comparison re-run. By L4 the recomputed grade can only have moved down in retention, so the verdict can only move from licensed toward unlicensed, never the reverse. If the floor now fails, the licence is withdrawn.
+. *The element degraded but did not vanish.* A source check that downgrades a claimed `Attenuated(2)` to a measured `Attenuated(6)` worsens the warrant without destroying it. The recomputation may find the floor still satisfied — a use-model tolerating loss 10 keeps its licence — in which case the licence _survives revocation of its original grounds_, standing now on the degraded warrant. Withdrawal is graded because licences are graded.
+. *The element was redundant.* The warrant graph shows independent support sufficient for the floor; the licence stands, its warrant pruned.
+
+The contraction then propagates: every withdrawn licence is itself a warrant element for whatever was built on it, so its withdrawal triggers the same recomputation downstream until the frontier stabilises. Termination is immediate — the warrant graph is finite and recomputation only removes or degrades — and the result is a _revocation report_: licences withdrawn, licences degraded but surviving, downstream uses now standing on withdrawn ground. One further property matters: revocation is _recorded_, not silent. A withdrawn licence leaves a dated, reasoned trace, because an evidential practice that forgets its retractions is not an evidential practice.
+
+=== Comparison with AGM contraction
+
+The AGM theory <<agm85>> axiomatises rational contraction of a belief set: remove a proposition and enough of its support that it is no longer entailed, changing as little else as possible. `revoke` is recognisably in this family — it removes a commitment and visits its consequences — and the comparison is illuminating precisely where it fails.
+
+First, _what is contracted_. AGM contracts propositions from a deductively closed set of beliefs. `revoke` does not remove the particular (it remains stored, retrieved and perhaps interpretable as ever), and does not remove a proposition; it removes an _entitlement_ — the standing of a specific answer under a specific use-model. Because licences are use-relative, contraction is naturally _scoped_: the failure of a warrant for a critical-paraphrase use need not touch the same particular's licence under a laxer use whose floor the degraded warrant still clears. AGM has no counterpart of this scoping, because belief is not use-indexed: here it is the _same_ claim licensed differently for different purposes.
+
+Second, _how the residual is determined_. AGM must choose among the maximal subsets that fail to entail the contracted belief, and imports a selection function — epistemic entrenchment, in the standard development — to choose rationally. In `revoke` there is no choice: the residual is _computed_. The warrant graph fixes which verdicts are touched; the conservative re-grading rule fixes the new grades; the floor comparison fixes which licences survive. Where AGM needs entrenchment, this system has the retention order, declared in advance by the same acts that declared the grades and floors. The cost of this determinism is expressiveness — one cannot save a favoured conclusion by deeming it entrenched; the gain is that revocation is reproducible and auditable, which for an evidential instrument is the better trade.
+
+Third, _partiality of withdrawal_. AGM contraction is binary: after contraction the belief is out. Case 2 above has no AGM analogue — a licence surviving the failure of its original grounds in degraded form, because the demand it must meet is a point in an order rather than a fact of entailment. This is the precise sense in which withdrawal here is not simply removing a belief: the object withdrawn has internal structure that entailment lacks, and the operation reads that structure.
+
+Fourth, _recovery_. The contested AGM recovery postulate — contracting then re-adding restores the original set — fails here by design: re-establishing a failed warrant re-runs the verdict against the store and use-model _as they now stand_, and there is no guarantee, nor should there be, that the old licence returns.
+
+The claim of novelty is deliberately narrow. Contraction is old; dependency-directed retraction in truth-maintenance systems <<doyle79>> propagates support failure through a justification graph in a way case 1 visibly echoes. What has no analogue in query languages, and no direct analogue in either tradition, is the conjunction: withdrawal of _graded, use-relative_ entitlements, propagated over a warrant graph, with the residual fixed by an order declared in advance — offered as a query-language verb coequal with retrieval.
+
+== Limitations and open questions
+
+Honesty about scope is part of the design, and several limits are structural.
+
+*Grades are supplied, not adjudicated.* The edifice computes over grade annotations that arrive with the transformation record — in the surrounding system, from the transformation layer (Haec) that produced them. Hermeneia inherits whatever judgement produced those annotations and cannot audit it: if an annotator declares that a paraphrase lost `Attenuated(6)` of quality, nothing in the algebra can say whether 6 is the right number, or whether the transformation was graded where it should have been. Soundness is conditional: _given_ these grades, _this_ verdict follows; the correctness of the declarations is a separate, per-producer obligation that no theorem here discharges.
+
+*The fidelity metric is ordinal arithmetic without calibration.* Finite δ values add and compare, which presupposes commensurability — that one annotator's 3 means what another's 3 means, and that a 2 followed by a 4 is comparable to a single 6. Nothing enforces this. δ is at best an ordinal scale on which the system performs arithmetic; inter-annotator agreement, scale anchoring, and whether addition is even the right accumulation for semantic loss are all unaddressed. The formal results survive monotone rescaling; the practical meaning of any verdict is only as good as the discipline of the graders.
+
+*The meet at fuses is conservative.* Crediting a fused particular with its worse constituent's retention in every coordinate is safe but lossy: a fusion in which each constituent supplies exactly the fields the other lacks is graded as though both were degraded. A finer, per-field-provenance rule would license more true positives at the cost of a much heavier record. The conservative rule errs the way the whole design errs: the expensive failure is a false licence, not a false refusal.
+
+*⊤ poisons paths.* Unknown loss absorbs: one unmeasured edge anywhere on a path drives the accumulated fidelity to stem:[\top], which fails every finite floor. We have argued this is _correct_ — an unmeasured link genuinely voids quantified certification of the whole chain — but it is costly: unmeasured edges are common in real archives, so quantified floors are usable only over disciplined pipelines. Mitigations (bounding rather than measuring, retrospective measurement, floors expressed in the coarser fates) are workflow, not theory; the theory offers no discount on ignorance.
+
+*Use-models do not yet revise in time.* `revoke` handles withdrawal of warrants under a fixed population of use-models. It does not address temporal revision of the use-models themselves: what becomes of standing licences when a floor is tightened or a use-model deprecated. The warrant graph gives an obvious purchase — a use-model is a warrant element of every verdict issued under it, so tightening it is a mass degradation — but the semantics of versioned use-models, and of grandfathering versus wholesale re-examination, is open.
+
+Beyond these: whether the six coordinates are complete for particularity-loss is an open question rather than a theorem, and the operational cost of warrant graphs at archive scale is unmeasured.
+
+== Conclusion
+
+The argument of this paper is that "the system found it" and "the system licensed it" are different claims, that the difference is precisely the failure mode of AI-assisted evidential work, and that it can be made computable at small formal cost: a six-coordinate graded monoid with a tropical fidelity dimension, a componentwise retention order, and one comparison — stem:[\mathrm{floor}(U) \sqsubseteq \mathrm{acc}(v)] — with a witness on failure. Around that core, a query vocabulary in which retrieval (`evoke`, `convoke`, `transvoke`), licensing (`invoke`, `provoke`, `intervoke`), and withdrawal (`revoke`) are distinct verbs, so that no result carries an endorsement it was never given and no withdrawn licence disappears without trace. None of the ingredients is new. The instrument they assemble — a query language whose answers know what they are licensed to become — is, we believe, new; the experiment worth running is whether practices that adopt the trichotomy stop mistaking retrieval for warrant.
+
+[bibliography]
+== References
+
+* [[[codd70]]] E. F. Codd. A relational model of data for large shared data banks. _Communications of the ACM_ 13(6), 1970.
+* [[[buneman01]]] P. Buneman, S. Khanna, W.-C. Tan. Why and where: a characterization of data provenance. _Proc. ICDT_, 2001.
+* [[[gkt07]]] T. J. Green, G. Karvounarakis, V. Tannen. Provenance semirings. _Proc. PODS_, 2007.
+* [[[provo]]] T. Lebo, S. Sahoo, D. McGuinness (eds.). PROV-O: The PROV Ontology. W3C Recommendation, 2013.
+* [[[agm85]]] C. E. Alchourrón, P. Gärdenfors, D. Makinson. On the logic of theory change: partial meet contraction and revision functions. _Journal of Symbolic Logic_ 50(2), 1985.
+* [[[doyle79]]] J. Doyle. A truth maintenance system. _Artificial Intelligence_ 12(3), 1979.
+* [[[denning76]]] D. E. Denning. A lattice model of secure information flow. _Communications of the ACM_ 19(5), 1976.
+* [[[zadeh65]]] L. A. Zadeh. Fuzzy sets. _Information and Control_ 8(3), 1965.
+* [[[suciu11]]] D. Suciu, D. Olteanu, C. Ré, C. Koch. _Probabilistic Databases._ Morgan & Claypool, 2011.
+* [[[katsumata14]]] S. Katsumata. Parametric effect monads and semantics of effect systems. _Proc. POPL_, 2014.
+* [[[petricek14]]] T. Petricek, D. Orchard, A. Mycroft. Coeffects: a calculus of context-dependent computation. _Proc. ICFP_, 2014.
+* [[[williams53]]] D. C. Williams. On the elements of being. _Review of Metaphysics_ 7, 1953.
+* [[[campbell90]]] K. Campbell. _Abstract Particulars._ Blackwell, 1990.

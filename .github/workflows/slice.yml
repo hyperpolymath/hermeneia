@@ -1,0 +1,94 @@
+# SPDX-License-Identifier: MPL-2.0
+#
+# The vertical slice gate: .hil -> plan -> Trope IR -> tropecheck -> verdict.
+#
+# The end-to-end tests REQUIRE a real checker and fail loudly without one (no
+# silent skip, per AGENTIC). This workflow therefore builds `tropecheck-rs` from
+# trope-checker and points HERMENEIA_TROPECHECK at it, so a green run here means
+# the slice was genuinely exercised against the reference semantics.
+name: Slice (end to end)
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  slice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout hermeneia
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Checkout trope-checker (the reference semantics)
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: hyperpolymath/trope-checker
+          path: .trope-checker
+          persist-credentials: false
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      # tropecheck-rs is deliberately dependency-free, so this needs no network.
+      - name: Build the checker
+        run: cargo build --release --manifest-path .trope-checker/src/rust/Cargo.toml
+
+      - name: Confirm the checker agrees with the conformance corpus
+        working-directory: .trope-checker/tests/conformance
+        run: |
+          set -euo pipefail
+          TC="$GITHUB_WORKSPACE/.trope-checker/src/rust/target/release/tropecheck-rs"
+          fail=0
+          # Every fixture must produce the verdict cases.json declares.
+          for ir in fixtures/*.ir.json; do
+            set +e; "$TC" "$ir" >/dev/null 2>&1; code=$?; set -e
+            if [ "$code" -ge 2 ]; then
+              echo "::error::$ir produced exit $code (validation/io fault)"
+              fail=1
+            fi
+          done
+          [ "$fail" -eq 0 ] || exit 1
+
+      - name: Format
+        run: cargo fmt --all -- --check
+
+      - name: Lint
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Test (unit, plus the gate that keeps the slice honest)
+        run: cargo test --workspace
+
+      - name: Test (end-to-end slice, against the real checker)
+        env:
+          HERMENEIA_TROPECHECK: ${{ github.workspace }}/.trope-checker/src/rust/target/release/tropecheck-rs
+        run: cargo test -p hermeneia-cli --features e2e --test slice
+
+      - name: Demonstrate use-relativity
+        env:
+          TC: ${{ github.workspace }}/.trope-checker/src/rust/target/release/tropecheck-rs
+        run: |
+          set -uo pipefail
+          cargo build
+          Q='invoke "authentic language" under use_model'
+          set +e
+          ./target/debug/hermeneia query --checker "$TC" -e "$Q \"critical-paraphrase\" show verdict"
+          strict=$?
+          ./target/debug/hermeneia query --checker "$TC" -e "$Q \"loose-gloss\" show verdict"
+          loose=$?
+          set -e
+          echo "strict=$strict loose=$loose"
+          # The same particular, the same path, the same declared grade:
+          # insufficient under a strict use, sufficient under a permissive one.
+          [ "$strict" -eq 1 ] || { echo "::error::expected p-insufficient (1), got $strict"; exit 1; }
+          [ "$loose"  -eq 0 ] || { echo "::error::expected p-sufficient (0), got $loose";  exit 1; }

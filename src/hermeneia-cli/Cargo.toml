@@ -1,0 +1,41 @@
+# SPDX-FileCopyrightText: © 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+# SPDX-License-Identifier: MPL-2.0
+[package]
+name = "hermeneia-cli"
+description = "The hermeneia command-line interface"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "hermeneia"
+path = "src/main.rs"
+
+# The end-to-end slice needs a real `tropecheck`, which a bare `cargo test`
+# cannot assume. It is gated behind `e2e` rather than made to skip silently.
+# The gate is NOT free: tests/gate.rs runs by default and fails if the workflow
+# that supplies the checker and enables this feature has gone missing, so the
+# slice cannot quietly stop being verified.
+[features]
+e2e = []
+
+[[test]]
+name = "slice"
+path = "tests/slice.rs"
+required-features = ["e2e"]
+
+[[test]]
+name = "gate"
+path = "tests/gate.rs"
+
+[dependencies]
+hermeneia-core = { path = "../hermeneia-core" }
+hermeneia-ir = { path = "../hermeneia-ir" }
+hermeneia-store = { path = "../hermeneia-store" }
+hermeneia-syntax = { path = "../hermeneia-syntax" }
+
+# Integration tests are separate crates and do not inherit the package's regular
+# dependencies; gate.rs reads the seed corpus to check it against the README.
+[dev-dependencies]
+hermeneia-store = { path = "../hermeneia-store" }

@@ -6,50 +6,74 @@
 [metadata]
 project = "hermeneia"
 version = "0.1.0"
-last-updated = "2026-06-26"
+last-updated = "2026-07-21"
 status = "active"  # active | paused | archived
 
 [project-context]
 name = "hermeneia"
 purpose = "An experimental voking / imminence query language for Vocarium. Hermeneia calls trope-shaped stored particulars into a declared use-relation (invoke / evoke / convoke / transvoke / provoke / intervoke / revoke) and reports what is preserved, lost, licensed, or insufficient under a use-model. It separates the retrieved from the interpretable from the licensed."
-# Early/experimental estimate, not a verified figure. Per EXPLAINME §9, the
-# evidence boundary (conceptual design vs grammar draft vs parser prototype vs
-# Vocarium-integrated runner) is itself an open receipt; see §12 next-actions.
-completion-percentage = 20
+# 2026-07-21: the evidence boundary IS now settled. It is a running parser +
+# planner + IR emitter with an end-to-end query runner, checked against the real
+# tropecheck; the store is a local JSONL stub, NOT Vocarium. One of seven voking
+# operations is implemented. Per-operation detail: docs/SPEC.adoc §"Status — no
+# overclaim". Raised 20 -> 45 on that basis and no further.
+completion-percentage = 45
 
 [position]
-phase = "design"           # design | implementation | testing | maintenance | archived
+phase = "implementation"   # design | implementation | testing | maintenance | archived
 maturity = "experimental"  # experimental | alpha | beta | production | lts
 
 [route-to-mvp]
 # Milestones sourced from EXPLAINME §12 "Next receipts needed" — the honest
 # evidence still owed before the stronger "implemented query layer" claim holds.
 milestones = [
-  { name = "Minimal Hermeneia grammar", completion = 0 },
-  { name = "Voke-operation table with implemented/planned status", completion = 0 },
-  { name = "invoke example checking a Vocarium record against a use-model", completion = 0 },
+  # Implemented and executing: src/hermeneia-syntax parses the `invoke` form.
+  { name = "Minimal Hermeneia grammar", completion = 100 },
+  { name = "Voke-operation table with implemented/planned status", completion = 100 },
+  # Runs end to end, but against the JSONL stub store — NOT a Vocarium record.
+  # That is why this is 70 and not 100.
+  { name = "invoke example checking a Vocarium record against a use-model", completion = 70 },
   { name = "provoke example showing why a candidate fails", completion = 0 },
   { name = "transvoke example tracing a particular across contexts", completion = 0 },
   { name = "revoke example withdrawing a verdict after warrant failure", completion = 0 },
-  { name = "JSON result shape (query/candidates/loss-shape/floor/verdict/reasons/missing-warrants)", completion = 0 },
-  { name = "Design note separating retrieved / interpretable / licensed", completion = 0 },
-  { name = "No-overclaim status table (Designed/Parsed/Planned/Implemented/Tested/Integrated)", completion = 0 },
+  # Trope IR v0.2 is emitted and accepted by the reference validator, and the
+  # verdict/witness/coordinate are rendered. The loss-shape and missing-warrants
+  # parts of the result shape are NOT available: the checker CLI does not emit
+  # the per-dimension vector (see docs/SPEC.adoc).
+  { name = "JSON result shape (query/candidates/loss-shape/floor/verdict/reasons/missing-warrants)", completion = 40 },
+  { name = "Design note separating retrieved / interpretable / licensed", completion = 100 },
+  { name = "No-overclaim status table (Designed/Parsed/Planned/Implemented/Tested/Integrated)", completion = 100 },
 ]
 
 [blockers-and-issues]
-# No blockers recorded.
+# Not blocking the slice, but bounding what can be claimed:
+issues = [
+  "tropecheck emits only a verdict plus ONE witness edge/coordinate; Check.idr computes the full violated-coordinate list and Main.idr discards it. `show loss` is therefore unimplementable against the current CLI. Upstream contribution to trope-checker, to be proposed not taken.",
+  "Vocarium does not exist, so nothing is Integrated; the store is a local JSONL stub behind StoreProvider.",
+  "Bounded traversal (evoke/convoke) needs the retention order in-process. Deferred behind the StoreProvider seam; reimplementing the algebra here is rejected permanently.",
+]
 
 [critical-next-actions]
+# The four previous actions are DISCHARGED as of 2026-07-21:
+#   evidence boundary settled (docs/SPEC.adoc §Status);
+#   grammar + voke-operation table produced;
+#   end-to-end fixture runs query -> Trope IR -> tropecheck -> verdict;
+#   use-model fixtures where the verdict changes: `critical-paraphrase`
+#     (p-insufficient) vs `loose-gloss` (p-sufficient) on the SAME particular.
 actions = [
-  "Settle the evidence boundary (EXPLAINME §9): state which of design / grammar draft / parser prototype / query runner is currently true.",
-  "Produce a minimal grammar and a voke-operation table marking the implemented subset.",
-  "Add end-to-end fixture: Vocarium record → Hermeneia query → verdict-bearing result.",
-  "Add use-model fixtures where changing the use-model changes the verdict.",
+  "Implement evoke/convoke (store traversal, no checker) — this forces the in-process retention-order decision recorded in blockers.",
+  "Implement transvoke over Haec edges.",
+  "Implement provoke and intervoke, reusing the invoke path.",
+  "Design and implement revoke with a persisted warrant graph; decide whether licence state lives here or in Vocarium.",
+  "Propose upstream: have tropecheck emit the violated-coordinate list it already computes, so `show loss` can be honest.",
+  "Write the Idris2 voke-algebra laws under verification/proofs/idris2/Voke/ — NOT yet started.",
 ]
 
 [maintenance-status]
-last-run-utc = "never"
-last-result = "unknown"  # unknown | pass | warn | fail
+last-run-utc = "2026-07-21"
+last-result = "pass"  # unknown | pass | warn | fail
+# 46 tests: 39 unit+gate, 7 end-to-end against the real tropecheck.
+# cargo fmt --check and cargo clippy -D warnings both clean.
 open-warnings = 0
 open-failures = 0
 
