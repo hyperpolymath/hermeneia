@@ -102,7 +102,7 @@ Top level requires `version`, `profile`, `nodes`, `edges`, `use_model`.
 ----
 { "version": "0.2",
   "profile": "prevent",
-  "nodes":  [ { "id", "type": Trope|Floating|Codomain, "present": [field…] } ],
+  "nodes":  [ { "id", "type": Trope|FloatingQuality|Codomain, "present": [field…] } ],
   "edges":  [ { "id", "effect", "inputs": [nodeId…], "output": nodeId,
                 "grade": { "fate": {quality,bearer,context,record}, "bond", "merge" } } ],
   "use_model": { "output": nodeId, "floor": { … partial … } } }
@@ -237,11 +237,19 @@ pub trait StoreProvider {
     /// Bounded neighbourhood. The bound is in the retention order, so the
     /// implementation owns the algebra cost (see <<algebra>>).
     fn neighbours(&self, id: &TropeId, max_loss: Delta) -> Result<Vec<Trope>>;
-    fn paths(&self, from: &TropeId, to: &TropeId) -> Result<Vec<Path>>;
+    /// All maximal transformation paths leading out of `from`. The terminus is
+    /// what the use-model judges; the destination is discovered, not supplied.
+    fn paths_from(&self, from: &TropeId) -> Result<Vec<Path>>;
     /// Resolves a named use-model to its partial demand vector (the floor).
     fn use_model(&self, name: &str) -> Result<UseModel>;
 }
 ----
+
+`neighbours` is the one method that needs the retention order, so any
+implementation supporting it owns the algebra cost — the planner never does.
+The JSONL stub returns `Unsupported` for it rather than an empty list, because
+`evoke` is unimplemented in slice v1 and a silent empty result would misreport
+that as "no neighbours found".
 
 The seed corpus is the README's own worked example — de Man, "authentic
 language", `critical-paraphrase` — so that the documentation and the tests are
@@ -306,6 +314,35 @@ schema-validate → `tropecheck` → render verdict with witness and coordinate.
 
 Then widen in cost order: `evoke` and `convoke` (store-only, no checker), then
 `transvoke`, `provoke`, `intervoke`, and finally `revoke` with its warrant graph.
+
+== Status — no overclaim
+
+The honest state of each voking operation. *Designed* means specified here or
+in `THEORY.adoc`; *Parsed* means the surface syntax is recognised; *Implemented*
+means it plans and runs; *Tested* means covered by a test that would fail if it
+broke; *Integrated* means it works against Vocarium rather than the stub store.
+
+[cols="1,1,1,1,1,1",options="header"]
+|===
+| Operation | Designed | Parsed | Implemented | Tested | Integrated
+
+| `invoke`    | yes | yes | yes | yes, end to end against the real checker | no — stub store
+| `evoke`     | yes | recognised, reports unimplemented | no | the refusal is tested | no
+| `convoke`   | yes | recognised, reports unimplemented | no | the refusal is tested | no
+| `transvoke` | yes | recognised, reports unimplemented | no | the refusal is tested | no
+| `provoke`   | yes | recognised, reports unimplemented | no | the refusal is tested | no
+| `intervoke` | yes | recognised, reports unimplemented | no | the refusal is tested | no
+| `revoke`    | yes | recognised, reports unimplemented | no | the refusal is tested | no
+|===
+
+Other surfaces:
+
+* `show verdict` — implemented, with witness edge and coordinate.
+* `show loss` — *refused*, not implemented. The checker CLI does not emit the
+  per-dimension vector, and fabricating one would be dishonest.
+* `show warrant` / `show failure_points` — refused; they need the warrant graph.
+* Nothing is Integrated. Vocarium does not exist yet; every result above is
+  against the JSONL stub and its seed corpus.
 
 == Open questions
 

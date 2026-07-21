@@ -134,3 +134,6 @@ dist/
 
 # Coaptation re-anchor basis (occasional, generated on --reanchor when red; not a baseline)
 .machine_readable/coaptation/receipts/reanchor-basis.a2ml
+
+# Rust build output
+/target/

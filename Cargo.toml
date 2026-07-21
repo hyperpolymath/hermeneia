@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: © 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+# SPDX-License-Identifier: MPL-2.0
+#
+# The Hermeneia workspace.
+#
+# DELIBERATELY DEPENDENCY-FREE (std only, hand-written JSON), mirroring the
+# decision taken in trope-checker/src/rust: it builds offline with no crates.io
+# access, so CI cannot fail for reasons unrelated to the language.
+
+[workspace]
+resolver = "2"
+members = [
+    "src/hermeneia-ir",
+    "src/hermeneia-syntax",
+    "src/hermeneia-store",
+    "src/hermeneia-core",
+    "src/hermeneia-cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MPL-2.0"
+repository = "https://github.com/hyperpolymath/hermeneia"
+
+[profile.release]
+opt-level = 3
