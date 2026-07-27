@@ -137,3 +137,8 @@ dist/
 
 # Rust build output
 /target/
+
+# Transient checkout of trope-checker, created by .github/workflows/slice.yml
+# (and by anyone reproducing that workflow locally) so the reference checker can
+# be built to test against. It is another repository — never commit it.
+/.trope-checker/
