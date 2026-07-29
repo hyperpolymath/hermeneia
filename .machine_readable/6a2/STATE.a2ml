@@ -6,7 +6,7 @@
 [metadata]
 project = "hermeneia"
 version = "0.1.0"
-last-updated = "2026-07-21"
+last-updated = "2026-07-29"
 status = "active"  # active | paused | archived
 
 [project-context]
@@ -46,11 +46,26 @@ milestones = [
 ]
 
 [blockers-and-issues]
+# Human-readable companion: docs/status/STATE-OF-PLAY.adoc (keep the two in step).
 # Not blocking the slice, but bounding what can be claimed:
 issues = [
   "tropecheck emits only a verdict plus ONE witness edge/coordinate; Check.idr computes the full violated-coordinate list and Main.idr discards it. `show loss` is therefore unimplementable against the current CLI. Upstream contribution to trope-checker, to be proposed not taken.",
   "Vocarium does not exist, so nothing is Integrated; the store is a local JSONL stub behind StoreProvider.",
-  "Bounded traversal (evoke/convoke) needs the retention order in-process. Deferred behind the StoreProvider seam; reimplementing the algebra here is rejected permanently.",
+  "RESOLVED 2026-07-28: bounded traversal (evoke/convoke) needed the retention order in-process. trope-checker PR #46 exposes tropecheck-rs as a [lib] with grade_le, so hermeneia can DEPEND on the validated implementation. Reimplementing the algebra here remains rejected permanently.",
+]
+
+# CI red on main as at 2026-07-29. Recorded so a green-looking board is not
+# mistaken for a healthy one.
+ci-failing-on-main = [
+  "Guix Package Policy — root flake.nix present while Nix is retired estate-wide (ruled 2026-05-18, hardened 2026-07-28). CANNOT simply delete it: build/guix.scm is an UNINSTANTIATED template ({{PROJECT_NAME}}, {{AUTHOR}}) and there is no Containerfile, so removal would leave the repo with no packaging. Retire the flake AND make the Guix side real in the same change.",
+  "Estate Rules — root-shape allowlist: Cargo.toml + Cargo.lock (from the Rust workspace) plus pre-existing ARCHITECTURE.md, GOVERNANCE.md, MAINTAINERS, mise.toml. One PR covering all six clears it.",
+  "Dogfood Gate — not yet diagnosed.",
+]
+
+# GREEN and genuinely so, verified from run logs rather than badges:
+ci-verified-green = [
+  "Slice (end to end) — all 14 steps; the 7 e2e tests RUN (named in the log) and the use-relativity step asserts strict=1 / loose=0.",
+  "Rust CI — 39 passed, count matches the local unit+gate total exactly.",
 ]
 
 [critical-next-actions]
@@ -70,11 +85,14 @@ actions = [
 ]
 
 [maintenance-status]
-last-run-utc = "2026-07-21"
-last-result = "pass"  # unknown | pass | warn | fail
-# 46 tests: 39 unit+gate, 7 end-to-end against the real tropecheck.
-# cargo fmt --check and cargo clippy -D warnings both clean.
-open-warnings = 0
+last-run-utc = "2026-07-29"
+last-result = "warn"  # unknown | pass | warn | fail
+# Tests and the slice are green; the repo is not. 46 tests pass (39 unit+gate,
+# 7 end-to-end against the real tropecheck); cargo fmt --check and
+# cargo clippy -D warnings both clean; Slice (end to end) is green on main after
+# the workspace-nesting fix (PR #26). But three estate gates are RED on main —
+# see ci-failing-on-main above. "warn" not "pass" for that reason.
+open-warnings = 3
 open-failures = 0
 
 [ecosystem]
