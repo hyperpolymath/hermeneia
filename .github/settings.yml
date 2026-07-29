@@ -7,15 +7,15 @@
 # applied by the probot/settings app when changes are pushed to the default
 # branch. Install the app at: https://github.com/apps/settings
 #
-# Template file — replace {{REPO}} and {{DESCRIPTION}} with actual values.
+# Repository *identity* (name, description, homepage, visibility) is deliberately
+# NOT declared here. Declaring `name:` makes the repository rename itself to the
+# literal value on every default-branch push — the origin of the estate's stray
+# `-REPO-` repositories. Identity belongs in GitHub's own settings, which is the
+# single source of truth; this file governs behaviour only.
 
 # ─── Repository Settings ───────────────────────────────────────────────────────
 
 repository:
-  name: "{{REPO}}"
-  description: "{{DESCRIPTION}}"
-  homepage: "https://github.com/hyperpolymath/{{REPO}}"
-  private: false
   has_issues: true
   has_projects: true
   has_wiki: false
