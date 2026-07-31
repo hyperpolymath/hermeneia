@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: © 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+# SPDX-License-Identifier: CC-BY-SA-4.0
+#
+# The seed corpus IS the README's worked example, so that the documentation and
+# the tests are one artefact and cannot drift apart. Vocarium replaces this.
+#
+# Records are discriminated by "kind": trope | edge | use_model.
+# Grades here are DECLARED, not computed — Haec produces them; the store keeps
+# them; trope-checker composes and judges them.
+{"kind":"trope","id":"t_authentic_language","quality":"authentic language","bearer":"Paul de Man","context":"de Man / Romantic irony","record":"source quotation"}
+{"kind":"trope","id":"t_real_language","quality":"real language","bearer":"Paul de Man","context":"student paraphrase","record":"submitted essay"}
+# The paraphrase preserves a loose ordinary association but loses the
+# theoretical force carried by "authentic" — declared as a quality attenuation
+# of 6. Every other coordinate survives intact.
+{"kind":"edge","id":"e_paraphrase","effect":"attenuate","from":"t_authentic_language","to":"t_real_language","grade":{"fate":{"quality":{"k":"Attenuated","delta":6},"bearer":{"k":"Present"},"context":{"k":"Present"},"record":{"k":"Present"}},"bond":{"k":"Intact"},"merge":{"k":"Single"}}}
+# Critical paraphrase demands that quality survive with a loss of no more than
+# 3. It says nothing about bearer, context, or record: those coordinates are
+# omitted, and an omitted coordinate imposes NO demand.
+{"kind":"use_model","name":"critical-paraphrase","floor":{"fate":{"quality":{"k":"Attenuated","delta":3}}}}
+# A permissive use for contrast: it tolerates any finite quality loss, so the
+# same particular and the same path yield p-sufficient. Same answer, different
+# use — which is the whole point.
+{"kind":"use_model","name":"loose-gloss","floor":{"fate":{"quality":{"k":"Attenuated","delta":10}}}}
