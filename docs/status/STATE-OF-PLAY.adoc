@@ -1,0 +1,174 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Hermeneia — State of Play
+:toc: left
+:toclevels: 2
+:sectnums:
+
+*As at:* 2026-07-29
+
+[abstract]
+What is actually built, what is deliberately not, and what is known to be
+broken. Written to be read by someone picking this up cold. Every claim here was
+measured against `origin/main`, not recalled; where something is unverified it
+says so.
+
+For *why* the language exists see link:../THEORY.adoc[docs/THEORY.adoc]; for
+*how it binds* to the rest of the stack see link:../SPEC.adoc[docs/SPEC.adoc].
+This document is neither — it is the honest status board.
+
+== One-line summary
+
+A running vertical slice: one of seven voking operations works end to end
+against the real checker, over a stub store. The theory is written; the
+implementation is a beginning, not a product.
+
+== What works, and what that proves
+
+[source,text]
+----
+$ hermeneia query -e 'invoke "authentic language" \
+    under use_model "critical-paraphrase" show verdict'
+
+subject:   "authentic language"
+use_model: "critical-paraphrase"
+verdict:   p-insufficient
+witness:   e_paraphrase (fate.quality)
+           the `attenuate` step is where the floor was breached
+----
+
+Change one word and the verdict changes — on the *same particular*, the *same
+path*, and the *same declared grade* of `Attenuated(6)`:
+
+[cols="2,2,1,1",options="header"]
+|===
+| use-model | floor | verdict | exit
+
+| `critical-paraphrase` | quality `Attenuated(3)` | p-insufficient | 1
+| `loose-gloss`         | quality `Attenuated(10)`| p-sufficient   | 0
+|===
+
+The answer did not change; the *use* did. That is the
+retrieved / interpretable / licensed trichotomy computing a verdict rather than
+asserting one, and it is enforced on every push by the `Slice (end to end)`
+workflow.
+
+== Status by voking operation — no overclaim
+
+[cols="1,1,1,1,1",options="header"]
+|===
+| Operation | Parsed | Implemented | Tested | Integrated
+
+| `invoke`    | yes | yes | end to end, against the real checker | no — stub store
+| `evoke`     | recognised, reports unimplemented | no | the refusal is tested | no
+| `convoke`   | recognised, reports unimplemented | no | the refusal is tested | no
+| `transvoke` | recognised, reports unimplemented | no | the refusal is tested | no
+| `provoke`   | recognised, reports unimplemented | no | the refusal is tested | no
+| `intervoke` | recognised, reports unimplemented | no | the refusal is tested | no
+| `revoke`    | recognised, reports unimplemented | no | the refusal is tested | no
+|===
+
+*Nothing is Integrated.* Vocarium does not exist; every result above is against
+the in-repo JSONL stub and its seed corpus.
+
+Output surfaces:
+
+* `show verdict` — implemented, with witness edge and coordinate.
+* `show loss` — *refused, not faked.* See <<known-broken>>.
+* `show warrant`, `show failure_points` — refused; they need the warrant graph.
+
+== Deliberate honesty properties
+
+These are design decisions, not omissions, and each is covered by a test that
+fails if it regresses:
+
+* `evoke`…`revoke` parse and report *"recognised but not implemented"* — a
+  distinct error from a syntax error.
+* `JsonlStore::neighbours` returns `Unsupported`, never an empty vector, so an
+  unimplemented `evoke` cannot masquerade as "no neighbours found".
+* `Fate::from_json` rejects `Falsified`; the loader rejects deceptive grades.
+  Under the `prevent` profile a deceptive grade cannot be emitted even by
+  accident.
+* The end-to-end suite *fails loudly without a checker* rather than skipping.
+  It is gated behind `--features e2e`, and because a silent gate is the same
+  sin, `tests/gate.rs` runs by default and goes red if the workflow stops
+  opening it.
+
+== Architecture in one rule
+
+*Hermeneia does not implement the grade algebra.* It is proved in Idris2 inside
+`trope-checker`; a second implementation here would fork the exact semantics the
+design exists to protect. Hermeneia emits Trope IR v0.2 and delegates verdicts.
+
+It is not a wrapper, though: only three of seven operations need a verdict at
+all (`invoke`, `provoke`, `intervoke`). The rest are store traversal, path
+composition, or licence state — which hermeneia owns.
+
+== Known broken or blocked [[known-broken]]
+
+[cols="1,3"]
+|===
+| `show loss`
+| *Cannot be implemented against the current checker CLI.* `Checker.Check.check`
+  computes the full violated-coordinate list; `Main.idr` discards it and prints
+  one witness edge plus coordinate. The CLI is strictly lossier than the
+  checker's own verdict type. Surfacing that list is an upstream contribution to
+  `trope-checker` and is the highest-value small fix in the stack.
+
+| Guix Package Policy (CI red)
+| This repo still has a root `flake.nix` while Nix is retired estate-wide
+  (ruled 2026-05-18, hardened 2026-07-28). `build/guix.scm` is an
+  *uninstantiated template* — `{{PROJECT_NAME}}`, `{{AUTHOR}}` — and there is no
+  `Containerfile`, so removing the flake today would leave the repo with no
+  packaging at all. Retire the flake *and* make the Guix side real in the same
+  change.
+
+| Estate Rules (CI red)
+| Root-shape allowlist. `Cargo.toml` and `Cargo.lock` arrived with the Rust
+  workspace and are not yet allowlisted; `ARCHITECTURE.md`, `GOVERNANCE.md`,
+  `MAINTAINERS` and `mise.toml` pre-date that work. One PR covering all six
+  clears it.
+
+| Dogfood Gate (CI red)
+| Not yet diagnosed.
+
+| Placeholder debt
+| ~92 files still carry `{{PLACEHOLDER}}` tokens, including
+  `docs/status/READINESS.adoc` (the CRG assessment is still a blank template, so
+  this repo has *no* published readiness grade). Tracked as issue #8, which
+  undercounts at ~57.
+|===
+
+== Verification — how to check these claims yourself
+
+[source,bash]
+----
+# build the oracle (dependency-free, ~4s, no network needed)
+cargo build --release --manifest-path ../trope-checker/src/rust/Cargo.toml
+export HERMENEIA_TROPECHECK=$PWD/../trope-checker/src/rust/target/release/tropecheck-rs
+
+cargo test --workspace                                    # 39 unit + gate tests
+cargo test -p hermeneia-cli --features e2e --test slice   # 7 end-to-end tests
+----
+
+The end-to-end suite is validated against `trope-checker`'s conformance corpus —
+the same oracle that validates its Rust fast core against the Idris2 reference.
+
+== What comes next, in order
+
+. *`evoke` / `convoke`* — store traversal, no checker. This forces the deferred
+  decision: bounded traversal needs the retention order in-process. The door is
+  now open — `tropecheck-rs` exposes a `[lib]` with `grade_le` as of
+  trope-checker PR #46, so hermeneia can depend on the validated implementation
+  instead of forking or shelling out.
+. *`transvoke`* over Haec edges; then *`provoke`* and *`intervoke`*, which reuse
+  the `invoke` path.
+. *`revoke`* with a persisted warrant graph. Open design question: does licence
+  state live here or in Vocarium?
+. *Upstream:* have `tropecheck` emit the violated-coordinate list it already
+  computes, so `show loss` can be honest.
+. *`verification/proofs/idris2/Voke/`* — the voke-algebra laws. Not started, and
+  deliberately *not* stubbed: this estate's proof gates are known to exit 0 when
+  the prover is absent, so a stub would read as a passing milestone while
+  proving nothing. Note `trope-checker` now declares its requirement as
+  *Idris 2 0.8.0*.
