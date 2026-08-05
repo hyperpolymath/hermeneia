@@ -118,7 +118,7 @@ composition, or licence state — which hermeneia owns.
 | Guix Package Policy (CI red)
 | This repo still has a root `flake.nix` while Nix is retired estate-wide
   (ruled 2026-05-18, hardened 2026-07-28). `build/guix.scm` is an
-  *uninstantiated template* — `{{PROJECT_NAME}}`, `{{AUTHOR}}` — and there is no
+  *uninstantiated template* — `Hermeneia`, `Jonathan D.A. Jewell` — and there is no
   `Containerfile`, so removing the flake today would leave the repo with no
   packaging at all. Retire the flake *and* make the Guix side real in the same
   change.
