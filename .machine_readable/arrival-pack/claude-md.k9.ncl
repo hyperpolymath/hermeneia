@@ -11,6 +11,8 @@ K9!
 # contract shape.
 {
   pedigree = {
+    name = "claude-md.k9.ncl",
+    security = { leash = 'Yard },
     schema_version = "1.0.0",
     contractile_verb = "trust",   # provenance: the view must equal its source
     semantics = "projection-fidelity",
@@ -22,7 +24,7 @@ K9!
       allow_subprocess = true,    # runs extract.sh + nickel to reproduce the view
     },
     metadata = {
-      name = "claude-md-arrival-pack",
+      
       version = "1.0.0",
       description = "CLAUDE.md arrival pack is a faithful projection of this repo's a2ml.",
       paired_runner = "verify.sh",

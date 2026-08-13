@@ -46,5 +46,7 @@ signals:
 
 {
   pedigree = {
-    security = { leash = "Yard" }, schema_version = "1.0.0", name = "coordination.k9" }
+    name = "coordination.k9",
+    security = { leash = "Yard" },
+     schema_version = "1.0.0",  }
 }
