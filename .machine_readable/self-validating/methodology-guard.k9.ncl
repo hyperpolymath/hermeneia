@@ -1,7 +1,8 @@
 K9!
 # SPDX-License-Identifier: MPL-2.0
 # Copyright (c) {
-  pedigree = { schema_version = "1.0.0", name = "methodology-guard.k9.ncl" },{CURRENT_YEAR}} {{AUTHOR}} ({{OWNER}}) <{{AUTHOR_EMAIL}}>
+  pedigree = {
+    security = { leash = "Yard" }, schema_version = "1.0.0", name = "methodology-guard.k9.ncl" },{CURRENT_YEAR}} {{AUTHOR}} ({{OWNER}}) <{{AUTHOR_EMAIL}}>
 #
 # K9 Validator: Methodology Guard
 # Checks that agent work respects methodology constraints declared in

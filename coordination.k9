@@ -45,5 +45,6 @@ signals:
     command: "handover human <path>"
 
 {
-  pedigree = { schema_version = "1.0.0", name = "coordination.k9" }
+  pedigree = {
+    security = { leash = "Yard" }, schema_version = "1.0.0", name = "coordination.k9" }
 }
