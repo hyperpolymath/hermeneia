@@ -1,3 +1,5 @@
+K9!
+# SPDX-License-Identifier: MPL-2.0
 # Thin coordination bindings for central session-management standards
 
 session_management:
@@ -41,3 +43,7 @@ signals:
     command: "handover model <path>"
   - name: "session.handover.human"
     command: "handover human <path>"
+
+{
+  pedigree = { schema_version = "1.0.0", name = "coordination.k9" }
+}

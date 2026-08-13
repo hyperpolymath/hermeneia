@@ -1,3 +1,5 @@
+K9!
+# SPDX-License-Identifier: MPL-2.0
 # Local repository session checks (thin policy layer)
 version: "0.1"
 
@@ -13,3 +15,7 @@ checks:
   - id: "session-state-has-recommended-next-protocol"
     applies_to: ["intake repo", "checkpoint change", "recover repo", "handover full"]
     requirement: "Recommended next protocol is set"
+
+{
+  pedigree = { schema_version = "1.0.0", name = "custom-checks.k9" }
+}
