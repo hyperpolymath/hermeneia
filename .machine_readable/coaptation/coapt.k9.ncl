@@ -12,6 +12,8 @@ K9!
 # sits alongside arrival-pack/claude-md.k9.ncl as its architectural sibling.
 {
   pedigree = {
+    name = "coapt.k9.ncl",
+    security = { leash = 'Yard },
     schema_version = "1.0.0",
     contractile_verb = "trust",   # provenance: the reading must equal its sources
     semantics = "coaptation-fidelity",
@@ -23,7 +25,7 @@ K9!
       allow_subprocess = true,    # runs the extractors + nickel to reproduce the reading
     },
     metadata = {
-      name = "coaptation",
+      
       version = "0.1.0",
       description = "The committed coaptation receipt is a faithful, current reading of this repo's contractiles vs descriptiles.",
       paired_runner = "verify.sh",
