@@ -1,10 +1,9 @@
 # SPDX-License-Identifier: MPL-2.0
 # This workflow is managed by gh actions-lock.
+# This workflow is managed by gh actions-lock.
 name: OSSF Scorecard
 
 on:
-  push:
-    branches: [main, master]
   schedule:
     - cron: '0 4 * * *'
   workflow_dispatch:
@@ -13,7 +12,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 permissions:
+  actions: read
   contents: read
+  id-token: write
+  security-events: write
 
 jobs:
   scorecard:
