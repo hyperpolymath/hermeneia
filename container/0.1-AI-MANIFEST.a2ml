@@ -10,12 +10,14 @@ context:
 ---
 ### [AI_MANIFEST]
 description: |
-  Container templates for the stapeln container ecosystem. This directory
-  provides Podman-Chainguard-stapeln templates that are customised via
-  `just container-init` or `just init` during project bootstrap.
+  Container configuration for the stapeln container ecosystem: Podman /
+  Chainguard / stapeln build, compose, signing and deployment files.
 
-  All files use {{PLACEHOLDER}} tokens that are substituted with project-
-  specific values during initialisation.
+  These files are RENDERED, not templates. `just init`
+  (scripts/instantiate.sh, values in
+  .machine_readable/configs/instantiation.a2ml) substituted the service name,
+  port and registry across the module; re-running it is a no-op and re-renders
+  any token a template re-sync brings back.
 
 purpose: |
   Provide a complete, security-first container deployment story for any
@@ -139,8 +141,12 @@ invariants:
 ---
 ### [USAGE]
 initialisation: |
-  Run `just container-init` to substitute all {{PLACEHOLDER}} tokens with
-  project-specific values. This is also run as part of `just init`.
+  Already done: `just init` rendered this module from
+  .machine_readable/configs/instantiation.a2ml. To change a value, edit the
+  manifest and re-run `just init` — do not hand-edit the rendered files, or the
+  next render will disagree with them. There is no separate
+  `just container-init` here; the container module's build/just/container.just
+  was never carried over from the template.
 
 development: |
   1. `just container-build`   — Build the container image

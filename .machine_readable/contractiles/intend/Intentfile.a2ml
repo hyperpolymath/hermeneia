@@ -20,55 +20,113 @@
 #            contractile for hard gates.
 
 @abstract:
-North-star contractile for hermeneia. This repository is the
-canonical template for Rhodium Standard Repository compliance. It provides
-the scaffold that all hyperpolymath repos should copy and customize.
+North-star contractile for Hermeneia: the voking / imminence query language for
+Vocarium. Hermeneia calls trope-shaped stored particulars into a declared
+use-relation and reports what is preserved, lost, licensed, or insufficient
+under a use-model — separating the retrieved from the interpretable from the
+licensed.
+
+This file was inherited from rsr-template-repo and at instantiation (issue #8)
+still declared that this repository IS the canonical RSR template providing "the
+scaffold that all hyperpolymath repos should copy". A self-name substitution
+fixed the name and left the claim, which is the worse outcome: a north-star
+contractile describing a different project. Rewritten from README.adoc,
+EXPLAINME.adoc and descriptiles/{STATE,ECOSYSTEM}.a2ml. All three committed
+next-action probes below were also FALSE against this tree while two were
+declared in_progress and one done; each is restated with a probe that was
+executed before it was written down.
 @end
 
 ## Purpose
 
-The hermeneia serves as the master template for all hyperpolymath
-repositories. It contains the complete set of contractile files, machine-readable
-specifications, and governance documentation that define the Rhodium Standard.
+Hermeneia is the query layer of the hyperpolymath voking stack. Vocarium stores
+vokeable particulars (tropes, transformation paths, grades, warrants, use-models,
+verdicts); Haec records transformations; Hermeneia asks what a stored particular
+can become under a declared use.
 
-Every new repository in the hyperpolymath estate should be initialized by
-copying this template and substituting the placeholder values with
-repo-specific content.
+It is organised around a family of voke operations — invoke, evoke, convoke,
+transvoke, provoke, intervoke, revoke — of which `invoke` is implemented and
+executing end to end against the real trope-checker oracle. The chain is
+`query -> Trope IR -> tropecheck -> verdict / witness / coordinate`.
 
 ## Anti-Purpose
 
-This repository is NOT:
-- A general-purpose project scaffold for external use (hyperpolymath-only)
-- A replacement for per-repo customization (all files must be bespoke)
-- A static template that never changes (evolves with RSR spec)
-- A runtime library or framework (build-time only)
+Sourced from EXPLAINME §10 and ECOSYSTEM.a2ml `what-this-is-not` — the
+boundary-erosion guard. This repository is NOT:
+
+- SQL with poetic verbs
+- a general-purpose search engine
+- a thesaurus
+- a semantic oracle or truth engine
+- a replacement for human interpretation
+- a proof that an answer is good
+- the store (that is Vocarium) or the transformation language (that is Haec).
+  Hermeneia queries; it does not take long-term storage responsibility and does
+  not re-implement transformation effects as query verbs.
+- a re-implementation of the trope algebra. trope-checker exposes
+  `tropecheck-rs` as a library with `grade_le`, and hermeneia DEPENDS on that
+  validated implementation. Reimplementing the algebra here is rejected
+  permanently (STATE.a2ml, resolved 2026-07-28).
 
 ## If In Doubt
 
 If you are unsure whether a change is in scope, ask. Sensitive areas:
-- .machine_readable/ contractile definitions
-- RSR specification files
-- Governance templates
-- License policy documents
+
+- `docs/SPEC.adoc` — the specification and its "Status — no overclaim" section.
+  A change that widens a claim has to widen the receipts in the same PR.
+- `src/hermeneia-ir/` — the Trope IR is the contract with the external oracle;
+  changing its shape changes what tropecheck will accept.
+- `.machine_readable/contractiles/` and `.machine_readable/descriptiles/` —
+  the normative set-point and the descriptive self-model. Coaptation compares
+  the two, so editing one without the other is drift, not a change.
+- `.machine_readable/configs/instantiation.a2ml` — the values this repository
+  was rendered from. Edit it and re-run `just init`; do not hand-edit the
+  rendered files.
 
 ## Committed Next-Actions
 
 ### repo-initialization
-- description: Provide just copy-and-substitute template for new repos
-- probe: test -f scripts/init-repo.sh
+- description: The repository is instantiated from its template, and stays so
+- probe: bash scripts/instantiate.sh --check
 - status: done
-- notes: Run with source scripts/init-repo.sh <new-repo-name>
+- notes: |
+    Was "Provide just copy-and-substitute template for new repos" with probe
+    `test -f scripts/init-repo.sh`, declared done. No such script has ever
+    existed here, so the probe was FALSE against a clause marked complete.
+    For an instantiated repo the same clause name means the opposite direction:
+    not "can be copied FROM" but "was rendered, and has not drifted back".
+    `scripts/instantiate.sh` renders from
+    `.machine_readable/configs/instantiation.a2ml` and `--check` exits non-zero
+    if any token came back. Also gated by openssf-compliance.yml and by the
+    Mustfile's instantiation-rendered invariant.
 
 ### contractile-completeness
-- description: Every RSR contractile has an a2ml and ncl implementation
-- probe: ls .machine_readable/contractiles/*.a2ml | wc -l | grep -q "^6$"
-- status: in_progress
-- notes: Currently 6 contractile verbs: intend, must, trust, adjust, bust, dust
+- description: Every RSR contractile verb has an a2ml declaration and an ncl runner
+- probe: test "$(ls .machine_readable/contractiles/*/*.a2ml | wc -l)" -ge 12 && test "$(ls .machine_readable/contractiles/*/*.ncl | wc -l)" -ge 6
+- status: done
+- notes: |
+    The old probe globbed `.machine_readable/contractiles/*.a2ml` — the FLAT
+    layout — which matches only INDEX.a2ml here, so it counted 1 and could never
+    equal 6. This repo uses the per-verb directory layout (intend/, must/,
+    trust/, adjust/, bust/, dust/), which the Mustfile's
+    bust-dust-files-present invariant already assumed. Six verbs, each with an
+    a2ml declaration plus a manifest a2ml, plus the ncl runner and k9 wrapper.
 
 ### automation-scripts
-- description: All repetitive tasks have just recipes
-- probe: grep -c "^# " Justfile | grep -q "^[6-9][0-9]*$"
+- description: The Justfile's imported phase modules exist, so `just` recipes are not silent no-ops
+- probe: test -f build/just/init.just
 - status: in_progress
+- notes: |
+    The old probe counted `^# ` lines in the Justfile and asked whether the count
+    matched `[6-9][0-9]*`. The Justfile has 150 such lines, so the probe was
+    FALSE — and it measured comment volume, which is not "every repetitive task
+    has a recipe".
+    The real exposure this repo has is the opposite of too few recipes: the root
+    Justfile `import?`s build/just/{init,container,groove,assess}.just and
+    build/contractile.just, and `import?` is an OPTIONAL import, so a missing
+    module is silently ignored. Only init.just exists (added for issue #8). The
+    probe asserts the one that matters; the other four remain absent and are
+    recorded in STATE.a2ml rather than papered over by a probe that passes.
 
 ## Wishes
 
@@ -80,9 +138,16 @@ If you are unsure whether a change is in scope, ask. Sensitive areas:
 - status: declared
 
 #### automated-substitution
-- description: Script to automate repo-specific substitution in template
+- description: Script to automate repo-specific substitution
 - horizon: near
-- status: declared
+- status: achieved
+- notes: |
+    Promoted from a wish: scripts/instantiate.sh plus
+    .machine_readable/configs/instantiation.a2ml, added for issue #8. Idempotent,
+    guard-aware, and gated in CI. What is still wished for is the upstream
+    equivalent landing here — build/just/repo-init.just's archetype overlays and
+    provenance/deed splicing — which only matters if this repo is ever re-minted
+    from a newer template.
 
 ### Mid Horizon
 

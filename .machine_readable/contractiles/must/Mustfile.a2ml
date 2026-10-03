@@ -7,9 +7,16 @@
 # Fix with: must fix (where a deterministic fix exists)
 
 @abstract:
-Physical-state invariants for hermeneia. This is the canonical
-RSR template repository. These are hard requirements — CI and pre-commit
-hooks fail if any check fails.
+Physical-state invariants for hermeneia. These are hard requirements — CI and
+pre-commit hooks fail if any check fails.
+
+This file was inherited from rsr-template-repo and, at instantiation (issue #8),
+five of its invariants were found to be FALSE against this tree: they named the
+template's own paths and markers rather than hermeneia's. A contractile that
+declares invariants which do not hold is worse than one that declares fewer, so
+each was either corrected to the real path or replaced by a check that is true
+and load-bearing. What is asserted below was executed against this tree before
+it was written down.
 @end
 
 ## File Presence
@@ -25,9 +32,16 @@ hooks fail if any check fails.
 - severity: critical
 
 ### security-policy
-- description: SECURITY.md must exist
-- run: test -f SECURITY.md
+- description: A SECURITY policy must exist (root or .github/, .md or .adoc)
+- run: test -f SECURITY.md || test -f SECURITY.adoc || test -f .github/SECURITY.md
 - severity: critical
+- notes: |
+    Was `test -f SECURITY.md` and FALSE here — this repo's policy lives at
+    .github/SECURITY.md, which is the estate-canonical location
+    (.machine_readable/root-allow.txt records the tension: openssf-compliance
+    and scorecard accept either, this contractile accepted only the root).
+    Widened to the same set openssf-compliance.yml accepts, so the contractile
+    and the CI gate cannot disagree about what satisfies the obligation.
 
 ### ai-manifest
 - description: 0-AI-MANIFEST.a2ml must exist
@@ -52,9 +66,15 @@ hooks fail if any check fails.
 - severity: critical
 
 ### contractiles-files-present
-- description: All four primary contractile files exist
-- run: test -f .machine_readable/contractiles/Intentfile.a2ml && test -f .machine_readable/contractiles/Mustfile.a2ml && test -f .machine_readable/contractiles/Trustfile.a2ml && test -f .machine_readable/contractiles/Adjustfile.a2ml
+- description: All four primary contractile files exist, each in its verb directory
+- run: test -f .machine_readable/contractiles/intend/Intentfile.a2ml && test -f .machine_readable/contractiles/must/Mustfile.a2ml && test -f .machine_readable/contractiles/trust/Trustfile.a2ml && test -f .machine_readable/contractiles/adjust/Adjustfile.a2ml
 - severity: critical
+- notes: |
+    Was the flat `.machine_readable/contractiles/<Verb>file.a2ml` layout and
+    FALSE here — this repo uses the per-verb directory layout
+    (intend/, must/, trust/, adjust/, bust/, dust/) that the sibling
+    bust-dust-files-present invariant already assumes. The two invariants
+    contradicted each other; this one was the stale half.
 
 ### bust-dust-files-present
 - description: Bustfile and Dustfile exist in their directories
@@ -72,22 +92,46 @@ hooks fail if any check fails.
 - severity: warning
 
 ### self-validating-structure
-- description: self-validating directory has k9-svc and examples
-- run: test -d .machine_readable/self-validating && test -d .machine_readable/self-validating/k9-svc && test -d .machine_readable/self-validating/examples
+- description: self-validating directory has its examples and its methodology guard
+- run: test -d .machine_readable/self-validating && test -d .machine_readable/self-validating/examples && test -f .machine_readable/self-validating/methodology-guard.k9.ncl
 - severity: warning
+- notes: |
+    Was `test -d .../k9-svc` and FALSE — no k9-svc/ directory exists in this
+    repo and nothing creates one. Asserting the files that ARE the structure
+    (the k9 templates' examples/ and methodology-guard.k9.ncl, the validator
+    that enforces this contractile's own state-validation rules) instead.
 
 ## Template Integrity
 
 ### no-placeholder-values
-- description: No placeholder values remain in template files
-- run: test -z "$(grep -r '{{' .machine_readable/contractiles/ 2>/dev/null)"
+- description: No unfilled template placeholder token survives anywhere in the tree
+- run: bash scripts/check-no-placeholders.sh .
 - severity: critical
-- notes: All placeholders must be substituted when copying this template
+- notes: |
+    Was `test -z "$(grep -r '{{' .machine_readable/contractiles/)"` and FALSE —
+    that grep has no closing brace, so it matched just's own {{args}}
+    interpolation in contractiles/Justfile and the word {{PLACEHOLDER}} used in
+    Adjustfile.a2ml's prose about placeholders. It could only ever fail.
+    Delegated to scripts/check-no-placeholders.sh, the single estate
+    implementation of this rule (vendored from rsr-template-repo), which matches
+    upper-snake tokens only, exempts metasyntactic ones, and allow-lists the
+    template and example trees by path. One implementation, not a second copy
+    that can drift from the CI gate.
 
-### template-readonly
-- description: Template marker files are not modified
-- run: grep -q 'RSR_TEMPLATE_DO_NOT_EDIT' .machine_readable/0.1-AI-MANIFEST.a2ml
-- severity: warning
+### instantiation-rendered
+- description: The tree is fully rendered from .machine_readable/configs/instantiation.a2ml
+- run: bash scripts/instantiate.sh --check
+- severity: critical
+- notes: |
+    REPLACES `template-readonly`, which grepped for an RSR_TEMPLATE_DO_NOT_EDIT
+    marker that exists nowhere in this repository — an invariant that could only
+    ever fail, guarding a condition (this is the template, do not edit it) that
+    is not true of hermeneia.
+    What this repo actually needs guarded is the regression that issue #8
+    describes: the tree was scaffolded and never rendered, and nothing noticed
+    for the repo's whole life. This asserts the rendered state is still true, so
+    a template re-sync that reintroduces a token fails here rather than shipping.
+    Companion CI check: openssf-compliance.yml runs the same gate.
 
 ## Git State
 

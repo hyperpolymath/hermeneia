@@ -17,11 +17,19 @@ not block.
 ## Template Drift
 
 ### placeholder-drift
-- description: Template placeholders should be replaced when copied
-- tolerance: 0 placeholder markers in copied repos
-- corrective: Search and replace all {{PLACEHOLDER}} markers
+- description: No unfilled template placeholder token survives in this repository
+- tolerance: 0 unfilled upper-snake brace tokens outside the allow-listed template and example trees
+- corrective: Edit .machine_readable/configs/instantiation.a2ml, then run `just init` (scripts/instantiate.sh). Do not hand-edit the rendered files.
 - severity: advisory
-- notes: This check only applies to repos that copied from this template
+- notes: |
+    Was scoped to "repos that copied from this template", which is not a
+    condition this repository can be in — it is the copy. Restated as the drift
+    this repo actually has: it was scaffolded and never rendered, and nothing
+    noticed for its whole life (issue #8). Measured by
+    scripts/check-no-placeholders.sh, the single estate implementation of the
+    rule, which is also what openssf-compliance.yml runs and what the Mustfile's
+    no-placeholder-values invariant delegates to. Kept advisory here and critical
+    in Mustfile deliberately: adjust reports posture, must gates.
 
 ### template-version-drift
 - description: Template version should match RSR spec version

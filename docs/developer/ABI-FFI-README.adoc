@@ -1,13 +1,32 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = ABI/FFI Standards
-{{~ Aditionally delete this line and fill out the template below ~}}
 
 # HERMENEIA ABI/FFI Documentation
 
+[NOTE]
+====
+*Status — read before relying on anything below.* This document describes the
+ABI/FFI seam's intended shape. The seam itself is still scaffolding inherited
+from the template, and hermeneia's working implementation is the Rust workspace
+(`src/hermeneia-{syntax,ir,store,core,cli}`). Concretely, as at the
+instantiation in issue #8:
+
+* `src/interface/Abi/Foreign.idr` still declares `%foreign "C:rsr_init,librsr"`
+  and friends — the *template's* symbol names against the *template's* library.
+  Nothing named `librsr` exists here.
+* `src/interface/generated/abi/` holds only `.gitkeep` and a README: no C header
+  has ever been generated, so the Idris2 -> C -> Zig bridge is not wired.
+* `src/interface/ffi/build.zig` says so itself — "Template FFI Build
+  Configuration ... minimal build file that demonstrates Zig integration".
+
+So the paths and commands below are correct, and the pipeline they describe is
+not yet built. Do not cite this file as evidence that the ABI seam works.
+====
+
 ## Overview
 
-This library follows the **Hyperpolymath RSR Standard** for ABI and FFI design:
+This repository follows the **Hyperpolymath RSR Standard** for ABI and FFI design:
 
 - **ABI (Application Binary Interface)** defined in **Idris2** with formal proofs
 - **FFI (Foreign Function Interface)** implemented in **Zig** for C compatibility
@@ -17,37 +36,37 @@ This library follows the **Hyperpolymath RSR Standard** for ABI and FFI design:
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────┐
-│  ABI Definitions (Idris2)                   │
-│  src/interface/Abi/                                   │
-│  - Types.idr      (Type definitions)        │
-│  - Layout.idr     (Memory layout proofs)    │
-│  - Foreign.idr    (FFI declarations)        │
-└─────────────────┬───────────────────────────┘
-                  │
-                  │ generates (at compile time)
-                  ▼
-┌─────────────────────────────────────────────┐
-│  C Headers (auto-generated)                 │
-│  generated/abi/hermeneia.h                │
-└─────────────────┬───────────────────────────┘
-                  │
-                  │ imported by
-                  ▼
-┌─────────────────────────────────────────────┐
-│  FFI Implementation (Zig)                   │
-│  ffi/zig/src/main.zig                       │
-│  - Implements C-compatible functions        │
-│  - Zero-cost abstractions                   │
-│  - Memory-safe by default                   │
-└─────────────────┬───────────────────────────┘
-                  │
-                  │ compiled to libhermeneia.so/.a
-                  ▼
-┌─────────────────────────────────────────────┐
-│  Any Language via C ABI                     │
-│  - Rust, ReScript, Julia, Python, etc.     │
-└─────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│  ABI Definitions (Idris2)                            │
+│  src/interface/Abi/                                  │
+│  - Types.idr      (Type definitions)                 │
+│  - Layout.idr     (Memory layout proofs)             │
+│  - Foreign.idr    (FFI declarations)                 │
+└──────────────────────────┬───────────────────────────┘
+                           │
+                           │ generates (at compile time)
+                           ▼
+┌──────────────────────────────────────────────────────┐
+│  C Headers (auto-generated)                          │
+│  src/interface/generated/abi/hermeneia.h             │
+└──────────────────────────┬───────────────────────────┘
+                           │
+                           │ imported by
+                           ▼
+┌──────────────────────────────────────────────────────┐
+│  FFI Implementation (Zig)                            │
+│  src/interface/ffi/src/main.zig                      │
+│  - Implements C-compatible functions                 │
+│  - Zero-cost abstractions                            │
+│  - Memory-safe by default                            │
+└──────────────────────────┬───────────────────────────┘
+                           │
+                           │ compiled to libhermeneia.so/.a
+                           ▼
+┌──────────────────────────────────────────────────────┐
+│  Any Language via C ABI                              │
+│  - Rust, Julia, and anything else with a C toolchain │
+└──────────────────────────────────────────────────────┘
 ```
 
 ## Directory Structure
@@ -192,7 +211,7 @@ pub const lib = @import("std");
 ### Build FFI Library
 
 ```bash
-cd ffi/zig
+cd src/interface/ffi
 zig build                         # Build debug
 zig build -Doptimize=ReleaseFast  # Build optimized
 zig build test                    # Run tests
@@ -201,14 +220,14 @@ zig build test                    # Run tests
 ### Generate C Header from Idris2 ABI
 
 ```bash
-cd src/abi
-idris2 --cg c-header Types.idr -o ../../generated/abi/hermeneia.h
+cd src/interface/Abi
+idris2 --cg c-header Types.idr -o ../generated/abi/hermeneia.h
 ```
 
 ### Cross-Compile
 
 ```bash
-cd ffi/zig
+cd src/interface/ffi
 
 # Linux x86_64
 zig build -Dtarget=x86_64-linux
@@ -322,30 +341,35 @@ end
 ### Unit Tests (Zig)
 
 ```bash
-cd ffi/zig
+cd src/interface/ffi
 zig build test
 ```
 
 ### Integration Tests
 
 ```bash
-cd ffi/zig
+cd src/interface/ffi
 zig build test-integration
 ```
 
 ### ABI Verification (Idris2)
 
-```idris
--- Compile-time verification
-%runElab verifyABI
+The ABI is verified by TYPECHECKING, not by a runtime script:
 
--- Runtime checks
-main : IO ()
-main = do
-  verifyLayouorrect
-  verifyAlignmenorrect
-  putStrLn "ABI verification passed"
+```bash
+idris2 --typecheck abi.ipkg
 ```
+
+`abi.ipkg` sets `sourcedir = src/interface` so the `module Abi.*` namespace
+resolves; that is why the package is typechecked rather than each file passed to
+`idris2 --check` individually. A bare per-file check reports "module name does
+not match file name" and masks exactly the namespace/path breakage this is meant
+to catch — `scripts/validate-template.sh` Phase 7 makes the same point.
+
+Layout and alignment are discharged in `src/interface/Abi/Layout.idr` at compile
+time, so there is no `verifyLayout` / `verifyAlignment` to call at runtime.
+(This section previously showed an illustrative `%runElab verifyABI` script with
+two corrupted identifiers in it; no such symbol exists in `src/interface/Abi/`.)
 
 ## Contributing
 
@@ -358,10 +382,10 @@ When modifying the ABI/FFI:
 
 2. **Generate C header**
    ```bash
-   idris2 --cg c-header src/interface/Abi/Types.idr -o generated/abi/hermeneia.h
+   idris2 --cg c-header src/interface/Abi/Types.idr -o src/interface/generated/abi/hermeneia.h
    ```
 
-3. **Update FFI implementation** (`ffi/zig/src/main.zig`)
+3. **Update FFI implementation** (`src/interface/ffi/src/main.zig`)
    - Implement new functions
    - Match ABI types exactly
 

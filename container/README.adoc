@@ -32,8 +32,15 @@ or delete — the rest.
   https://github.com/hyperpolymath/stapeln[stapeln] stack.
 |===
 
-All files use `{{PLACEHOLDER}}` tokens, replaced by `just container-init`
-(or the top-level `just init` during project bootstrap).
+These files were template-shaped and are now rendered: `just init`
+(`scripts/instantiate.sh`, values in
+`.machine_readable/configs/instantiation.a2ml`) substituted the service name,
+port and registry across the whole module. There is no separate
+`just container-init` in this repository — the container module's
+`build/just/container.just` was never carried over from the template, so the
+`import? "build/just/container.just"` in the root Justfile is a silent no-op.
+The rendered configs are inert until that module lands or the recipes are
+written here; `container-build.yml` is off unless `CONTAINER_CI=true`.
 
 The container engine is *auto-detected* (`podman`, then `nerdctl`, then
 `docker`). Override with `CONTAINER_ENGINE=docker just container-build`.

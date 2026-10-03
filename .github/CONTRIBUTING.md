@@ -2,6 +2,28 @@
 SPDX-License-Identifier: CC-BY-SA-4.0
 Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 -->
+# Contributing to Hermeneia
+
+Hermeneia is an experimental voking / imminence query language for Vocarium.
+Thanks for your interest in it.
+
+This file is the copy GitHub auto-discovers and shows on the New Issue and New
+PR pages. The fuller, estate-facing contribution guide is
+[CONTRIBUTING.adoc](../CONTRIBUTING.adoc) at the repository root; the two are
+deliberately both present (see `.machine_readable/root-allow.txt`, which records
+that deduping them is an owner decision because several CI gates `test -f` a
+root CONTRIBUTING without a `.github/` fallback).
+
+Read [README.adoc](../README.adoc) for what the language claims and
+[EXPLAINME.adoc](../EXPLAINME.adoc) for the evidence behind those claims before
+opening a PR — in particular the evidence boundary in EXPLAINME §9, because a
+change that widens a claim has to widen the receipts too.
+
+## Getting Started
+
+### Development Setup
+
+```bash
 # Clone the repository
 git clone https://github.com/hyperpolymath/hermeneia.git
 cd hermeneia
@@ -12,7 +34,13 @@ guix shell -D -f guix.scm
 # Or using toolbox/distrobox
 toolbox create hermeneia-dev
 toolbox enter hermeneia-dev
+
+# Or using mise (reads mise.toml)
+mise install
+
 # Install dependencies manually
+# (the Cargo workspace is deliberately dependency-free — std only — so there
+#  are no crates to fetch; the ABI seam additionally needs idris2 and zig)
 
 # Verify setup
 just check   # or: cargo check / mix compile / etc.
