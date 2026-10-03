@@ -80,4 +80,4 @@ errorDescription Busy = "Library is busy"
 ||| 4. FFI boundary uses explicitly tagged types from Abi.Types.
 public export
 abiSafetyGuarantees : String
-abiSafetyGuarantees = "RSR-Template ABI: 4 proven safety properties for FFI integration"
+abiSafetyGuarantees = "Hermeneia ABI: 4 proven safety properties for FFI integration"
