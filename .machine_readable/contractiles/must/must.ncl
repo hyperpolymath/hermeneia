@@ -1,52 +1,47 @@
 # SPDX-License-Identifier: MPL-2.0
-# Must — invariants runner
+# Must — Hermeneia invariants runner schema
 #
 # Pairs with: Mustfile.a2ml (same directory)
-# Verb:       must (invariant assertion)
-# Semantics:  every check is a hard gate. A single failure blocks merge.
-# CLI:        `contractile must run` → reads Mustfile.a2ml, evaluates each check,
-#             emits pass/fail verdict per item, exits non-zero if any failed.
+# Verb:       must
+# Semantics:  intended hard gate for repository invariants and evidence.
 #
-# This file is the *schema + runner* that the `contractile` CLI (at
-# /var/mnt/eclipse/repos/reposystem/contractiles/cli/) loads alongside
-# Mustfile.a2ml. Anything else in this directory is human-only notes/archive
-# and MUST be ignored by machines.
+# This declares the expected schema and authority. The compatible contractile
+# executable is not bundled in this repository, so no `must check` CLI command
+# is currently wired. scripts/verify-contractiles.sh checks only structure and
+# manifest integrity; Rust and GitHub workflow probes are listed separately in
+# the declaration.
 #
 # Base: ../_base.ncl provides pedigree_schema, run_defaults, probe_schema.
-# See: docs/CONTRACTILE-SPEC.adoc
+# See: .machine_readable/contractiles/README.adoc
 
 let base = import "../_base.ncl" in
 
 {
   pedigree = base.pedigree_schema & {
     contractile_verb = "must",
-    semantics = "invariant",
+    semantics = "Hermeneia repository, test, and evidence-boundary invariants",
     security = {
       leash = 'Kennel,
       trust_level = "read-only verification",
       allow_network = false,
       allow_filesystem_write = false,
-      allow_subprocess = true,    # verification probes may shell out (e.g. grep, test -f)
+      allow_subprocess = true,
     },
     metadata = {
       name = "must-runner",
-      version = "1.0.0",
-      description = "Evaluates every invariant in the adjacent Mustfile.a2ml as a hard gate.",
+      version = "1.1.0",
+      description = "Declares intended release-blocking repository and evidence invariants; only the explicitly named GitHub workflow probes are currently wired.",
       paired_xfile = "Mustfile.a2ml",
       author = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>",
     },
   },
 
-  # Contract schema — the shape every Mustfile.a2ml must satisfy.
-  # Used by `contractile must typecheck Mustfile.a2ml`.
   schema = {
     invariants
       | Array {
           id | String,
           description | String,
-          # TODO: migrate to base.probe_schema (structured probe) when CLI supports it
-          probe | String,                          # shell command; exit 0 = pass
-          # status_core values: 'declared, 'verified, 'failing
+          probe | String,
           status | [| 'declared, 'verified, 'failing |] | default = 'declared,
           severity | [| 'critical, 'high, 'medium |] | default = 'critical,
           notes | String | optional,
@@ -54,11 +49,9 @@ let base = import "../_base.ncl" in
         },
   },
 
-  # Runner behaviour — consumed by the contractile CLI dispatcher.
-  # Inherits from base.run_defaults; on_any_fail is the hard-gate default.
   run = base.run_defaults & {
-    on_any_fail = "exit-nonzero",     # hard gate
-    report_format = "a2ml",           # emit a2ml report, not json
+    on_any_fail = "exit-nonzero",
+    report_format = "a2ml",
     emit_summary = true,
   },
 }

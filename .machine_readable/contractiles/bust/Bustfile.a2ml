@@ -1,52 +1,58 @@
 # SPDX-License-Identifier: MPL-2.0
-# Bustfile — failure mode contractile for hermeneia
+# Bustfile — fail-closed stop conditions for Hermeneia
 # Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 #
 # Paired runner: bust.ncl
-# Verb:          bust
-# Semantics:     Every declared failure mode must have a working recovery path
-#                that has been exercised. Status moves:
-#                  declared → drilled (probe run) → verified (recovery confirmed)
-#                  or → failing (recovery broken)
-#
-# CLI:
-#   contractile bust check  → list failure modes + recovery status
-#   contractile bust drill  → inject failures, verify recovery paths
-#
-# This repository: hermeneia is the canonical template for RSR compliance.
-# Failure modes here relate to template distribution and substitution.
+# The probes below exercise synthetic repository-local tests; they do not inject
+# faults into a user's data, mutate tracked files, or contact external systems.
 
 @abstract:
-Bustfile for hermeneia. Lists failure modes specific to the template
-repository itself, particularly around template distribution, substitution,
-and synchronization across the hyperpolymath estate.
+Bust defines conditions under which Hermeneia must stop rather than report a
+successful or licensed answer. Current stop conditions are grounded in the
+implemented `.hil` parser, JSONL loader, IR validator, and external checker
+seam. Failure of the checker, malformed input, or an unimplemented voke must
+never be converted to `p-sufficient` or an empty successful result.
+
+Hermeneia currently has no runtime certificate, token, or grant whose expiry
+can be checked. No expiry condition is invented here. Any new remote service,
+credential, or destructive failure drill requires owner review and a bounded,
+repository-local test plan first.
 @end
 
 ## Failure Modes
 
-### template-substitution-failure
-- class: template_processing
-- description: Template substitution fails when initializing a new repo from this template
-- injection_probe: "cp -r hermeneia test-repo && cd test-repo && sed -i 's/hermeneia/TEST/g' .machine_readable/contractiles/Intentfile.a2ml && grep -q 'TEST' .machine_readable/contractiles/Intentfile.a2ml"
-- recovery_probe: "git -C test-repo diff --quiet .machine_readable/contractiles/Intentfile.a2ml"
-- expected_recovery_time_seconds: 10
+### unsupported-voke-must-stop
+- class: unsupported_operation
+- description: A recognized but unimplemented voke must return an explicit not-implemented error rather than successful empty output
+- injection_probe: cargo test -p hermeneia-syntax other_vokes_are_unimplemented_not_syntax_errors
+- recovery_probe: cargo test -p hermeneia-core plans_the_readme_example
+- expected_recovery_time_seconds: 30
 - status: declared
-- notes: Verify that substitution scripts handle all placeholder replacements correctly
+- notes: The injection is a synthetic parser fixture; the recovery probe checks the supported invoke planning path.
 
-### sync-drift-between-repos
-- class: synchronization
-- description: Drift occurs between hermeneia and other repos after template updates
-- injection_probe: "echo 'template_updated' > /tmp/test_drift_marker"
-- recovery_probe: "test -f /tmp/test_drift_marker && rm /tmp/test_drift_marker"
+### missing-checker-must-not-pass
+- class: oracle_unavailable
+- description: Missing tropecheck or checker I/O failure must not be interpreted as a passing verdict
+- injection_probe: cargo test -p hermeneia-cli --features e2e --test slice missing_checker_exits_three_with_instructions
+- recovery_probe: cargo test -p hermeneia-cli --test gate the_slice_workflow_supplies_a_checker
 - expected_recovery_time_seconds: 60
 - status: declared
-- notes: The estate-wide sync scripts (see scripts/) should prevent this; verify with scripts/verify-sync.sh
+- notes: The named test removes PATH and HERMENEIA_TROPECHECK only inside its child process; CI must still supply a real checker for the full slice.
 
-### contractile-parse-error
-- class: contractile_format
-- description: A contractile file fails to parse due to syntax errors
-- injection_probe: "echo 'invalid syntax' >> hermeneia/.machine_readable/contractiles/Intentfile.a2ml"
-- recovery_probe: "git checkout hermeneia/.machine_readable/contractiles/Intentfile.a2ml"
-- expected_recovery_time_seconds: 5
+### malformed-store-data-must-stop
+- class: malformed_input
+- description: Malformed JSONL and deceptive grades must be rejected before planning or verdict rendering
+- injection_probe: cargo test -p hermeneia-store malformed_line_reports_its_number
+- recovery_probe: cargo test -p hermeneia-store seed_corpus_loads
+- expected_recovery_time_seconds: 30
 - status: declared
-- notes: All .a2ml files should be valid A2ML; use a2ml-validate runner
+- notes: The test uses an in-memory synthetic line and does not alter the checked-in corpus.
+
+### loss-or-warrant-must-not-be-fabricated
+- class: false_license
+- description: A requested loss vector or warrant must be refused when the current checker/store interface cannot provide it
+- injection_probe: cargo test -p hermeneia-core show_loss_is_refused_honestly
+- recovery_probe: cargo test -p hermeneia-core plans_the_readme_example
+- expected_recovery_time_seconds: 30
+- status: declared
+- notes: This protects the documented evidence boundary: unsupported output is an error, not an invented explanation.

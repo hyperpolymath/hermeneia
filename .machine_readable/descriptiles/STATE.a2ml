@@ -6,7 +6,7 @@
 [metadata]
 project = "hermeneia"
 version = "0.1.0"
-last-updated = "2026-07-29"
+last-updated = "2026-10-03"
 status = "active"  # active | paused | archived
 
 [project-context]
@@ -85,7 +85,8 @@ ci-dead-workflows = [
 ci-verified-green = [
   "Slice (end to end) — all 14 steps; the 7 e2e tests RUN (named in the log) and the use-relativity step asserts strict=1 / loose=0. [from run logs, 2026-07-29]",
   "Rust CI — 39 passed, count matches the local unit+gate total exactly. [from run logs, 2026-07-29]",
-  "OpenSSF Compliance — all 10 steps executed locally; PASS. Its placeholder step used to grep a HAND-LISTED set of ~13 files, which is why it was green while ~120 files were unrendered. It now calls scripts/check-no-placeholders.sh (every text file, allow-listed carriers) plus scripts/instantiate.sh --check.",
+  "OpenSSF Compliance — the pre-issue-#10 steps passed locally; scripts/verify-contractiles.sh and the six-verb Coaptation extraction predicate also pass locally. The full workflow has not run as a unit; its placeholder check covers all text files plus instantiate --check.",
+  "Issue #10 structural evidence — the contractile structural/hash verifier passes; Coaptation extracts 30 clauses across all six verbs with descriptions and provenance. This is extraction/structure evidence only, not semantic validation or ratification.",
   "Estate Rules — both scripts executed locally; PASS.",
   "Workflow structure — all 29 workflows checked against the three gates hyperpolymath/standards runs at the revision Governance pins (874ffe5): parse, no-jobs, reusable-call-with-timeout-minutes, and duplicate YAML keys. All pass.",
   "Descriptile policy — check-descriptile-policy.sh executed locally at the pinned revision; exit 0.",
@@ -130,8 +131,8 @@ ci-blocked-account-billing = [
 ci-still-owed = [
   "AFFIRMATION.adoc is still an unsigned template — it says so itself in a NOTE block. Filling it honestly requires RUNNING the project's checks in the session that signs it (cargo test, idris2 --typecheck, zig build), and none of those toolchains is available here. Inventing an affirmation is exactly the overclaim the file exists to prevent.",
   "docs/status/READINESS.adoc — the CRG assessment is still a blank template, so this repo has no published readiness grade.",
-  "Coaptation receipt — REGENERATED 2026-10-03 against the current contractiles and descriptiles (issues #8/#11). Two defects had to be cleared before it COULD be regenerated: (a) extract-clauses.sh matched clause headers with the interval expression /^#{3,4} /, which mawk — the default awk on Debian/Ubuntu, therefore on every ubuntu-* runner — does not support and silently never matches, so `just coapt` had been emitting clauses-total = 0 while exiting 0; and (b) the receipt's repo field was a literal that instantiation hand-substituted instead of regenerating, so the committed receipt had stopped being a projection of any committed tree. The comparator now DERIVES repo from CLADE.a2ml canonical-name, so the identity cannot revert to rsr-template-repo. Still owed: one `just coapt` run under real nickel to confirm byte-identity — nickel is not installable in every checkout, and this regeneration was produced by re-evaluating coapt.ncl, validated by reproducing 98 of the previous receipt's 100 lines byte-for-byte from the pre-instantiation tree that generated it (the 2 exceptions being the hand-substituted identity line and already-stale provenance hashes).",
-  "The contractiles beyond Intentfile/Adjustfile/Mustfile still carry template-era clauses — bust.template-substitution-failure, dust.no-template-artifacts, trust.template-files-readonly and friends describe a repository that is a template. They are internally consistent and none of them gates CI here, but they are not hermeneia's failure modes.",
+  "Coaptation receipt — regenerated on main by issue #11 on 2026-10-03 after the repo identity and portable extractor were fixed. The six issue-#10 Xfiles now differ from that baseline, so this receipt is stale for the current branch and must be regenerated with `just coapt` after Nickel is available. Never hand-edit it. Echo Types is a separate future proof bridge, not a dependency of this report; see coaptation/README.adoc.",
+  "Issue #10 — Hermeneia-specific drafts for all six tridents and a structural/hash verifier are present. The local K9 hook mirrors hyperpolymath/k9-ecosystem/validate-action at 347ee5d and passes strict validation (15 scanned, 3 explicitly excluded non-contract files); canonical validator regression tests pass. Four Hunt-tier tridents now declare signature_required=true. These are lexical checks, not Nickel typechecking or cryptographic signature verification. The standalone contractile executable is absent in Hermeneia and the upstream contractiles standards repo; that repo has generated Just recipes but no CLI source. The separate Coaptation coapt.sh report runner exists. Still owed: record formal owner ratification, run Cargo/e2e and Nickel/K9 semantics, and regenerate the receipt. Hermeneia devcontainer now provisions Rust/Cargo, Just, and Nickel on rebuild, but the active sandbox lacks them because package/release downloads are unreachable. The VeriSimDB feed remains inactive pending an explicit decision; no gate was weakened.",
   "The root Justfile `import?`s build/just/{container,groove,assess}.just and build/contractile.just. `import?` is an OPTIONAL import, so all four are silent no-ops — the same defect class that made `just init` a no-op and let ~120 files ship unrendered. Only init.just was added, because it is the one this issue is about; the other four need the upstream modules ported or the imports removed.",
   "src/interface/ is un-instantiated scaffolding: Foreign.idr still declares %foreign \"C:rsr_init,librsr\" — the template's symbol names against the template's library — and src/interface/generated/abi/ holds only .gitkeep, so no C header has ever been generated. docs/developer/ABI-FFI-README.adoc now says this up front.",
 ]
@@ -148,6 +149,7 @@ actions = [
   "Implement transvoke over Haec edges.",
   "Implement provoke and intervoke, reusing the invoke path.",
   "Design and implement revoke with a persisted warrant graph; decide whether licence state lives here or in Vocarium.",
+  "Complete issue #10: after owner ratification, run the real Nickel/K9 and Cargo/e2e gates, use the contractile CLI once it is specified and available, regenerate the Coaptation receipt, and keep the issue open until those evidence gates pass.",
   "Propose upstream: have tropecheck emit the violated-coordinate list it already computes, so `show loss` can be honest.",
   "Write the Idris2 voke-algebra laws under verification/proofs/idris2/Voke/ — NOT yet started.",
 ]

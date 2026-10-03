@@ -1,47 +1,47 @@
 # SPDX-License-Identifier: MPL-2.0
-# adjust.manifest.a2ml — Trident coherence manifest for the adjust verb.
-# Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-#
-# Fifth trident instance. First (Yard, advisory) authority pattern —
-# complements the (Hunt, blocking) triple (must + trust + bust) and
-# the (Hunt, reporting) north-star (intend).
+# adjust.manifest.a2ml — Hermeneia trident integrity manifest.
 
 ---
-trident_version = "1.0.0"
+trident_version = "1.1.0"
 verb = "adjust"
-semantics = "drift tolerances + corrective actions"
+semantics = "advisory plain-text accessibility, diagnostic clarity, and implementation-status tolerances"
 cardinality = "one per repo"
-authority = "advisory (continue-with-warnings)"
+authority = "advisory (non-blocking; no automatic file edits)"
 
 [[files]]
 role = "declaration"
 path = "Adjustfile.a2ml"
-sha256 = "pending-first-verify"
-size_bytes = "pending-first-verify"
+sha256 = "a4805d512fd60d7b2f20288a7578855a722545cec851c76a359f020ad0363895"
+size_bytes = "3405"
 
 [[files]]
 role = "runner"
 path = "adjust.ncl"
-sha256 = "pending-first-verify"
-size_bytes = "pending-first-verify"
+sha256 = "6537ed61c59ca4e7c9f45a4dd935b171eb2a01193a92e73907c7919cfa02af73"
+size_bytes = "2225"
 
 [[files]]
 role = "k9_component"
 path = "adjust.k9.ncl"
-sha256 = "pending-first-verify"
-size_bytes = "pending-first-verify"
+sha256 = "0a487c0d2c8e3d283feee87f4023078e0643b1ec08ecaa85875b1dbb92b4e413"
+size_bytes = "6053"
 
 [cross_refs]
 runner_paired_xfile = "Adjustfile.a2ml"
-k9_paired_xfile     = "../adjust/Adjustfile.a2ml"
-k9_paired_runner    = "../adjust/adjust.ncl"
+k9_paired_xfile = "../adjust/Adjustfile.a2ml"
+k9_paired_runner = "../adjust/adjust.ncl"
 
 [signed_by]
-user    = "Jonathan D.A. Jewell"
-date    = "2026-04-18"
-context = "adjust trident — canonical template in hermeneia. (Yard, advisory) authority pattern. Specialises in cumulative-drift catchment — tolerance bands + trend tracking + auto-fix-where-declared. Advisory (continue-with-warnings). Copy this trident into a new repo and define its drift tolerances and corrective actions."
+user = "Jonathan D.A. Jewell"
+date = "2026-04-18"
+context = "Original trident structure authored 2026-04-18. The Hermeneia-specific content drafted 2026-10-03 is provisional and is not owner-ratified by this historical author/date entry."
 
 [[history]]
 date = "2026-04-18"
 event = "trident-born"
-note = "Adjustfile.a2ml and adjust.ncl pre-existed. This manifest + adjust.k9.ncl complete the trident. Exercises the Yard tier + advisory authority for the first time; on_exceeded = 'warn_and_attempt_fix rather than 'fail. adjust-specific track_drift_trend_over_sessions + flag_accelerating_drift."
+note = "Initial drift-tolerance shape. The project-specific draft replaces template drift with text-CLI accessibility, diagnostics, and evidence-boundary tolerances."
+
+[[history]]
+date = "2026-10-03"
+event = "hermeneia-specialization-draft"
+note = "No WCAG claim or automated fix is authorized; applicable standards and thresholds require maintainer review."

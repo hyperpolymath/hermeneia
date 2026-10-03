@@ -11,25 +11,22 @@ K9!
 #                              explicit per-item approval)
 # Authority:  advisory        (continue-with-warnings)
 #
-# dust is the retirement + audit-trail verb. Rollback paths, deprecation
-# markers, evidence-preservation semantics. Where bust declares
-# "broken, don't run", dust declares "how to safely undo / retire / roll
-# back". Complement to bust — bust marks the dead end, dust describes
-# the exit ramp.
+# Hermeneia-specific Dust scope: keep Rust/Cargo and Coaptation generated
+# outputs out of source history while preserving tracked source, tests,
+# receipts, and repository configuration. In particular, build/ contains
+# tracked project configuration and is not a generated directory.
 #
-# Cardinality: ONE dust trident per repo.
-#
-# Failure-mode focus: dust is the audit-trail preservation verb —
-# defends against E1 refactor stampede (check audit trail still
-# intact) and against silent removal (anything removed must have a
-# rollback path; anything retired must preserve the evidence of its
-# previous existence).
+# Any future source/operation retirement needs maintainer approval, a reviewed
+# diff, and a recovery path. The current draft proposes no source deletion;
+# the compatible contractile runner is not bundled.
 
-let base_k9 = import "../k9/template-hunt.k9.ncl" in
 let base    = import "../_base.ncl" in
 
 {
-  pedigree = base_k9.pedigree_schema & {
+  pedigree = base.pedigree_schema & {
+    name = "dust.k9.ncl",
+    component_type = "hermeneia-contractile",
+    schema_version = "1.0.0",
     contractile_verb = "dust",
     paired_xfile     = "../dust/Dustfile.a2ml",
     paired_runner    = "../dust/dust.ncl",
@@ -39,8 +36,8 @@ let base    = import "../_base.ncl" in
 
     metadata = {
       name = "dust-k9",
-      version = "1.0.0",
-      description = "Rollback + deprecation + audit-trail runner. Sixth trident instance — completes the full verb set.",
+      version = "1.1.0",
+      description = "Declares Hermeneia generated-output cleanup candidates and source-retirement safeguards. Advisory; no source deletion is proposed and the runner is not bundled.",
       paired_xfile = "Dustfile.a2ml",
       paired_runner = "dust.ncl",
       author = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>",
@@ -50,9 +47,9 @@ let base    = import "../_base.ncl" in
       leash = 'Yard,
       trust_level = "audit-trail verification + structural checks",
       allow_network = false,
-      # dust is the verb that ACTUALLY wants filesystem write — to
-      # execute declared rollback/removal — but only behind explicit
-      # --apply flag + per-item approval. Default is dry-run.
+      # A future compatible runner may write only after its dry-run diff,
+      # explicit --apply flag, and maintainer approval of each item. No such
+      # command is currently bundled or available.
       allow_filesystem_write_conditional = true,
       allow_subprocess = true,
       destructive_action_gating = {

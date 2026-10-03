@@ -1,164 +1,110 @@
 # SPDX-License-Identifier: MPL-2.0
-# Intentfile (A2ML Canonical) — north-star contractile for hermeneia
+# Intentfile — Hermeneia's north-star, committed actions, and aspirations
 # Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 #
 # Paired runner: intend.ncl
 # Verb:          intend
+# Authority:     reporting only; intents and wishes never block a build.
 #
-# Semantics: North-star contractile. Declares BOTH concrete committed
-#            next-actions AND horizon aspirations the project wishes to
-#            become. Two sections share one file because they answer
-#            the same question at different ranges:
-#              [[intents]] — "we WILL do this; track progress"
-#                            status: declared → in_progress → done |
-#                                    deferred | retired
-#              [[wishes]]  — "we WISH this were true; revisit later"
-#                            status: declared → in_progress → achieved |
-#                                    abandoned
-#                            grouped by horizon: near / mid / far.
-#            Non-gating — this is a report, not a gate. See the `must`
-#            contractile for hard gates.
+# This is a project-specific draft. Owner ratification is still required;
+# see .machine_readable/contractiles/README.adoc.
 
 @abstract:
-North-star contractile for Hermeneia: the voking / imminence query language for
-Vocarium. Hermeneia calls trope-shaped stored particulars into a declared
-use-relation and reports what is preserved, lost, licensed, or insufficient
-under a use-model — separating the retrieved from the interpretable from the
-licensed.
+Hermeneia is an experimental voking query language for asking what a stored
+particular can become under a declared use-model. The current implementation
+supports `invoke` end-to-end against a local JSONL seed corpus and the external
+`tropecheck` oracle. Vocarium is not yet integrated; the other six voke
+operations are recognized but not implemented. This declaration records that
+boundary rather than treating design intent as delivered capability.
 
-This file was inherited from hermeneia and at instantiation (issue #8)
-still declared that this repository IS the canonical RSR template providing "the
-scaffold that all hyperpolymath repos should copy". A self-name substitution
-fixed the name and left the claim, which is the worse outcome: a north-star
-contractile describing a different project. Rewritten from README.adoc,
-EXPLAINME.adoc and descriptiles/{STATE,ECOSYSTEM}.a2ml. All three committed
-next-action probes below were also FALSE against this tree while two were
-declared in_progress and one done; each is restated with a probe that was
-executed before it was written down.
+A 2026-10-03 review replaced scaffold-era purpose text and probes that did not
+measure Hermeneia. The current project-specific content is provisional until
+the maintainer confirms the policies and priorities below.
 @end
 
 ## Purpose
 
-Hermeneia is the query layer of the hyperpolymath voking stack. Vocarium stores
-vokeable particulars (tropes, transformation paths, grades, warrants, use-models,
-verdicts); Haec records transformations; Hermeneia asks what a stored particular
-can become under a declared use.
+Hermeneia is the query layer in the trope stack: Vocarium is intended to store
+vokeable particulars, Haec records transformations, and Hermeneia queries a
+particular under a declared use-model. It emits Trope IR v0.2 and delegates
+grade comparison and the p-sufficiency verdict to `tropecheck`.
 
-It is organised around a family of voke operations — invoke, evoke, convoke,
-transvoke, provoke, intervoke, revoke — of which `invoke` is implemented and
-executing end to end against the real trope-checker oracle. The chain is
-`query -> Trope IR -> tropecheck -> verdict / witness / coordinate`.
+The implemented vertical slice is `.hil` parsing → `invoke` planning against
+the local JSONL store → Trope IR → `tropecheck` → verdict/witness rendering.
+Only `invoke` is implemented. `evoke`, `convoke`, `transvoke`, `provoke`,
+`intervoke`, and `revoke` remain recognized-but-unimplemented operations.
 
 ## Anti-Purpose
 
-Sourced from EXPLAINME §10 and ECOSYSTEM.a2ml `what-this-is-not` — the
-boundary-erosion guard. This repository is NOT:
+Hermeneia is NOT:
 
-- SQL with poetic verbs
-- a general-purpose search engine
-- a thesaurus
-- a semantic oracle or truth engine
-- a replacement for human interpretation
-- a proof that an answer is good
-- the store (that is Vocarium) or the transformation language (that is Haec).
-  Hermeneia queries; it does not take long-term storage responsibility and does
-  not re-implement transformation effects as query verbs.
-- a re-implementation of the trope algebra. trope-checker exposes
-  `tropecheck-rs` as a library with `grade_le`, and hermeneia DEPENDS on that
-  validated implementation. Reimplementing the algebra here is rejected
-  permanently (STATE.a2ml, resolved 2026-07-28).
+- a truth engine or an automatic interpreter;
+- a general-purpose search engine, SQL replacement, or thesaurus;
+- Vocarium (the intended store) or Haec (the transformation language);
+- a reimplementation of the trope grade algebra owned by `trope-checker`;
+- evidence that a source grade or warrant is itself correct;
+- a replacement for human interpretation or accountability.
+
+A retrieved or interpretable particular is not automatically licensed. A
+p-sufficiency verdict is conditional on the supplied grades, use-model, and
+checker result; it is not a claim of semantic truth.
 
 ## If In Doubt
 
-If you are unsure whether a change is in scope, ask. Sensitive areas:
+Ask before changing a boundary-bearing contract. The sensitive areas are:
 
-- `docs/SPEC.adoc` — the specification and its "Status — no overclaim" section.
-  A change that widens a claim has to widen the receipts in the same PR.
-- `src/hermeneia-ir/` — the Trope IR is the contract with the external oracle;
-  changing its shape changes what tropecheck will accept.
+- `src/hermeneia-syntax/` — accepted syntax and honest reporting of operations
+  that are not implemented;
+- `src/hermeneia-ir/` — Trope IR v0.2, the integration contract with the oracle;
+- `src/hermeneia-core/` — query planning and the rule that the checker owns the
+  grade algebra;
 - `.machine_readable/contractiles/` and `.machine_readable/descriptiles/` —
-  the normative set-point and the descriptive self-model. Coaptation compares
-  the two, so editing one without the other is drift, not a change.
-- `.machine_readable/configs/instantiation.a2ml` — the values this repository
-  was rendered from. Edit it and re-run `just init`; do not hand-edit the
-  rendered files.
+  normative contracts and descriptive evidence; changing only one side is drift;
+- `docs/SPEC.adoc`, `EXPLAINME.adoc`, and `README.adoc` — public claims must not
+  outrun executable receipts;
+- any proposed persistent store, network service, deployment, or destructive
+  action. None is authorized by this declaration.
 
 ## Committed Next-Actions
 
-### repo-initialization
-- description: The repository is instantiated from its template, and stays so
-- probe: bash scripts/instantiate.sh --check
-- status: done
-- notes: |
-    Was "Provide just copy-and-substitute template for new repos" with probe
-    `test -f scripts/init-repo.sh`, declared done. No such script has ever
-    existed here, so the probe was FALSE against a clause marked complete.
-    For an instantiated repo the same clause name means the opposite direction:
-    not "can be copied FROM" but "was rendered, and has not drifted back".
-    `scripts/instantiate.sh` renders from
-    `.machine_readable/configs/instantiation.a2ml` and `--check` exits non-zero
-    if any token came back. Also gated by openssf-compliance.yml and by the
-    Mustfile's instantiation-rendered invariant.
-
-### contractile-completeness
-- description: Every RSR contractile verb has an a2ml declaration and an ncl runner
-- probe: test "$(ls .machine_readable/contractiles/*/*.a2ml | wc -l)" -ge 12 && test "$(ls .machine_readable/contractiles/*/*.ncl | wc -l)" -ge 6
-- status: done
-- notes: |
-    The old probe globbed `.machine_readable/contractiles/*.a2ml` — the FLAT
-    layout — which matches only INDEX.a2ml here, so it counted 1 and could never
-    equal 6. This repo uses the per-verb directory layout (intend/, must/,
-    trust/, adjust/, bust/, dust/), which the Mustfile's
-    bust-dust-files-present invariant already assumed. Six verbs, each with an
-    a2ml declaration plus a manifest a2ml, plus the ncl runner and k9 wrapper.
-
-### automation-scripts
-- description: The Justfile's imported phase modules exist, so `just` recipes are not silent no-ops
-- probe: test -f build/just/init.just
+### contractile-specialization
+- description: Replace the inherited generic contractile clauses with an accurate Hermeneia-specific draft and obtain maintainer ratification
+- probe: bash scripts/verify-contractiles.sh
 - status: in_progress
 - notes: |
-    The old probe counted `^# ` lines in the Justfile and asked whether the count
-    matched `[6-9][0-9]*`. The Justfile has 150 such lines, so the probe was
-    FALSE — and it measured comment volume, which is not "every repetitive task
-    has a recipe".
-    The real exposure this repo has is the opposite of too few recipes: the root
-    Justfile `import?`s build/just/{init,container,groove,assess}.just and
-    build/contractile.just, and `import?` is an OPTIONAL import, so a missing
-    module is silently ignored. Only init.just exists (added for issue #8). The
-    probe asserts the one that matters; the other four remain absent and are
-    recorded in STATE.a2ml rather than papered over by a probe that passes.
+    The probe verifies file presence, cross-references, and pinned hashes only.
+    It does not establish that the owner agrees with the policy choices or that
+    the external contractile CLI executes these declarations. Owner review and
+    coaptation receipt regeneration remain outstanding.
 
 ## Wishes
 
 ### Near Horizon
 
-#### cross-repo-validation
-- description: Tooling to validate all repos against RSR spec
+#### vocarium-store-provider
+- description: Replace or complement the local JSONL stub with a real Vocarium StoreProvider without changing query planning
 - horizon: near
 - status: declared
-
-#### automated-substitution
-- description: Script to automate repo-specific substitution
-- horizon: near
-- status: achieved
-- notes: |
-    Promoted from a wish: scripts/instantiate.sh plus
-    .machine_readable/configs/instantiation.a2ml, added for issue #8. Idempotent,
-    guard-aware, and gated in CI. What is still wished for is the upstream
-    equivalent landing here — build/just/repo-init.just's archetype overlays and
-    provenance/deed splicing — which only matters if this repo is ever re-minted
-    from a newer template.
+- notes: Vocarium does not exist as an integrated backend in this repository yet.
 
 ### Mid Horizon
 
-#### formal-verification
-- description: Idris2 proofs for all critical contractile invariants
+#### voke-family-implementation
+- description: Implement the remaining recognized voke operations with explicit semantics, tests, and truthful status reporting
 - horizon: mid
 - status: declared
+- notes: Do not mark an operation implemented until its executable path and evidence exist.
+
+#### warrant-aware-revocation
+- description: Implement `revoke` over a warrant graph so licence withdrawal is traceable and use-relative
+- horizon: mid
+- status: declared
+- notes: Requires a warrant graph and is not part of the current slice.
 
 ### Far Horizon
 
-#### ecosystem-visualization
-- description: Interactive graph of all hyperpolymath repos and dependencies
+#### loss-vector-from-oracle
+- description: Render the full loss vector only after the checker exposes the required violated-coordinate evidence
 - horizon: far
 - status: declared
+- notes: Do not reconstruct or fabricate the vector in Hermeneia while the oracle CLI omits it.

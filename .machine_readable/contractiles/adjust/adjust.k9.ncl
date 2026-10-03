@@ -6,27 +6,25 @@ K9!
 # Pairs with: Adjustfile.a2ml (declaration) + adjust.ncl (runner).
 #
 # Verb:       adjust          (drift tolerances + corrective actions)
-# Tier:       Yard            (validation with subprocess for measurement;
-#                              no mutation beyond auto-fix where declared)
+# Tier:       Yard            (read-only local measurement)
+#                              No automatic mutation is authorized.
 # Authority:  advisory        (continue-with-warnings; not blocking)
 #
-# adjust is the tolerance-band verb. Where must says "this MUST hold"
-# and trust says "this MUST verify clean" (both binary), adjust says
-# "drift ≤ X is acceptable; drift > X triggers action Y". Between them,
-# adjust handles the subtle-drift territory that binary verbs can't.
+# Hermeneia-specific adjust scope: advisory review of plain-text CLI
+# accessibility, actionable diagnostics, and truthful implementation-status
+# claims. There is no graphical interface and no WCAG claim in this draft.
+# Corrective actions are maintainer-reviewed recommendations; automatic file
+# edits are disabled. The compatible contractile runner is not bundled.
 #
-# Cardinality: ONE adjust trident per repo.
-#
-# Failure-mode focus: adjust catches cumulative-small-drift patterns
-# (E2 cosmetic churn accumulating into real regression, F2 context
-# erosion causing gradual parameter drift). Where must flags "broken
-# now", adjust flags "drifting toward broken".
+# Cardinality: one adjust trident per repository. No numeric score is invented.
 
-let base_k9 = import "../k9/template-hunt.k9.ncl" in
 let base    = import "../_base.ncl" in
 
 {
-  pedigree = base_k9.pedigree_schema & {
+  pedigree = base.pedigree_schema & {
+    name = "adjust.k9.ncl",
+    component_type = "hermeneia-contractile",
+    schema_version = "1.0.0",
     contractile_verb = "adjust",
     paired_xfile     = "../adjust/Adjustfile.a2ml",
     paired_runner    = "../adjust/adjust.ncl",
@@ -36,8 +34,8 @@ let base    = import "../_base.ncl" in
 
     metadata = {
       name = "adjust-k9",
-      version = "1.0.0",
-      description = "Drift-tolerance + corrective-action runner. Fifth trident instance. First (Yard, advisory) authority pattern.",
+      version = "1.1.0",
+      description = "Declares advisory Hermeneia text-CLI, diagnostic, and implementation-status tolerances. Corrective actions are recommendations; automatic writes are disabled.",
       paired_xfile = "Adjustfile.a2ml",
       paired_runner = "adjust.ncl",
       author = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>",
@@ -45,11 +43,11 @@ let base    = import "../_base.ncl" in
 
     security = {
       leash = 'Yard,
-      trust_level = "tolerance measurement + declared auto-fix",
+      trust_level = "read-only tolerance measurement + human-reviewed recommendations",
       allow_network = false,
-      allow_filesystem_write_conditional = true,  # auto_fix_when_available may edit
+      allow_filesystem_write_conditional = false,
       allow_subprocess = true,
-      probe_scope = 'measurement_plus_declared_fix,
+      probe_scope = 'read_only,
     },
   },
 
@@ -72,9 +70,9 @@ let base    = import "../_base.ncl" in
       measure_drift = true,
       record_outcome = true,
       respect_variance = true,
-      # adjust-specific authority: tolerance exceeded → warn, try
-      # auto-fix if declared, then continue. Never blocks.
-      on_exceeded = 'warn_and_attempt_fix,
+      # Advisory only: report the variance; any correction is reviewed by a
+      # maintainer. Filesystem writes are disabled in this project profile.
+      on_exceeded = 'warn,
       on_auto_fix_applied = 'record_and_continue,
       on_auto_fix_unavailable = 'record_as_advisory_drift,
       # Cumulative-drift detection (adjust's specialty)

@@ -1,88 +1,92 @@
 # SPDX-License-Identifier: MPL-2.0
-# Trustfile — Trust boundaries and integrity invariants for hermeneia
+# Trustfile — Hermeneia's security boundary and trust checks
 # Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 #
-# Defines what LLM/SLM agents are trusted to do without asking, and
-# integrity invariants that verify the repo has not been tampered with.
+# Paired runner: trust.ncl
+# The runner schema expects `probe` commands. This is a provisional policy draft;
+# the project owner must ratify the trust level and approval boundaries.
 
 @abstract:
-Trust boundaries and integrity checks for hermeneia. This file
-combines the trust-level definitions from the original TRUST.contractile
-with the integrity invariants from the old Trustfile.a2ml. It defines
-what AI agents may do autonomously and what requires human approval,
-plus checks that verify repository integrity.
+Hermeneia is currently a local command-line query tool, not a network service.
+Its query text, user-supplied JSONL, stored grades, and external checker output
+are untrusted inputs. The parser and IR validator must reject malformed or
+unsupported data; checker failure must never become a p-sufficient result.
+
+## Threat Model
+
+- Assets: integrity of the parsed query, planned Trope IR, and emitted verdict;
+  confidentiality of user-provided local query/store data.
+- Untrusted inputs: `.hil` text, local JSONL records and annotations, and all
+  output/status from the external `tropecheck` process.
+- Failure/abuse cases: malformed input, deceptive grades, an unsupported voke,
+  a missing or failing checker, and false claims that supplied evidence proves
+  semantic truth.
+- Boundaries: Hermeneia is a local CLI. It has no network-facing service and
+  does not itself write to a remote store. The optional analytics-feed file
+  below this repository is not evidence of an active writer.
+- Out of scope: penetration testing of external systems, handling production
+  credentials, and enabling remote persistence without a separate approval.
+
+Hermeneia reports a verdict conditional on the declared input grades and
+use-model. It does not establish that an annotation, warrant, or interpretation
+is true. Vocarium is not integrated, and the container directory is not a
+production deployment target. `.machine_readable/integrations/verisimdb.a2ml`
+contains an optional cross-repository analytics-feed declaration, but no
+application code or workflow was found that performs the feed. Treat it as
+inactive until the maintainer explicitly decides otherwise. Do not enable
+network access, credentials, remote persistence, or active probes without
+explicit approval and a reviewed data-handling scope.
+
+The repository's agent doctrine requires invariant/equivalence changes to be
+provisional and supervised. Proposed trust posture: `restricted` for changes to
+this file, Must/Bust policy, Trope IR, proofs, data-handling boundaries,
+releases, or destructive/external actions. This level is not owner-ratified and
+is not machine-enforced by the current contractile CLI.
 @end
 
-## Trust Levels
+## Integrity Verifications
 
-The hermeneia operates at trust level: maximal
+### no-tracked-secret-material
+- description: No private key, credential file, or local environment secret is tracked in Git
+- probe: test -z "$(git ls-files -- '*.pem' '*.key' 'id_rsa' 'id_ed25519' '.env' '.env.*' 'credentials.json' 'secrets/**')"
+- severity: critical
+- notes: GitHub's secret-scanner workflow remains the broader secret-detection gate; this path-name check is not a secret scanner.
 
-Trust levels:
-- maximal:    Agent may read, build, test, lint, format, heal freely.
-             Only destructive/external actions require approval.
-- standard:   Agent may read and build. Test/lint need approval.
-- restricted: Agent may read only. All modifications need approval.
-- minimal:    Agent may read specific files only. Everything else blocked.
-
-Current trust level: maximal
-
-## Integrity Invariants
-
-### Secrets
-
-#### no-secrets-committed
-- description: No credential files in repo
-- run: test ! -f .env && test ! -f credentials.json && test ! -f .env.local && test ! -f .env.production
+### malformed-and-deceptive-store-data-rejected
+- description: Malformed JSONL records and deceptive grades are rejected by the local store parser
+- probe: cargo test -p hermeneia-store
 - severity: critical
 
-#### no-private-keys
-- description: No private key files committed
-- run: "! find . -name '*.pem' -o -name '*.key' -o -name 'id_rsa' -o -name 'id_ed25519' 2>/dev/null | grep -v node_modules | head -1 | grep -q ."
+### unsupported-store-operation-not-empty-success
+- description: A store operation that is not implemented reports Unsupported rather than returning an empty success result
+- probe: cargo test -p hermeneia-store evoke_is_unsupported_not_silently_empty
+- severity: high
+
+### missing-oracle-fails-closed
+- description: A missing tropecheck executable is reported as an I/O/checker fault, never as a verdict
+- probe: cargo test -p hermeneia-cli --features e2e --test slice missing_checker_exits_three_with_instructions
 - severity: critical
+- notes: The named regression test removes HERMENEIA_TROPECHECK and PATH within its isolated child process.
 
-#### no-tokens-in-source
-- description: No hardcoded API tokens in source
-- run: "! grep -rE '(api[_-]?key|secret|token|password)\s*[:=]\s*[\"'\\''][A-Za-z0-9]{16,}' --include='*.js' --include='*.ts' --include='*.res' --include='*.py' . 2>/dev/null | grep -v node_modules | head -1 | grep -q ."
-- severity: critical
+### secret-scanning-workflow-present
+- description: The repository's reusable secret-scanner workflow remains configured
+- probe: grep -q 'secret-scanner-reusable.yml' .github/workflows/secret-scanner.yml
+- severity: high
 
-## Provenance
+## Safe-Hacking Boundary
 
-#### author-correct
-- description: Git author matches expected identity
-- run: "git log -1 --format='%ae' | grep -qE '(hyperpolymath|j\\.d\\.a\\.jewell)'"
-- severity: warning
+No active exploit, fuzzing, network, or chaos probe is authorized by this draft.
+The only allowed security probes are the checked-in, repository-local tests in
+the preceding section. They may exercise synthetic fixtures; they must not
+contact external systems or mutate tracked source. Any broader penetration test
+requires a named target, an explicit authorization window, and maintainer
+approval first.
 
-#### license-content
-- description: LICENSE contains expected identifier
-- run: grep -q 'PMPL\|MPL\|MIT\|Apache\|LGPL' LICENSE
-- severity: warning
+## Provenance and Trust Limits
 
-## Template-Specific Trust
-
-### template-files-readonly
-- description: Template scaffold files should not be modified except by maintainer
-- run: test -z "$(git status --short .machine_readable/ 2>/dev/null | grep -v '^??' || true)"
-- severity: advisory
-- notes: Changes to template files require careful review
-
-### trust-deny-areas
-- description: Sensitive areas from INTENT.contractile require explicit approval
-- run: echo "Check .machine_readable/ contractiles and governance docs"
-- severity: advisory
-- areas:
-  - .machine_readable/
-  - GOVERNANCE.adoc
-  - MAINTAINERS.adoc
-  - .github/CODEOWNERS
-
-## Container Security
-
-#### container-images-pinned
-- description: Containerfile uses pinned base images
-- run: test ! -f Containerfile || grep -q 'cgr.dev\|@sha256:' Containerfile
-- severity: warning
-
-#### no-dockerfile
-- description: No Dockerfile (use Containerfile)
-- run: test ! -f Dockerfile
-- severity: warning
+- Treat `.hil`, JSONL, Trope IR, and checker output as untrusted until validated.
+- Use `tropecheck` as the sole grade-algebra oracle; do not duplicate the algebra.
+- Treat provenance and grades as supplied evidence, not proof of semantic truth.
+- Keep the distinction between retrieved, interpretable, and licensed visible.
+- The local structural script verifies hashes and paths only; it is not a
+  cryptographic signature, a K9 evaluation, or an owner approval record.

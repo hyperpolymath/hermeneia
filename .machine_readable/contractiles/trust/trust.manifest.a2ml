@@ -1,72 +1,47 @@
 # SPDX-License-Identifier: MPL-2.0
-# trust.manifest.a2ml — Trident coherence manifest for the trust verb.
-# Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-#
-# Asserts: exactly three files constitute the trust trident; their
-# content-hashes are pinned here; cross-references round-trip; no
-# partial publication is permitted.
-#
-# The contractile CLI's `verify trust` subcommand MUST:
-#   1. Confirm all three listed files exist at the declared paths.
-#   2. Compute each file's sha256 and match against the pinned value.
-#   3. Follow each cross-reference and confirm the target file's
-#      reciprocal field points back.
-#   4. Refuse the dir (exit non-zero) if any of 1–3 fails.
-#
-# trust is the concrete + ephemeral + transactional verb (per user
-# 2026-04-18); first blocking-authority trident in the estate. Exercises
-# the (Hunt, blocking) authority pattern — complement to intend's
-# (Hunt, reporting). Primary defense against failure mode B1 (threat-
-# model misclassification) and the "turn off the firewall" class of
-# drift attempts the adversarial pilot is designed to exercise.
+# trust.manifest.a2ml — Hermeneia trident integrity manifest.
 
 ---
-trident_version = "1.0.0"
+trident_version = "1.1.0"
 verb = "trust"
-semantics = "security + provenance + safe-hacking"
+semantics = "untrusted query/data/IR/oracle boundaries, provenance, and fail-closed behavior"
 cardinality = "one per repo"
-authority = "blocking (hard gate)"
-
-## Files (three; exactly)
+authority = "blocking (intended security/integrity gate)"
 
 [[files]]
 role = "declaration"
 path = "Trustfile.a2ml"
-sha256 = "pending-first-verify"
-size_bytes = "pending-first-verify"
-notes = "Extensively populated exemplar; covers threat model, DNS, TLS, crypto, SDP, safe-hacking, response headers, container supply chain, Cloudflare edge."
+sha256 = "7f30f444e8fa5b2b6a214bf8b8845d1050d584deb7ac13b3362271d69590d51c"
+size_bytes = "4966"
 
 [[files]]
 role = "runner"
 path = "trust.ncl"
-sha256 = "pending-first-verify"
-size_bytes = "pending-first-verify"
-notes = "Runner existed pre-trident; schema covers verifications + safe_hacking with authorised-probes-only, this_repo_only scope enforcement."
+sha256 = "2ad6d89bed801517b41cc68ad5525ab694d91a03cfb47cc3e9bc3b4ee15e0652"
+size_bytes = "2947"
 
 [[files]]
 role = "k9_component"
 path = "trust.k9.ncl"
-sha256 = "pending-first-verify"
-size_bytes = "pending-first-verify"
-notes = "Trust-tier Hunt with blocking authority. on_open foregrounds threat model before negotiation; block_session_close_on_critical_drift."
-
-## Cross-references (must round-trip)
+sha256 = "6cae363ef38b6aaf3e185288a58c34981e17bb9c7c804715f8adeb38a803e645"
+size_bytes = "12805"
 
 [cross_refs]
-runner_paired_xfile   = "Trustfile.a2ml"
-k9_paired_xfile       = "../trust/Trustfile.a2ml"
-k9_paired_runner      = "../trust/trust.ncl"
-
-## Trident signing
+runner_paired_xfile = "Trustfile.a2ml"
+k9_paired_xfile = "../trust/Trustfile.a2ml"
+k9_paired_runner = "../trust/trust.ncl"
 
 [signed_by]
-user    = "Jonathan D.A. Jewell"
-date    = "2026-04-18"
-context = "trust trident — canonical template in hermeneia. (Hunt, blocking) authority pattern. Primary catchment for adversarial drift test scenarios (firewall-off, cleartext-auth, PQ-downgrade, CSP-weaken). Hard gate: failed verification blocks merge. Copy this trident into a new repo and point it at the real keys, policies, and authority boundaries."
-
-## Change log
+user = "Jonathan D.A. Jewell"
+date = "2026-04-18"
+context = "Original trident structure authored 2026-04-18. The Hermeneia-specific content drafted 2026-10-03 is provisional and is not owner-ratified by this historical author/date entry."
 
 [[history]]
 date = "2026-04-18"
 event = "trident-born"
-note = "Trustfile.a2ml and trust.ncl pre-existed. This manifest + trust.k9.ncl complete the trident. Inherits on_open negotiation + accountability + plain-language-translation schema from intend.k9.ncl v2.0.0; adds trust-specific threat_model_foregrounding + block_session_close_on_critical_drift + stricter accountability pledge (user cannot disable verification to unblock merges)."
+note = "Initial general security runner shape. Web-service, TLS, edge, and credential assumptions were removed; the draft now describes Hermeneia's local CLI, untrusted inputs, checker boundary, and local tests."
+
+[[history]]
+date = "2026-10-03"
+event = "hermeneia-specialization-draft"
+note = "No active network probe or external-feed writer was found. An optional VeriSimDB feed declaration exists outside this trident; it must remain inactive pending owner decision. The proposed restricted approval posture needs maintainer ratification."

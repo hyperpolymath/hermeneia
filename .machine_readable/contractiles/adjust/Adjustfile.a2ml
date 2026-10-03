@@ -1,80 +1,58 @@
 # SPDX-License-Identifier: MPL-2.0
-# Adjustfile — Drift-tolerance contract for hermeneia
+# Adjustfile — advisory accessibility, clarity, and drift tolerances for Hermeneia
 # Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 #
-# Cumulative-drift catchment: tolerance bands + corrective actions.
-# Authority: advisory (Yard) — continue-with-warnings; auto_fix where deterministic.
-# Run with: adjust check
-# Fix with: adjust fix (applies deterministic patches; advisory otherwise)
+# Paired runner: adjust.ncl
+# The runner schema treats these as advisory requirements/tolerances. No
+# automatic file edits are authorized by this draft.
 
 @abstract:
-Drift tolerances and corrective actions for hermeneia. Unlike
-MUST (hard gate), ADJUST tracks cumulative drift against tolerance bands
-and proposes corrective actions. Advisory — it warns and trends, it does
-not block.
+Adjust is Hermeneia's non-blocking review surface for accessibility, inclusive
+design, diagnostic clarity, and honest feature-status reporting. Hermeneia is a
+plain-text CLI and documentation project; it has no browser UI, so this file
+does not claim WCAG conformance or invent a numeric accessibility score.
+
+Corrective actions are recommendations for a maintainer. Automated fixes stay
+disabled unless a later owner-approved rule supplies a deterministic, reversible
+fix and an independently verified probe.
 @end
 
-## Template Drift
+## CLI Accessibility and Clarity
 
-### placeholder-drift
-- description: No unfilled template placeholder token survives in this repository
-- tolerance: 0 unfilled upper-snake brace tokens outside the allow-listed template and example trees
-- corrective: Edit .machine_readable/configs/instantiation.a2ml, then run `just init` (scripts/instantiate.sh). Do not hand-edit the rendered files.
+### explicit-text-status
+- description: Results and diagnostics identify the subject, use-model, verdict, and failure reason in text rather than color or icon alone
+- tolerance: Every essential status has a plain-text label; diagnostics distinguish parse/plan faults from checker faults
+- corrective: Preserve explicit labels and actionable error messages; add a regression test whenever output semantics change
+- probe: cargo test --workspace
 - severity: advisory
-- notes: |
-    Was scoped to "repos that copied from this template", which is not a
-    condition this repository can be in — it is the copy. Restated as the drift
-    this repo actually has: it was scaffolded and never rendered, and nothing
-    noticed for its whole life (issue #8). Measured by
-    scripts/check-no-placeholders.sh, the single estate implementation of the
-    rule, which is also what openssf-compliance.yml runs and what the Mustfile's
-    no-placeholder-values invariant delegates to. Kept advisory here and critical
-    in Mustfile deliberately: adjust reports posture, must gates.
+- notes: The CLI currently prints plain text; no color-only contract or WCAG claim is intended.
 
-### template-version-drift
-- description: Template version should match RSR spec version
-- tolerance: Template version matches current RSR spec
-- corrective: Update template to match latest RSR spec
+### unsupported-operation-disclosure
+- description: Recognized but unimplemented voke operations are reported as not implemented, not as syntax errors or successful empty results
+- tolerance: All six not-yet-implemented operations remain explicit and non-successful
+- corrective: Keep parser/store/CLI diagnostics and the implemented-versus-planned table in sync
+- probe: cargo test -p hermeneia-syntax other_vokes_are_unimplemented_not_syntax_errors
 - severity: advisory
 
-## Documentation Drift
-
-### readme-completeness
-- description: README should document all template features
-- tolerance: README covers all contractiles and directory structure
-- corrective: Update README.adoc with missing sections
+### accessible-documentation-format
+- description: General documentation stays in the repository's accessible, text-based AsciiDoc format
+- tolerance: No Markdown files are added under docs/; essential instructions remain usable without rendered graphics
+- corrective: Write new general documentation in AsciiDoc and provide textual descriptions for diagrams
+- probe: bash scripts/check-no-md-in-docs.sh
 - severity: advisory
 
-### example-accuracy
-- description: Examples in documentation should match actual template content
-- tolerance: All code examples in docs are accurate
-- corrective: Audit and fix examples in documentation
+## Scope and Evidence Drift
+
+### implementation-status-honesty
+- description: Public feature claims distinguish design, parsing, implementation, testing, and integration
+- tolerance: The current slice is described as one implemented operation (`invoke`) over the local JSONL store; Vocarium integration and the other six operations remain pending
+- corrective: Update README.adoc, docs/SPEC.adoc, EXPLAINME.adoc, and STATE.a2ml together with the code and tests
+- probe: cargo test --workspace
 - severity: advisory
+- notes: This is an advisory review target; unit tests do not prove every prose claim.
 
-## Structural Drift
-
-### contractile-sync
-- description: All contractiles should have matching a2ml and ncl implementations
-- tolerance: Every .a2ml has a corresponding .ncl
-- corrective: Generate missing .ncl files from .a2ml
-- severity: advisory
-
-### no-broken-symlinks
-- description: No broken symbolic links in template structure
-- tolerance: 0 broken symlinks
-- corrective: Run symlink-check script
-- severity: advisory
-
-## Accessibility Drift
-
-### adoc-not-md
-- description: Template docs should prefer AsciiDoc
-- tolerance: New prose docs are *.adoc
-- corrective: Convert any new *.md to *.adoc
-- severity: advisory
-
-### spdx-header-consistency
-- description: All template files have correct SPDX headers
-- tolerance: 0 files missing SPDX-License-Identifier
-- corrective: Add SPDX headers to files that need them
+### accessibility-standard-not-overclaimed
+- description: Accessibility conformance is not claimed for a product surface that has no graphical interface
+- tolerance: No WCAG score or web-interface compliance claim unless a user-facing graphical surface is added and evaluated
+- corrective: If a GUI is introduced, obtain owner approval for the applicable standard and measurable acceptance criteria before claiming compliance
 - severity: advisory

@@ -138,6 +138,13 @@ jobs:
             echo "::error::Run 'just init' to re-render, or update the manifest if a value changed."
             exit 1
           }
+      - name: Verify Hermeneia contractile tridents and manifests
+        run: bash scripts/verify-contractiles.sh
+      - name: Verify Coaptation extracts all six contractile clause sets
+        run: |
+          set -euo pipefail
+          bash .machine_readable/coaptation/extract-clauses.sh .machine_readable/contractiles \
+            | jq -e '(.clauses | length > 0) and (([.clauses[].verb] | unique | length) == 6) and (any(.clauses[]; .verb == "intend" and .is_wish)) and (all(.clauses[]; (.description | length) > 0)) and ((.provenance | keys | length) == 6)' >/dev/null
       - name: Summary
         run: |
           echo "=== OpenSSF Best Practices Compliance: PASS ==="

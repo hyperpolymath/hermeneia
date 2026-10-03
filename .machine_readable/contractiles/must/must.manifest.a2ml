@@ -1,59 +1,47 @@
 # SPDX-License-Identifier: MPL-2.0
-# must.manifest.a2ml — Trident coherence manifest for the must verb.
-# Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-#
-# Third trident instance in the estate. Completes the blocking-authority
-# pair (must + trust). must is concrete + persistent invariants; trust
-# is concrete + ephemeral transactions. Together they gate every
-# security- and invariant-affecting merge.
+# must.manifest.a2ml — Hermeneia trident integrity manifest.
 
 ---
-trident_version = "1.0.0"
+trident_version = "1.1.0"
 verb = "must"
-semantics = "invariant assertion — release-blocking"
+semantics = "Hermeneia repository, test, and evidence-boundary invariants"
 cardinality = "one per repo"
-authority = "blocking (hard gate)"
-
-## Files (three; exactly)
+authority = "blocking (intended release gate)"
 
 [[files]]
 role = "declaration"
 path = "Mustfile.a2ml"
-sha256 = "pending-first-verify"
-size_bytes = "pending-first-verify"
-notes = "Mustfile declaration — invariants each with id, description, probe, severity."
+sha256 = "326c6d756363fc799352bd0fa3fb7895f36d949912e406b93219eeed54fb2807"
+size_bytes = "3990"
 
 [[files]]
 role = "runner"
 path = "must.ncl"
-sha256 = "pending-first-verify"
-size_bytes = "pending-first-verify"
-notes = "Runner pre-existed. Schema covers invariants array with status_core + severity."
+sha256 = "6e243886bdda721cfa021618c4927b5515cd6e526fa08aa493d2cd8d5dcd1ea5"
+size_bytes = "1906"
 
 [[files]]
 role = "k9_component"
 path = "must.k9.ncl"
-sha256 = "pending-first-verify"
-size_bytes = "pending-first-verify"
-notes = "Hunt-restricted read-only tier; blocking authority. Tracks per-invariant trend across sessions; flags silent regressions; blocks session close on critical drift."
-
-## Cross-references (must round-trip)
+sha256 = "25b1f896109554e0d35a19ee748ae4d35784179ba892b776f0ce9f9d915ebb6a"
+size_bytes = "10530"
 
 [cross_refs]
 runner_paired_xfile = "Mustfile.a2ml"
-k9_paired_xfile     = "../must/Mustfile.a2ml"
-k9_paired_runner    = "../must/must.ncl"
-
-## Trident signing
+k9_paired_xfile = "../must/Mustfile.a2ml"
+k9_paired_runner = "../must/must.ncl"
 
 [signed_by]
-user    = "Jonathan D.A. Jewell"
-date    = "2026-04-18"
-context = "must trident — canonical template in hermeneia. Blocking-authority verb (paired with trust). Specialises in subtle invariant-erosion catchment vs trust's outrageous-attack catchment. Hard gate: any failing invariant blocks merge. Copy this trident into a new repo and replace the declaration with project-specific invariants."
-
-## Change log
+user = "Jonathan D.A. Jewell"
+date = "2026-04-18"
+context = "Original trident structure authored 2026-04-18. The Hermeneia-specific content drafted 2026-10-03 is provisional and is not owner-ratified by this historical author/date entry."
 
 [[history]]
 date = "2026-04-18"
 event = "trident-born"
-note = "Mustfile.a2ml and must.ncl pre-existed. This manifest + must.k9.ncl complete the trident. Inherits on_open schema from intend.k9.ncl v2.0.0; inherits block_session_close_on_critical_drift + variance-severity-acknowledgement from trust.k9.ncl v1.0.0; adds must-specific track_per_session_trend + flag_silent_regression + probe_scope = 'read_only (must doesn't do active exploit attempts — that's trust's safe_hacking territory)."
+note = "Initial invariant runner/declaration shape. Repository-template assertions were replaced with Hermeneia workspace, trident, rendering, unit-test, and oracle-slice requirements."
+
+[[history]]
+date = "2026-10-03"
+event = "hermeneia-specialization-draft"
+note = "Names wired CI probes separately and records that the external contractile CLI is not bundled; owner ratification remains pending."

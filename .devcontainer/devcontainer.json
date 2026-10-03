@@ -17,6 +17,9 @@
       "ppa": false,
       "version": "latest"
     },
+    "ghcr.io/devcontainers/features/rust:1": {
+      "version": "latest"
+    },
     "ghcr.io/jdx/devcontainer-features/just:1": {},
     "ghcr.io/nickel-lang/devcontainer-feature:0": {}
   },

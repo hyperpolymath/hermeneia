@@ -313,8 +313,13 @@ validate-claude-md:
     @bash .machine_readable/arrival-pack/verify.sh
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# COAPTATION — typed descriptile↔contractile face-off (homeostasis reading)
+# CONTRACTILE INTEGRITY & COAPTATION
 # ═══════════════════════════════════════════════════════════════════════════════
+
+# Check the six project-specific tridents, reciprocal paths, registry entries,
+# and SHA-256/size pins. Does not run Nickel/K9 probes or imply owner approval.
+verify-contractiles:
+    @bash scripts/verify-contractiles.sh
 
 # Emit the coaptation receipt: how the descriptiles coapt with the contractiles (SITREP)
 coapt:

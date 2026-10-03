@@ -5,7 +5,7 @@
 
 == Overview
 
-This dev container uses `cgr.dev/chainguard/wolfi-base` with git, curl, bash, and just pre-installed. Dev container features add git, just, and nickel automatically.
+This dev container uses `cgr.dev/chainguard/wolfi-base` for its shell and build basics. The Containerfile installs bash, curl, Git, and compiler utilities; Dev Container Features provision Rust (including Cargo), Just, and Nickel. The feature-based setup makes those tools available when the container is created or rebuilt.
 
 == VS Code (Local)
 

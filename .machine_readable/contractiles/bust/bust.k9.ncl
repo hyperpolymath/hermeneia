@@ -5,29 +5,26 @@ K9!
 #
 # Pairs with: Bustfile.a2ml (declaration) + bust.ncl (runner).
 #
-# Verb:       bust            (hard-stop / expiry / "must-not-run")
-# Tier:       Hunt-read-only  (subprocess probes for expiry/state checks)
-# Authority:  blocking        (HARD GATE on declared broken states)
+# Verb:       bust            (Hermeneia fail-closed stop conditions)
+# Tier:       Hunt            (repository-local synthetic regression tests)
+# Authority:  blocking        (intended gate for declared stop conditions)
 #
-# bust is the "this is broken, this has expired, this must not run"
-# declarative surface. Where must asserts invariants that must hold,
-# bust asserts failure states that must not be re-entered. Complement
-# to must: together they bound the "acceptable operating state" from
-# above (must) and below (bust).
+# Hermeneia-specific stops include recognized-but-unimplemented vokes,
+# malformed/deceptive JSONL, a missing tropecheck executable, and requests for
+# unsupported loss/warrant output. The tests use synthetic fixtures; they do
+# not target external systems or user data. This repository has no expiry-
+# bearing runtime credential, so no certificate/token/grant expiry is claimed.
 #
-# Cardinality: ONE bust trident per repo.
-#
-# Failure-mode focus: bust catches deprecated-path-still-called
-# patterns (C2 capability collapse attempts where an AI reintroduces
-# retired code), expiry-exceeded state (certificates / tokens / grants
-# past their expiry), and the "it works, ship it" pattern where a
-# caller silently starts using a must-not-run API.
+# Cardinality: one bust trident per repository. The compatible runner is not
+# bundled, so these K9 execution hooks are a policy target, not active CI.
 
-let base_k9 = import "../k9/template-hunt.k9.ncl" in
 let base    = import "../_base.ncl" in
 
 {
-  pedigree = base_k9.pedigree_schema & {
+  pedigree = base.pedigree_schema & {
+    name = "bust.k9.ncl",
+    component_type = "hermeneia-contractile",
+    schema_version = "1.0.0",
     contractile_verb = "bust",
     paired_xfile     = "../bust/Bustfile.a2ml",
     paired_runner    = "../bust/bust.ncl",
@@ -37,8 +34,8 @@ let base    = import "../_base.ncl" in
 
     metadata = {
       name = "bust-k9",
-      version = "1.0.0",
-      description = "Hard-stop / expiry / must-not-run gate. Fourth trident instance. Completes the blocking-authority triple (must + trust + bust).",
+      version = "1.1.0",
+      description = "Declares fail-closed stops for Hermeneia parser/store/oracle boundaries. Intended blocking policy; no runtime expiry credential or bundled contractile CLI.",
       paired_xfile = "Bustfile.a2ml",
       paired_runner = "bust.ncl",
       author = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>",
@@ -46,7 +43,8 @@ let base    = import "../_base.ncl" in
 
     security = {
       leash = 'Hunt,
-      trust_level = "read-only expiry + state-check with subprocess",
+      signature_required = true,
+      trust_level = "repository-local synthetic regression checks with subprocess",
       allow_network = false,
       allow_filesystem_write = false,
       allow_subprocess = true,
@@ -74,8 +72,8 @@ let base    = import "../_base.ncl" in
       respect_variance = true,
       on_triggered = 'fail,        # BLOCKING — bust condition hit = block
       severity_escalation = 'honour,
-      # bust-specific: detect re-introduction of deprecated calls
-      flag_deprecated_reintroduction = true,
+      # bust-specific: recognized but unimplemented operations remain hard stops
+      flag_unimplemented_operation_as_stop = true,
     },
 
     evidence_sinks = [
@@ -126,12 +124,12 @@ let base    = import "../_base.ncl" in
         parties = [
           {
             role = 'user,
-            pledge = "I have reviewed the declared hard-stop / expiry / must-not-run conditions. I accept accountability for not calling into must-not-run code paths, not ignoring expired tokens/grants, and not silently reintroducing deprecated patterns. I will raise a variance with severity acknowledgement if an exception is needed.",
+            pledge = "I have reviewed the proposed stop conditions for unsupported vokes, malformed/deceptive local data, unavailable tropecheck, and unsupported loss/warrant output. I understand that these are a draft until ratified and that no expiry-bearing runtime credential is currently asserted.",
             signature_required = true,
           },
           {
             role = 'ai_agent,
-            pledge = "I will refuse suggestions that reintroduce must-not-run patterns; I will surface bust triggers at session close; I will require variance-with-severity for any legitimate reintroduction of a deprecated path rather than silently allowing it.",
+            pledge = "I will refuse to convert unsupported operations, malformed/deceptive data, missing checker output, or unavailable evidence into a successful verdict. I will keep probes synthetic and repository-local, and require maintainer review before adding a new stop condition or destructive failure drill.",
             signature_required = true,
           },
         ],
@@ -152,10 +150,10 @@ let base    = import "../_base.ncl" in
 
   failure_mode_defenses = [
     'A1_enthusiasm_capture,
-    'C2_capability_collapse,       # prevents reintroduction of retired capability
-    'C4_modernization_drift,       # bust prevents silent re-adoption of deprecated libs
+    'C2_capability_collapse,       # unsupported operations remain explicitly unsupported
+    'C4_modernization_drift,       # new behavior needs tests and an explicit contract
     'D4_error_hiding,
-    'E1_refactor_stampede,         # refactor that reintroduces deprecated path caught
+    'E1_refactor_stampede,         # refactor must retain the stop-condition regression tests
     'F1_across_session_forgetting, # bust triggers persist across sessions
   ],
 }
