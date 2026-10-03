@@ -54,18 +54,52 @@ issues = [
   "RESOLVED 2026-07-28: bounded traversal (evoke/convoke) needed the retention order in-process. trope-checker PR #46 exposes tropecheck-rs as a [lib] with grade_le, so hermeneia can DEPEND on the validated implementation. Reimplementing the algebra here remains rejected permanently.",
 ]
 
-# CI red on main as at 2026-07-29. Recorded so a green-looking board is not
-# mistaken for a healthy one.
-ci-failing-on-main = [
-  "Guix Package Policy — root flake.nix present while Nix is retired estate-wide (ruled 2026-05-18, hardened 2026-07-28). CANNOT simply delete it: build/guix.scm is an UNINSTANTIATED template (Hermeneia, Jonathan D.A. Jewell) and there is no Containerfile, so removal would leave the repo with no packaging. Retire the flake AND make the Guix side real in the same change.",
-  "Estate Rules — root-shape allowlist: Cargo.toml + Cargo.lock (from the Rust workspace) plus pre-existing ARCHITECTURE.md, GOVERNANCE.md, MAINTAINERS, mise.toml. One PR covering all six clears it.",
-  "Dogfood Gate — not yet diagnosed.",
+# CI state, re-diagnosed 2026-10-03 during the issue #8 instantiation work.
+# The three entries below REPLACE the 2026-07-29 list. Two of the three were
+# mis-diagnosed, and the real cause of the largest outage was invisible: seven
+# workflows had been failing with `startup_failure`, zero jobs, zero logs and
+# zero check runs for three weeks, and there was nothing to read.
+ci-fixed-2026-10-03 = [
+  "Guix Package Policy — was attributed to a root flake.nix. There is no flake.nix in the tree and has not been since before this note. The gate was red for a different reason: its own YAML was invalid (see ci-dead-workflows below). flake.nix is now also REMOVED from .machine_readable/root-allow.txt, so estate-rules enforces the Nix ban alongside guix-policy instead of licensing the one file it forbids. build/guix.scm is instantiated and its inputs now match ANCHOR's allowed languages; it remains a dev-shell manifest, not a buildable package (source #f, no build phases) — that half is still owed, and idris2/just are deliberately absent from it pending verification of their Guix module names.",
+  "Estate Rules — was attributed to six unallowlisted root entries (Cargo.toml, Cargo.lock, ARCHITECTURE.md, GOVERNANCE.md, MAINTAINERS, mise.toml). Those six had already been added; the gate stayed red because the allowlist had drifted in BOTH directions — .mise.toml, ARCHITECTURE.adoc, CHANGELOG.adoc, CONTRIBUTING.adoc, FUNDING and GEMINI.md were at the root and not permitted. Reconciled against the actual root; scripts/check-root-shape.sh now passes (52 entries, 61 permitted). .mise.toml was deleted rather than allowlisted: its only live line `rust = \"nightly\"` overrode mise.toml (mise reads the dotted form with precedence) while CI builds with `toolchain: stable` and no source uses a nightly feature.",
+  "Dogfood Gate — 'not yet diagnosed' was the entry. It was never a Dogfood Gate defect: the workflow could not START. See ci-dead-workflows.",
 ]
 
-# GREEN and genuinely so, verified from run logs rather than badges:
+# The largest CI failure in this repository's history was invisible. Not one
+# failing step — no jobs, no logs, no annotations, no check runs at all, for
+# three weeks (2026-09-12 to 2026-10-01), across every workflow that ran its own
+# steps on a GitHub-hosted runner. Diagnosed 2026-10-03:
+ci-dead-workflows = [
+  "actions.lock was STALE, and this is the whole outage. The estate's own labels.yml documents the mechanism: actions.lock is keyed by workflow path, and a workflow the lock does not cover 'is rejected before any step runs (startup_failure, and therefore no check run at all)'. Five lock entries no longer matched the SHAs the workflows pinned, because the pins were bumped without regenerating the lock. Victims: CodeQL, Dogfood Gate, Estate Rules, Code Quality, SonarQube, Slice, Static Analysis Gate. Regenerated; each ref resolved from the pinned commit against the upstream tag list rather than trusted from the inline comment.",
+  "SIX workflows were not valid YAML at all — container-build, guix-policy, openssf-compliance, runtime-policy, security-policy, wellknown-enforcement. Each had its first step collapsed from a two-line `- name: Checkout` / `uses:` list item into a single ` uses:` at ONE space of indent. A re-pin pass rewrote the uses line and took the `- name:` line with it. GitHub could not read `name:`, which is why those runs displayed the file path as their title.",
+  "e2e.yml had a DUPLICATE `steps:` key. Its whole tail is a commented-out menu of stack-specific example jobs, and the same re-pin pass uncommented 22 lines inside it (ten `steps:`, eight `with:`, one `strategy:`, three `uses:`). yaml.safe_load silently keeps the LAST duplicate and reports success, so every local lint passed while GitHub rejected the file before creating any job.",
+  "scorecard.yml declared timeout-minutes ON A REUSABLE-WORKFLOW CALL JOB. That key is step-job-only; GitHub rejects the job before creating any of them. Same zero-job, zero-log signature.",
+  "Governance ran but was red on two jobs: `Workflow security linter` (check-descriptile-policy.sh rejected .machine_readable/6a2/ as a retired descriptile path — fixed by migrating to .machine_readable/descriptiles/, the layout both hermeneia and standards use) and `Actions lockfile verify` (the stale lock again).",
+]
+
+# GREEN and genuinely so. The two entries carried over from 2026-07-29 were
+# verified from run logs at the time and are kept; everything below them was
+# verified by EXECUTING the gate locally against this tree on 2026-10-03, which
+# is the only way any of it could be checked — the workflows themselves had not
+# run in three weeks.
 ci-verified-green = [
-  "Slice (end to end) — all 14 steps; the 7 e2e tests RUN (named in the log) and the use-relativity step asserts strict=1 / loose=0.",
-  "Rust CI — 39 passed, count matches the local unit+gate total exactly.",
+  "Slice (end to end) — all 14 steps; the 7 e2e tests RUN (named in the log) and the use-relativity step asserts strict=1 / loose=0. [from run logs, 2026-07-29]",
+  "Rust CI — 39 passed, count matches the local unit+gate total exactly. [from run logs, 2026-07-29]",
+  "OpenSSF Compliance — all 10 steps executed locally; PASS. Its placeholder step used to grep a HAND-LISTED set of ~13 files, which is why it was green while ~120 files were unrendered. It now calls scripts/check-no-placeholders.sh (every text file, allow-listed carriers) plus scripts/instantiate.sh --check.",
+  "Estate Rules — both scripts executed locally; PASS.",
+  "Workflow structure — all 29 workflows checked against the three gates hyperpolymath/standards runs at the revision Governance pins (874ffe5): parse, no-jobs, reusable-call-with-timeout-minutes, and duplicate YAML keys. All pass.",
+  "Descriptile policy — check-descriptile-policy.sh executed locally at the pinned revision; exit 0.",
+]
+
+# Still owed. Recorded rather than fixed, because each needs either a toolchain
+# this checkout does not have or an owner decision.
+ci-still-owed = [
+  "AFFIRMATION.adoc is still an unsigned template — it says so itself in a NOTE block. Filling it honestly requires RUNNING the project's checks in the session that signs it (cargo test, idris2 --typecheck, zig build), and none of those toolchains is available here. Inventing an affirmation is exactly the overclaim the file exists to prevent.",
+  "docs/status/READINESS.adoc — the CRG assessment is still a blank template, so this repo has no published readiness grade.",
+  "The coaptation receipt (.machine_readable/coaptation/receipts/latest.a2ml) is GENERATED by `just coapt` and is now stale: its [provenance] hashes are of the pre-rename descriptiles, and its [clauses] still grade template-era clauses. It must be regenerated with nickel available. witness-map.ncl (the hand-authored layer) was corrected; the receipt must not be hand-edited.",
+  "The contractiles beyond Intentfile/Adjustfile/Mustfile still carry template-era clauses — bust.template-substitution-failure, dust.no-template-artifacts, trust.template-files-readonly and friends describe a repository that is a template. They are internally consistent and none of them gates CI here, but they are not hermeneia's failure modes.",
+  "The root Justfile `import?`s build/just/{container,groove,assess}.just and build/contractile.just. `import?` is an OPTIONAL import, so all four are silent no-ops — the same defect class that made `just init` a no-op and let ~120 files ship unrendered. Only init.just was added, because it is the one this issue is about; the other four need the upstream modules ported or the imports removed.",
+  "src/interface/ is un-instantiated scaffolding: Foreign.idr still declares %foreign \"C:rsr_init,librsr\" — the template's symbol names against the template's library — and src/interface/generated/abi/ holds only .gitkeep, so no C header has ever been generated. docs/developer/ABI-FFI-README.adoc now says this up front.",
 ]
 
 [critical-next-actions]
@@ -85,14 +119,20 @@ actions = [
 ]
 
 [maintenance-status]
-last-run-utc = "2026-07-29"
+last-run-utc = "2026-10-03"
 last-result = "warn"  # unknown | pass | warn | fail
-# Tests and the slice are green; the repo is not. 46 tests pass (39 unit+gate,
-# 7 end-to-end against the real tropecheck); cargo fmt --check and
-# cargo clippy -D warnings both clean; Slice (end to end) is green on main after
-# the workspace-nesting fix (PR #26). But three estate gates are RED on main —
-# see ci-failing-on-main above. "warn" not "pass" for that reason.
-open-warnings = 3
+# The three gates recorded as red on 2026-07-29 are diagnosed and repaired — see
+# ci-fixed-2026-10-03 and ci-dead-workflows above. What keeps this at "warn" and
+# not "pass" is that NONE of it has yet been confirmed by a CI run: the workflows
+# in question had not executed in three weeks, so every gate above was verified by
+# running the check locally against this tree, which is weaker evidence. It
+# becomes "pass" when a push to main shows them green.
+#
+# Also still open, and the reason this is not "pass" on content either: the items
+# in ci-still-owed — above all AFFIRMATION.adoc (unsigned template) and
+# docs/status/READINESS.adoc (no published CRG grade), both of which need a
+# session that can actually run cargo / idris2 / zig.
+open-warnings = 6
 open-failures = 0
 
 [ecosystem]

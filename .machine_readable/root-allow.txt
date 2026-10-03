@@ -14,7 +14,7 @@
 # This is a PERMISSION list, not a REQUIREMENT list: an entry here that is
 # absent from the root does not fail the gate. Entries that are permitted but
 # not currently present are marked PERMITTED-ABSENT below, and each says why it
-# is still listed. Upstream rsr-template-repo marks the same class with a `?`
+# is still listed. Upstream hermeneia marks the same class with a `?`
 # prefix; scripts/check-root-shape.sh here does not strip `?`, so the marker is
 # a comment instead — a `?`-prefixed line would become an entry that can never
 # match and would silently stop permitting the file it was meant to allow.

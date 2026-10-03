@@ -24,7 +24,7 @@ just                              # list recipes
 This section used to be "== From Template (New Project)": instructions for
 cloning this repository as a scaffold, wiping its git history and running
 `just init` to render it into something else. That is what
-https://github.com/hyperpolymath/rsr-template-repo[rsr-template-repo] is for.
+https://github.com/hyperpolymath/hermeneia[hermeneia] is for.
 hermeneia is an instantiation of it, already rendered — see
 `.machine_readable/configs/instantiation.a2ml` for the values and
 `scripts/instantiate.sh` for the pass. `just init` here is a repair-and-verify

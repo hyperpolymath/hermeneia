@@ -26,7 +26,7 @@ use-relation and reports what is preserved, lost, licensed, or insufficient
 under a use-model — separating the retrieved from the interpretable from the
 licensed.
 
-This file was inherited from rsr-template-repo and at instantiation (issue #8)
+This file was inherited from hermeneia and at instantiation (issue #8)
 still declared that this repository IS the canonical RSR template providing "the
 scaffold that all hyperpolymath repos should copy". A self-name substitution
 fixed the name and left the claim, which is the worse outcome: a north-star

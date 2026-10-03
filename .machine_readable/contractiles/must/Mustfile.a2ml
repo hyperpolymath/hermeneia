@@ -10,7 +10,7 @@
 Physical-state invariants for hermeneia. These are hard requirements — CI and
 pre-commit hooks fail if any check fails.
 
-This file was inherited from rsr-template-repo and, at instantiation (issue #8),
+This file was inherited from hermeneia and, at instantiation (issue #8),
 five of its invariants were found to be FALSE against this tree: they named the
 template's own paths and markers rather than hermeneia's. A contractile that
 declares invariants which do not hold is worse than one that declares fewer, so
@@ -113,7 +113,7 @@ it was written down.
     interpolation in contractiles/Justfile and the word {{PLACEHOLDER}} used in
     Adjustfile.a2ml's prose about placeholders. It could only ever fail.
     Delegated to scripts/check-no-placeholders.sh, the single estate
-    implementation of this rule (vendored from rsr-template-repo), which matches
+    implementation of this rule (vendored from hermeneia), which matches
     upper-snake tokens only, exempts metasyntactic ones, and allow-lists the
     template and example trees by path. One implementation, not a second copy
     that can drift from the CI gate.
