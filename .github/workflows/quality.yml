@@ -36,6 +36,49 @@ jobs:
       - name: EditorConfig check
         uses: editorconfig-checker/action-editorconfig-checker@51f63319f592f97930c73d9c46184d20bd206393  # v3.0.0
         continue-on-error: true
+
+  # Coaptation — the descriptile<->contractile face-off. Two gates, and the order
+  # matters: the identity gate needs no toolchain, so it runs first and alone can
+  # answer "does this pack describe THIS repository?" (issue #11's acceptance
+  # criterion: no `rsr-template-repo` in coaptation/, and the receipt's `repo`
+  # must be the canonical-name CLADE.a2ml declares). The drift gate then asks the
+  # harder question — "is the committed receipt still what the comparator would
+  # emit?" — which needs nickel to re-evaluate coapt.ncl.
+  #
+  # Neither gate ran in CI before, which is how the receipt stayed stale (and
+  # how `just coapt` could emit `clauses-total = 0` under the default awk) for
+  # as long as it did.
+  coaptation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      # Nickel-free. Cheap enough to be worth running even if everything below
+      # fails for an infrastructure reason.
+      - name: Coaptation identity gate
+        run: bash .machine_readable/coaptation/check-identity.sh
+
+      - name: Provision nickel
+        env:
+          NICKEL_VERSION: '1.18.0'
+        run: |
+          set -euo pipefail
+          curl -fsSL -o "$RUNNER_TEMP/nickel" \
+            "https://github.com/tweag/nickel/releases/download/${NICKEL_VERSION}/nickel-x86_64-linux"
+          chmod +x "$RUNNER_TEMP/nickel"
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/nickel" --version
+
+      - name: Coaptation receipt in sync (Yard drift gate)
+        run: |
+          if ! bash .machine_readable/coaptation/verify.sh; then
+            echo "::error::the committed coaptation receipt is stale — run \`just coapt\` and commit the regenerated receipt"
+            exit 1
+          fi
+
   docs:
     runs-on: ubuntu-latest
     timeout-minutes: 15

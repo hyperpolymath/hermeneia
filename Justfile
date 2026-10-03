@@ -328,6 +328,11 @@ coapt-reanchor:
 validate-coapt:
     @bash .machine_readable/coaptation/verify.sh
 
+# Fail if the coaptation pack does not declare THIS repository's identity.
+# Nickel-free, so it runs anywhere; this is the gate for issue #11.
+check-coapt-identity:
+    @bash .machine_readable/coaptation/check-identity.sh
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # DOCUMENTATION
 # ═══════════════════════════════════════════════════════════════════════════════

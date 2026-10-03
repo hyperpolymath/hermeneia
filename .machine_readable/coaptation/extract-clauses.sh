@@ -18,6 +18,23 @@
 # READER only — authors nothing. Deterministic (no timestamps) so the receipt the
 # Yard comparator emits can be byte-compared by verify.sh.
 #
+# PORTABILITY — this script must run under mawk, gawk AND busybox awk.
+#
+#   The clause headers used to be matched with the interval expression
+#   `/^#{3,4} /`. Intervals (`{n,m}`) are a POSIX *later* addition and are NOT
+#   supported by mawk before 1.3.4 — which is the default `awk` on Debian and
+#   Ubuntu, and therefore on every GitHub Actions `ubuntu-*` runner. Under mawk
+#   the pattern silently matches NOTHING: awk does not error on an unsupported
+#   regex, it just never fires. The symptom was not "clause extraction failed"
+#   but a perfectly well-formed receipt reporting `clauses-total = 0` — a
+#   coaptation reading of a contractile set it had silently read as empty.
+#   That is worse than a crash: `just coapt` exited 0 and `just validate-coapt`
+#   reported DRIFT against a receipt that no committed state could reproduce.
+#
+#   So: spell the two header levels out (`/^### / || /^#### /`) and strip with
+#   `sub(/^#+[[:space:]]+/, "")`. Both are plain ERE every awk understands.
+#   If a `##### ` level is ever introduced, extend the alternation here.
+#
 # Output (stdout): { "clauses": [ {id,verb,slug,description,severity,status,
 #                   tolerance,has_probe} ... ], "provenance": { <verb>: <hash> } }
 set -euo pipefail
@@ -54,7 +71,8 @@ atomise() {
       }
       slug=""; desc=""; sev=""; status=""; tol=""; hasprobe="false"; horizon=""; have_field=0
     }
-    /^#{3,4} / { flush(); line=$0; sub(/^#{3,4}[[:space:]]+/, "", line); slug=line; next }
+    # NOTE: deliberately NOT /^#{3,4} / — see PORTABILITY above.
+    /^### / || /^#### / { flush(); line=$0; sub(/^#+[[:space:]]+/, "", line); slug=line; next }
     /^## /     { flush(); next }
     /^- description:/ { d=$0; sub(/^- description:[[:space:]]*/, "", d); desc=d; have_field=1; next }
     /^- severity:/    { d=$0; sub(/^- severity:[[:space:]]*/, "", d);    sev=d;  have_field=1; next }

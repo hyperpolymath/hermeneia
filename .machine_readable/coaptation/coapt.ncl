@@ -27,6 +27,21 @@ let lookup = fun id =>
   if std.record.has_field id facts_by_id then facts_by_id."%{id}"
   else { id = id, value = "", present = false } in
 
+# --- repo identity: DERIVED, never hardcoded ---------------------------------
+# The receipt's `repo` used to be a literal in this template. A literal inside a
+# generated artifact is a drift seam, and this one was cut twice: the template's
+# own name (`rsr-template-repo`) survived instantiation (issue #8), and when it
+# was finally changed the receipt was hand-substituted rather than regenerated
+# (issue #11) — so the committed receipt stopped being a projection of anything
+# and `just validate-coapt` went permanently red.
+#
+# A repository's identity is declared ONCE, in CLADE.a2ml's `canonical-name`,
+# and is read here as a fact like any other. If CLADE stops declaring it, the
+# receipt declares `repo = ""` — a visible hole, which is the intended failure
+# mode, instead of a plausible-looking name nobody can trace to a source.
+# The Hunt-side writer in coapt.sh derives the same value the same way.
+let repo = (lookup "clade.canonical-name").value in
+
 # --- predicate evaluation (does a single witness hold?) ----------------------
 let eval_w = fun w =>
   let f = lookup w.fact in
@@ -122,7 +137,7 @@ m%"
 
 [receipt]
 schema = "hyperpolymath.coaptation/1"
-repo = "hermeneia"
+repo = "%{repo}"
 band = "%{band}"
 proposed-action = "%{action}"
 

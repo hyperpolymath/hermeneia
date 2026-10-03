@@ -18,11 +18,35 @@ TARGET="$CO/receipts/latest.a2ml"
 
 [ -f "$TARGET" ] || { echo "DRIFT: coaptation receipt missing — run \`just coapt\`"; exit 1; }
 
+command -v nickel >/dev/null 2>&1 || {
+  echo "verify.sh: 'nickel' is required to re-evaluate the comparator and is not on PATH." >&2
+  echo "           Install it (see .machine_readable/self-validating/README.adoc) or run this" >&2
+  echo "           inside the dev container, which provisions it." >&2
+  echo "           The nickel-free identity gate is .machine_readable/coaptation/check-identity.sh." >&2
+  exit 2
+}
+
 bash "$CO/extract-clauses.sh" "$ROOT/.machine_readable/contractiles" > "$CO/clauses.json"
 bash "$CO/extract-facts.sh"   "$ROOT/.machine_readable/descriptiles"           > "$CO/facts.json"
 
 fresh="$(nickel export --format raw "$CO/coapt.ncl")"
 committed="$(cat "$TARGET")"
+
+# A receipt that read ZERO clauses is not a reading — it is the atomiser having
+# failed quietly, and a drift gate that accepts it has laundered the failure
+# into a baseline. See the PORTABILITY note in extract-clauses.sh: an awk that
+# does not support the {n,m} interval expression (mawk, the default on Debian
+# and Ubuntu) does not error on the pattern, it simply never matches it, and the
+# runner still exits 0. The symptom was a well-formed receipt reporting
+# `clauses-total = 0`, which then compared equal to nothing.
+total="$(printf '%s\n' "$fresh" | grep -oP '^clauses-total = \K[0-9]+' | head -1 || true)"
+if [ "${total:-0}" -eq 0 ]; then
+  echo "DRIFT: the regenerated receipt read 0 contractile clauses." >&2
+  echo "       A coaptation of an empty clause set is not a reading of anything." >&2
+  echo "       Check extract-clauses.sh against the awk on this machine" >&2
+  echo "       (\`awk --version\`; mawk does not support {n,m} intervals)." >&2
+  exit 1
+fi
 
 if [ "$fresh" = "$committed" ]; then
   echo "OK: coaptation receipt is in sync with the contractiles + descriptiles."

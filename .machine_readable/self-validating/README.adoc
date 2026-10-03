@@ -148,8 +148,18 @@ To use K9 contractiles in your repository:
 [source,bash]
 ----
 # Install Nickel (configuration language)
-curl -L https://github.com/tweag/nickel/releases/latest/download/nickel-linux-x86_64 -o nickel
+#
+# NOTE: the asset is `nickel-x86_64-linux`, NOT `nickel-linux-x86_64`. The old
+# name retired with the 1.x release assets, and `releases/latest/download` on a
+# filename that no longer exists still returns 200 with the body "Not Found" —
+# so this used to install a 9-byte shell script that failed later, somewhere
+# else, for a reason that looked unrelated. Pin the version: `latest` also means
+# the gate you validated locally is not the gate CI runs.
+NICKEL_VERSION=1.18.0
+curl -fsSL -o nickel \
+  "https://github.com/tweag/nickel/releases/download/${NICKEL_VERSION}/nickel-x86_64-linux"
 chmod +x nickel && sudo mv nickel /usr/local/bin/
+nickel --version
 
 # Install Just (task runner, for Hunt level)
 cargo install just

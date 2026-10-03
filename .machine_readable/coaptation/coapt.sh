@@ -19,6 +19,21 @@ ROOT="$(git rev-parse --show-toplevel)"
 CO="$ROOT/.machine_readable/coaptation"
 MODE="${1:---report}"
 
+# Repository identity: DERIVED, never hardcoded.
+#
+# This repo's identity is declared ONCE — CLADE.a2ml `[identity] canonical-name`.
+# Both tiers of Coaptation read it from there: the Yard comparator coapt.ncl
+# reads it as a fact (`lookup "clade.canonical-name"`), and this Hunter derives
+# it for the re-anchor basis here. Two literals in two files is how the
+# template's own name (`rsr-template-repo`) survived instantiation and had to be
+# re-pointed by hand (issues #8, #11) — and how a generated artifact came to
+# disagree with the tree it claims to describe.
+#
+# If CLADE stops declaring a canonical-name, this is empty and the basis says so.
+# That is the intended failure mode: a visible hole beats a plausible fiction.
+CLADE="$ROOT/.machine_readable/descriptiles/CLADE.a2ml"
+REPO="$(grep -oP '^canonical-name = "\K[^"]+' "$CLADE" | head -1 || true)"
+
 # Kennel (sense) -> deterministic atomised inputs.
 bash "$CO/extract-clauses.sh" "$ROOT/.machine_readable/contractiles" > "$CO/clauses.json"
 bash "$CO/extract-facts.sh"   "$ROOT/.machine_readable/descriptiles"           > "$CO/facts.json"
@@ -53,7 +68,7 @@ case "$MODE" in
         echo ""
         echo "[reanchor-basis]"
         echo "schema = \"hyperpolymath.reanchor-basis/0\""
-        echo "repo = \"hermeneia\""
+        echo "repo = \"$REPO\""
         echo "occasioned-by = \"band=red in the coaptation receipt\""
         echo ""
         echo "[carnage]"
