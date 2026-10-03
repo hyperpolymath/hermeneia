@@ -1,5 +1,6 @@
 K9!
 # SPDX-License-Identifier: MPL-2.0
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 # K9 Kennel-level template: Pure data configuration
 # Security Level: Kennel (data-only, no execution)
 # No signature required - safe for any use
@@ -7,7 +8,6 @@ K9!
 {
   pedigree = {
     name = "template-kennel.k9.ncl",
-    security = { leash = 'Yard },
     schema_version = "1.0.0",
     component_type = "TODO: describe component type (e.g., 'build-config', 'metadata')",
     security = {
@@ -21,7 +21,7 @@ K9!
       
       version = "1.0.0",
       description = "TODO: Brief description of what this component contains",
-      author = "{{AUTHOR}} <{{AUTHOR_EMAIL}}>",
+      author = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>",
     },
   },
 

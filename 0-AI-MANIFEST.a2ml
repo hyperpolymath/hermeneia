@@ -5,11 +5,11 @@
 #
 [metadata]
 version = "0.1.0"
-last-updated = "{{CURRENT_DATE}}"
+last-updated = "2026-10-03"
 
 [project]
 name = "[YOUR-REPO-NAME]"
-purpose = "{{PROJECT_DESCRIPTION}}"
+purpose = "An experimental voking / imminence query language for Vocarium"
 
 [ai-allocation]
 agents = [

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-= {{PROJECT_NAME}} — CRG Audit ({{CURRENT_DATE}})
-{{AUTHOR}}
-{{CURRENT_DATE}}
+= Hermeneia — CRG Audit (2026-10-03)
+Jonathan D.A. Jewell
+2026-10-03
 :toc:
 :sectnums:
 
@@ -18,17 +18,17 @@
 
 == Scope and Standard
 
-Evaluates the `{{REPO}}` repository against
+Evaluates the `hermeneia` repository against
 *Component Readiness Grades v2.0 (STRICT)*, 2026-03-30 revision.
 
 - Standard: `standards/component-readiness-grades/COMPONENT-READINESS-GRADES.md`
 - Template (criteria boilerplate): `rsr-template-repo/docs/governance/CRG-CRITERIA.adoc`
 - Self-declared grade (prior art):
-  * `.machine_readable/6a2/STATE.a2ml` → `grade = "<declared>"`
+  * `.machine_readable/descriptiles/STATE.a2ml` → `grade = "<declared>"`
   * `docs/READINESS.md` (if present) → per-component grades
   * Third-party badges (Glama, OpenSSF, etc.) if any — note date and scope
-- Audit date: {{CURRENT_DATE}}
-- Auditor: {{AUTHOR}}
+- Audit date: 2026-10-03
+- Auditor: Jonathan D.A. Jewell
 
 The audit grades the repo *as-is today*, not aspirationally.
 
@@ -49,7 +49,7 @@ The audit grades the repo *as-is today*, not aspirationally.
 
 Publication requires B+. Long alpha is discipline, not shame.
 
-== Evidence Inventory (verified {{CURRENT_DATE}})
+== Evidence Inventory (verified 2026-10-03)
 
 === Structural compliance (Grade D floor)
 
@@ -64,7 +64,7 @@ Do *not* mark PRESENT without citing the path.
 | PRESENT / PARTIAL (count) / ABSENT
 | `.github/workflows/`
 
-| `.machine_readable/6a2/` canonical A2ML
+| `.machine_readable/descriptiles/` canonical A2ML
 | PRESENT (STATE, META, ECOSYSTEM, AGENTIC, NEUROSYM, PLAYBOOK) / ABSENT
 | Layout matches CLAUDE.md invariant
 
@@ -101,7 +101,7 @@ Do *not* mark PRESENT without citing the path.
 | Build-system policy (RSR R-020)
 
 | Remote
-| `git@{{FORGE}}:{{OWNER}}/{{REPO}}.git` (origin only) / drift
+| `git@github.com:hyperpolymath/hermeneia.git` (origin only) / drift
 | `git remote -v`
 |===
 
@@ -135,7 +135,7 @@ RSR compliance verdict: *met* / *partial* / *not met* — Grade D floor satisfie
 
 | Dangerous-pattern scan (`assert_total`, `Admitted`, `sorry`, `unsafeCoerce`, `Obj.magic`)
 | N
-| Grepped {{CURRENT_DATE}}.
+| Grepped 2026-10-03.
 |===
 
 === Test matrix
@@ -143,7 +143,7 @@ RSR compliance verdict: *met* / *partial* / *not met* — Grade D floor satisfie
 Cite *from authoritative source* (STATE.a2ml or CI log). Do not re-count by
 filesystem grep — grade the evidence that already exists.
 
-- `total-tests = N` (from `.machine_readable/6a2/STATE.a2ml` or CI).
+- `total-tests = N` (from `.machine_readable/descriptiles/STATE.a2ml` or CI).
 - Breakdown by suite: list each named suite and its count.
 - CI: `.github/workflows/<test-workflow>.yml` runs on push / tag / schedule.
 - Last green run: date + commit SHA.
@@ -280,8 +280,8 @@ them. Examples:
 == Related Files
 
 - `docs/READINESS.md` — per-component table. Note v1.0-vs-v2.0 schema alignment.
-- `.machine_readable/6a2/STATE.a2ml` — authoritative self-declared state.
-- `docs/governance/CRG-LIFT-PLAN-{{CURRENT_DATE}}.adoc` — companion plan for
+- `.machine_readable/descriptiles/STATE.a2ml` — authoritative self-declared state.
+- `docs/governance/CRG-LIFT-PLAN-2026-10-03.adoc` — companion plan for
   D→C (and medium-term C→B) lifts.
 - `docs/governance/CRG-CRITERIA.adoc` — boilerplate criteria doc.
 

@@ -1,0 +1,140 @@
+# SPDX-License-Identifier: MPL-2.0
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# STATE.a2ml — Project state checkpoint for hermeneia.
+
+[metadata]
+project = "hermeneia"
+version = "0.1.0"
+last-updated = "2026-07-29"
+status = "active"  # active | paused | archived
+
+[project-context]
+name = "hermeneia"
+purpose = "An experimental voking / imminence query language for Vocarium. Hermeneia calls trope-shaped stored particulars into a declared use-relation (invoke / evoke / convoke / transvoke / provoke / intervoke / revoke) and reports what is preserved, lost, licensed, or insufficient under a use-model. It separates the retrieved from the interpretable from the licensed."
+# 2026-07-21: the evidence boundary IS now settled. It is a running parser +
+# planner + IR emitter with an end-to-end query runner, checked against the real
+# tropecheck; the store is a local JSONL stub, NOT Vocarium. One of seven voking
+# operations is implemented. Per-operation detail: docs/SPEC.adoc §"Status — no
+# overclaim". Raised 20 -> 45 on that basis and no further.
+completion-percentage = 45
+
+[position]
+phase = "implementation"   # design | implementation | testing | maintenance | archived
+maturity = "experimental"  # experimental | alpha | beta | production | lts
+
+[route-to-mvp]
+# Milestones sourced from EXPLAINME §12 "Next receipts needed" — the honest
+# evidence still owed before the stronger "implemented query layer" claim holds.
+milestones = [
+  # Implemented and executing: src/hermeneia-syntax parses the `invoke` form.
+  { name = "Minimal Hermeneia grammar", completion = 100 },
+  { name = "Voke-operation table with implemented/planned status", completion = 100 },
+  # Runs end to end, but against the JSONL stub store — NOT a Vocarium record.
+  # That is why this is 70 and not 100.
+  { name = "invoke example checking a Vocarium record against a use-model", completion = 70 },
+  { name = "provoke example showing why a candidate fails", completion = 0 },
+  { name = "transvoke example tracing a particular across contexts", completion = 0 },
+  { name = "revoke example withdrawing a verdict after warrant failure", completion = 0 },
+  # Trope IR v0.2 is emitted and accepted by the reference validator, and the
+  # verdict/witness/coordinate are rendered. The loss-shape and missing-warrants
+  # parts of the result shape are NOT available: the checker CLI does not emit
+  # the per-dimension vector (see docs/SPEC.adoc).
+  { name = "JSON result shape (query/candidates/loss-shape/floor/verdict/reasons/missing-warrants)", completion = 40 },
+  { name = "Design note separating retrieved / interpretable / licensed", completion = 100 },
+  { name = "No-overclaim status table (Designed/Parsed/Planned/Implemented/Tested/Integrated)", completion = 100 },
+]
+
+[blockers-and-issues]
+# Human-readable companion: docs/status/STATE-OF-PLAY.adoc (keep the two in step).
+# Not blocking the slice, but bounding what can be claimed:
+issues = [
+  "tropecheck emits only a verdict plus ONE witness edge/coordinate; Check.idr computes the full violated-coordinate list and Main.idr discards it. `show loss` is therefore unimplementable against the current CLI. Upstream contribution to trope-checker, to be proposed not taken.",
+  "Vocarium does not exist, so nothing is Integrated; the store is a local JSONL stub behind StoreProvider.",
+  "RESOLVED 2026-07-28: bounded traversal (evoke/convoke) needed the retention order in-process. trope-checker PR #46 exposes tropecheck-rs as a [lib] with grade_le, so hermeneia can DEPEND on the validated implementation. Reimplementing the algebra here remains rejected permanently.",
+]
+
+# CI state, re-diagnosed 2026-10-03 during the issue #8 instantiation work.
+# The three entries below REPLACE the 2026-07-29 list. Two of the three were
+# mis-diagnosed, and the real cause of the largest outage was invisible: seven
+# workflows had been failing with `startup_failure`, zero jobs, zero logs and
+# zero check runs for three weeks, and there was nothing to read.
+ci-fixed-2026-10-03 = [
+  "Guix Package Policy — was attributed to a root flake.nix. There is no flake.nix in the tree and has not been since before this note. The gate was red for a different reason: its own YAML was invalid (see ci-dead-workflows below). flake.nix is now also REMOVED from .machine_readable/root-allow.txt, so estate-rules enforces the Nix ban alongside guix-policy instead of licensing the one file it forbids. build/guix.scm is instantiated and its inputs now match ANCHOR's allowed languages; it remains a dev-shell manifest, not a buildable package (source #f, no build phases) — that half is still owed, and idris2/just are deliberately absent from it pending verification of their Guix module names.",
+  "Estate Rules — was attributed to six unallowlisted root entries (Cargo.toml, Cargo.lock, ARCHITECTURE.md, GOVERNANCE.md, MAINTAINERS, mise.toml). Those six had already been added; the gate stayed red because the allowlist had drifted in BOTH directions — .mise.toml, ARCHITECTURE.adoc, CHANGELOG.adoc, CONTRIBUTING.adoc, FUNDING and GEMINI.md were at the root and not permitted. Reconciled against the actual root; scripts/check-root-shape.sh now passes (52 entries, 61 permitted). .mise.toml was deleted rather than allowlisted: its only live line `rust = \"nightly\"` overrode mise.toml (mise reads the dotted form with precedence) while CI builds with `toolchain: stable` and no source uses a nightly feature.",
+  "Dogfood Gate — 'not yet diagnosed' was the entry. It was never a Dogfood Gate defect: the workflow could not START. See ci-dead-workflows.",
+]
+
+# The largest CI failure in this repository's history was invisible. Not one
+# failing step — no jobs, no logs, no annotations, no check runs at all, for
+# three weeks (2026-09-12 to 2026-10-01), across every workflow that ran its own
+# steps on a GitHub-hosted runner. Diagnosed 2026-10-03:
+ci-dead-workflows = [
+  "actions.lock was STALE, and this is the whole outage. The estate's own labels.yml documents the mechanism: actions.lock is keyed by workflow path, and a workflow the lock does not cover 'is rejected before any step runs (startup_failure, and therefore no check run at all)'. Five lock entries no longer matched the SHAs the workflows pinned, because the pins were bumped without regenerating the lock. Victims: CodeQL, Dogfood Gate, Estate Rules, Code Quality, SonarQube, Slice, Static Analysis Gate. Regenerated; each ref resolved from the pinned commit against the upstream tag list rather than trusted from the inline comment.",
+  "SIX workflows were not valid YAML at all — container-build, guix-policy, openssf-compliance, runtime-policy, security-policy, wellknown-enforcement. Each had its first step collapsed from a two-line `- name: Checkout` / `uses:` list item into a single ` uses:` at ONE space of indent. A re-pin pass rewrote the uses line and took the `- name:` line with it. GitHub could not read `name:`, which is why those runs displayed the file path as their title.",
+  "e2e.yml had a DUPLICATE `steps:` key. Its whole tail is a commented-out menu of stack-specific example jobs, and the same re-pin pass uncommented 22 lines inside it (ten `steps:`, eight `with:`, one `strategy:`, three `uses:`). yaml.safe_load silently keeps the LAST duplicate and reports success, so every local lint passed while GitHub rejected the file before creating any job.",
+  "scorecard.yml declared timeout-minutes ON A REUSABLE-WORKFLOW CALL JOB. That key is step-job-only; GitHub rejects the job before creating any of them. Same zero-job, zero-log signature.",
+  "Governance ran but was red on two jobs: `Workflow security linter` (check-descriptile-policy.sh rejected .machine_readable/6a2/ as a retired descriptile path — fixed by migrating to .machine_readable/descriptiles/, the layout both hermeneia and standards use) and `Actions lockfile verify` (the stale lock again).",
+]
+
+# GREEN and genuinely so. The two entries carried over from 2026-07-29 were
+# verified from run logs at the time and are kept; everything below them was
+# verified by EXECUTING the gate locally against this tree on 2026-10-03, which
+# is the only way any of it could be checked — the workflows themselves had not
+# run in three weeks.
+ci-verified-green = [
+  "Slice (end to end) — all 14 steps; the 7 e2e tests RUN (named in the log) and the use-relativity step asserts strict=1 / loose=0. [from run logs, 2026-07-29]",
+  "Rust CI — 39 passed, count matches the local unit+gate total exactly. [from run logs, 2026-07-29]",
+  "OpenSSF Compliance — all 10 steps executed locally; PASS. Its placeholder step used to grep a HAND-LISTED set of ~13 files, which is why it was green while ~120 files were unrendered. It now calls scripts/check-no-placeholders.sh (every text file, allow-listed carriers) plus scripts/instantiate.sh --check.",
+  "Estate Rules — both scripts executed locally; PASS.",
+  "Workflow structure — all 29 workflows checked against the three gates hyperpolymath/standards runs at the revision Governance pins (874ffe5): parse, no-jobs, reusable-call-with-timeout-minutes, and duplicate YAML keys. All pass.",
+  "Descriptile policy — check-descriptile-policy.sh executed locally at the pinned revision; exit 0.",
+]
+
+# Still owed. Recorded rather than fixed, because each needs either a toolchain
+# this checkout does not have or an owner decision.
+ci-still-owed = [
+  "AFFIRMATION.adoc is still an unsigned template — it says so itself in a NOTE block. Filling it honestly requires RUNNING the project's checks in the session that signs it (cargo test, idris2 --typecheck, zig build), and none of those toolchains is available here. Inventing an affirmation is exactly the overclaim the file exists to prevent.",
+  "docs/status/READINESS.adoc — the CRG assessment is still a blank template, so this repo has no published readiness grade.",
+  "The coaptation receipt (.machine_readable/coaptation/receipts/latest.a2ml) is GENERATED by `just coapt` and is now stale: its [provenance] hashes are of the pre-rename descriptiles, and its [clauses] still grade template-era clauses. It must be regenerated with nickel available. witness-map.ncl (the hand-authored layer) was corrected; the receipt must not be hand-edited.",
+  "The contractiles beyond Intentfile/Adjustfile/Mustfile still carry template-era clauses — bust.template-substitution-failure, dust.no-template-artifacts, trust.template-files-readonly and friends describe a repository that is a template. They are internally consistent and none of them gates CI here, but they are not hermeneia's failure modes.",
+  "The root Justfile `import?`s build/just/{container,groove,assess}.just and build/contractile.just. `import?` is an OPTIONAL import, so all four are silent no-ops — the same defect class that made `just init` a no-op and let ~120 files ship unrendered. Only init.just was added, because it is the one this issue is about; the other four need the upstream modules ported or the imports removed.",
+  "src/interface/ is un-instantiated scaffolding: Foreign.idr still declares %foreign \"C:rsr_init,librsr\" — the template's symbol names against the template's library — and src/interface/generated/abi/ holds only .gitkeep, so no C header has ever been generated. docs/developer/ABI-FFI-README.adoc now says this up front.",
+]
+
+[critical-next-actions]
+# The four previous actions are DISCHARGED as of 2026-07-21:
+#   evidence boundary settled (docs/SPEC.adoc §Status);
+#   grammar + voke-operation table produced;
+#   end-to-end fixture runs query -> Trope IR -> tropecheck -> verdict;
+#   use-model fixtures where the verdict changes: `critical-paraphrase`
+#     (p-insufficient) vs `loose-gloss` (p-sufficient) on the SAME particular.
+actions = [
+  "Implement evoke/convoke (store traversal, no checker) — this forces the in-process retention-order decision recorded in blockers.",
+  "Implement transvoke over Haec edges.",
+  "Implement provoke and intervoke, reusing the invoke path.",
+  "Design and implement revoke with a persisted warrant graph; decide whether licence state lives here or in Vocarium.",
+  "Propose upstream: have tropecheck emit the violated-coordinate list it already computes, so `show loss` can be honest.",
+  "Write the Idris2 voke-algebra laws under verification/proofs/idris2/Voke/ — NOT yet started.",
+]
+
+[maintenance-status]
+last-run-utc = "2026-10-03"
+last-result = "warn"  # unknown | pass | warn | fail
+# The three gates recorded as red on 2026-07-29 are diagnosed and repaired — see
+# ci-fixed-2026-10-03 and ci-dead-workflows above. What keeps this at "warn" and
+# not "pass" is that NONE of it has yet been confirmed by a CI run: the workflows
+# in question had not executed in three weeks, so every gate above was verified by
+# running the check locally against this tree, which is weaker evidence. It
+# becomes "pass" when a push to main shows them green.
+#
+# Also still open, and the reason this is not "pass" on content either: the items
+# in ci-still-owed — above all AFFIRMATION.adoc (unsigned template) and
+# docs/status/READINESS.adoc (no published CRG grade), both of which need a
+# session that can actually run cargo / idris2 / zig.
+open-warnings = 6
+open-failures = 0
+
+[ecosystem]
+part-of = ["hyperpolymath voking stack"]
+depends-on = ["vocarium", "haec"]

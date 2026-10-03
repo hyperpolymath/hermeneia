@@ -22,16 +22,17 @@ Inventory snapshot at audit time:
 
 == Claim Vs Actual
 
+// The template's first row here audited "Placeholder badge tokens in README"
+// and named the OpenSSF Best Practices project-ID token. It was removed at
+// instantiation (issue #8): hermeneia has no OpenSSF project ID, so the token
+// had no value to take, and an unfilled token in a shipped file is what
+// scripts/check-no-placeholders.sh exists to fail on. Upstream repo-init drops
+// the same line at mint. Register at bestpractices.coreinfrastructure.org and
+// add the badge to README.adoc if that changes.
+
 [cols="2,2,3,1,3,3",options="header"]
 |===
 | Claimed item | Claimed by | Expected path | Actual status | Notes | Recommended action
-
-| Placeholder badge tokens in README
-| `README.adoc`
-| `{{OPENSSF_PROJECT_ID}}`, `{{OWNER}}`, `{{REPO}}`
-| placeholder
-| Template placeholders are intentional pre-bootstrap content.
-| Keep; document clearly as template tokens.
 
 | Docs links used `.adoc` files not present
 | legacy `README.adoc` (pre-migration)

@@ -5,11 +5,23 @@
 # must be moved into the appropriate subdirectory (or added here
 # with a justification comment).
 #
-# Used by: scripts/check-root-shape.sh
+# Used by: scripts/check-root-shape.sh  (enforced by .github/workflows/estate-rules.yml)
 # Authority: TEMPLATE-STANDARDS-AUDIT.adoc, "Proposed Final Directory Map"
 #
 # Format: one entry per line; '#' starts a comment; trailing '/' marks a directory.
 # Blank lines and comment-only lines are ignored.
+#
+# This is a PERMISSION list, not a REQUIREMENT list: an entry here that is
+# absent from the root does not fail the gate. Entries that are permitted but
+# not currently present are marked PERMITTED-ABSENT below, and each says why it
+# is still listed. Upstream hermeneia marks the same class with a `?`
+# prefix; scripts/check-root-shape.sh here does not strip `?`, so the marker is
+# a comment instead — a `?`-prefixed line would become an entry that can never
+# match and would silently stop permitting the file it was meant to allow.
+#
+# Reconciled against the actual root at issue #8 (the placeholder/instantiation
+# work): the list had drifted in BOTH directions — six entries present at the
+# root were not permitted, and eleven permitted entries were not present.
 
 # ─── Authority files (template-mandated) ─────────────────────────────────────
 README.adoc
@@ -19,33 +31,59 @@ AFFIRMATION.adoc           # dated/signed honesty snapshot (README/EXPLAINME/AFF
 0-AI-MANIFEST.a2ml         # thin pointer to .machine_readable/0.1-AI-MANIFEST.a2ml
 GOVERNANCE.adoc            # governance model (validator accepts root or docs/governance/)
 MAINTAINERS.adoc           # maintainer roster
-CONTRIBUTING.md            # REQUIRED AT ROOT by scorecard-enforcer/openssf-compliance/quality CI (test -f, no .github fallback). The fuller copy in .github/ is GitHub's auto-discovery convention; dedupe is an owner decision (would need those CI checks updated to accept .github/).
-SECURITY.md                # REQUIRED AT ROOT by scorecard-enforcer CI + the security-policy contractile (test -f SECURITY.md). See CONTRIBUTING.md note re: the .github/ copy.
+MAINTAINERS                # extensionless roster file that predates the .adoc copy; both are current
+ARCHITECTURE.adoc          # architecture summary; the .md this entry used to name was renamed to .adoc (AsciiDoc-by-default, enforced by scripts/check-no-md-in-docs.sh)
+CHANGELOG.adoc             # Keep-a-Changelog + SemVer; upstream canon is CHANGELOG.adoc, and openssf-compliance.yml accepts .md or .adoc
+CONTRIBUTING.adoc          # estate docs gate (standards scripts/check-docs-presence.sh) requires CONTRIBUTING at the ROOT; this is the copy it verifies
+GEMINI.md                  # pointer to CLAUDE.md for repos without AGENTS.md yet (upstream canon)
+CITATION.cff               # citation metadata (surfaced at root by #96; GitHub reads it from the root of the default branch only)
+FUNDING                    # human-readable funding document. GitHub's machine-readable sponsor file is .github/funding.yml, which is what the "Sponsor" button reads; this is the prose companion, not a duplicate of it.
 LICENSE
 LICENSES/                  # REUSE licence texts (MPL-2.0.txt + CC-BY-SA-4.0.txt) for the dual-licence model (code MPL-2.0 / docs CC-BY-SA-4.0)
+
+# PERMITTED-ABSENT: GitHub's community-health files. Each is accepted at the
+# root OR under .github/, and this repository keeps them under .github/
+# (SECURITY.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, GOVERNANCE.md) where GitHub
+# auto-discovers them. They stay listed so that promoting one to the root is not
+# treated as drift; openssf-compliance.yml already accepts either location.
+# NOTE the tension recorded here before: some estate gates `test -f SECURITY.md`
+# with no .github/ fallback. hermeneia's Mustfile security-policy invariant was
+# widened to accept either location at issue #8 rather than duplicating the file.
+SECURITY.md
+CONTRIBUTING.md
+GOVERNANCE.md
+ARCHITECTURE.md
 CHANGELOG.md
-CITATION.cff               # citation metadata (surfaced at root by #96)
 
 # ─── Build entry points (must live at root for their tooling) ────────────────
 Justfile                   # delegates phases to build/just/*.just
 coordination.k9            # repo-local session binding (template-mandated)
 abi.ipkg                   # Idris2 package for the ABI seam; sourcedir=src/interface (estate canon: root-level *-abi.ipkg). Single case-consistent src/interface/Abi/ dir. Typecheck: `idris2 --typecheck abi.ipkg`.
+Cargo.toml                 # Rust workspace manifest — must sit at the root to be found
+Cargo.lock                 # dependency lockfile — must sit beside its manifest
+mise.toml                  # the toolchain. Was accompanied by a .mise.toml stub whose sole live line `rust = "nightly"` silently overrode this file's `rust = "latest"` (mise reads the dotted form with precedence) while CI builds with `toolchain: stable` and no source uses a nightly feature. Deleted at issue #8; this is now the single toolchain file.
 
 # ─── Conventional dotfiles (tool-required at root) ───────────────────────────
 .editorconfig
 .envrc
 .gitattributes
 .gitignore
-.tool-versions
+.mailmap                   # git reads .mailmap from the WORKTREE ROOT only (or via mailmap.file / mailmap.blob, neither of which is configured). Moved here from .github/.mailmap at issue #8: the copy under .github/ was inert, which is why it was never filled. Currently declares no mapping — one author, one address — and says so in-file.
 CLAUDE.md                  # AI session instructions, generated by the arrival-pack from .machine_readable/ a2ml and read by agents at repo root (do not hand-edit; edit the a2ml source)
 .hypatia-ignore            # repo-scoped Hypatia scanner exemptions; the scanner reads it from the repo root
 sonar-project.properties   # SonarCloud analysis config; the SonarQube scan action reads it from the repo root
 
+# PERMITTED-ABSENT: .tool-versions (asdf). .envrc still probes `has asdf`, so
+# this is a supported route into the dev environment even though mise is the
+# primary one and no .tool-versions is committed.
+.tool-versions
+
 # ─── Directories ─────────────────────────────────────────────────────────────
 .devcontainer/             # VS Code dev container spec; tool-required at root
 .git/
+.githooks/                 # repo-local git hooks (validate-a2ml.sh, validate-k9.sh); wired via core.hooksPath
 .github/                   # CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, workflows/
-.machine_readable/         # AI manifests, contractiles, custom-format configs
+.machine_readable/         # AI manifests, contractiles, descriptiles, custom-format configs
 .well-known/
 build/                     # contractile.just, setup.sh, guix.scm, .guix-channel, Containerfile
 ci/                        # .gitlab-ci.yml, .pre-commit-config.yaml (root shims if tools require)
@@ -70,20 +108,18 @@ container/                 # may host Containerfile if not at build/
 .pre-commit-config.yaml    # TODO: relocate to ci/.pre-commit-config.yaml after invocation pattern decided
 affinescript/              # AffineScript source subtree consumed by this template
 tools/                     # TODO: consolidate with scripts/ or document the split (pending decision)
-.hypatia-ignore
-CLAUDE.md
-flake.nix
 
-# ─── Declared 2026-08-06: entries the RSR template's directory map did
-#     not anticipate. The template targets a documentation repository;
-#     these are this project's real top-level shape. Moving them would
-#     break every path that references them, to satisfy a map that was
-#     never written for it. Read from the estate-rules gate's own output.
-.githooks/                  # Top-level component directory of this project.
-ARCHITECTURE.md             # Project documentation.
-Cargo.lock                  # Dependency lockfile — must sit beside its manifest.
-Cargo.toml                  # Build/tool manifest — must sit at the root to be found.
-GOVERNANCE.md               # Project documentation.
-MAINTAINERS                 # Project file that must remain at the repository root.
-REQUIRES_INITIALISATION.md  # Project documentation.
-mise.toml                   # Build/tool manifest — must sit at the root to be found.
+# ─── REMOVED — deliberately not permitted ────────────────────────────────────
+# flake.nix
+#     Nix is RETIRED estate-wide (ruled 2026-05-18, hardened 2026-07-28) and
+#     .github/workflows/guix-policy.yml hard-fails on ANY *.nix file in the tree.
+#     This entry used to permit flake.nix at the root, which is how the Guix
+#     Package Policy gate went red on main: the allowlist licensed the one file
+#     the packaging policy forbids. Removing it makes estate-rules enforce the
+#     Nix ban alongside guix-policy instead of contradicting it. The file is
+#     already gone; packaging is build/guix.scm.
+# REQUIRES_INITIALISATION.md
+#     Upstream writes this at mint and removes it once `just repo-init` has run.
+#     This repository is instantiated (see
+#     .machine_readable/configs/instantiation.a2ml), so it must not reappear. If
+#     it does, that is the marker of an un-rendered tree, not a permitted file.

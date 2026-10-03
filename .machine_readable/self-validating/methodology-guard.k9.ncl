@@ -1,10 +1,6 @@
 K9!
 # SPDX-License-Identifier: MPL-2.0
-# Copyright (c) {
-  pedigree = {
-    name = "methodology-guard.k9.ncl",
-    security = { leash = 'Yard },
-     schema_version = "1.0.0",  },{CURRENT_YEAR}} {{AUTHOR}} ({{OWNER}}) <{{AUTHOR_EMAIL}}>
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
 # K9 Validator: Methodology Guard
 # Checks that agent work respects methodology constraints declared in
@@ -13,7 +9,24 @@ K9!
 # Usage: k9 validate methodology-guard
 
 let methodology_guard = {
-  
+  pedigree = {
+    name = "methodology-guard.k9.ncl",
+    schema_version = "1.0.0",
+    component_type = "validator",
+    security = {
+      leash = 'Yard,
+      trust_level = "validated-config",
+      allow_network = false,
+      allow_filesystem_write = false,
+      allow_subprocess = false,
+    },
+    metadata = {
+      version = "1.0.0",
+      description = "Validates that agent work respects the methodology constraints declared in bot_directives/methodology.a2ml",
+      author = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>",
+    },
+  },
+
   version = "1.0.0",
   description = "Validates that agent work respects declared methodology constraints",
 
@@ -48,7 +61,7 @@ let methodology_guard = {
     state_not_template = {
       description = "STATE.a2ml must not contain template placeholders",
       severity = "warning",
-      file = ".machine_readable/6a2/STATE.a2ml",
+      file = ".machine_readable/descriptiles/STATE.a2ml",
       # NOTE: the PROJECT token below is written as a Nickel concat
       # ("{{" ++ "PROJECT}}") ON PURPOSE. `just init` runs a sed substitution for
       # the brace-PROJECT-brace token over EVERY text file, which would otherwise

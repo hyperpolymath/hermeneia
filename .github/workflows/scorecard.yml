@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
 # This workflow is managed by gh actions-lock.
-# This workflow is managed by gh actions-lock.
 name: OSSF Scorecard
 
 on:
@@ -27,4 +26,10 @@ jobs:
       contents: read
       security-events: write
       id-token: write
-    timeout-minutes: 15
+    # NO timeout-minutes HERE. A job whose `uses:` calls a REUSABLE WORKFLOW may
+    # only declare uses/with/secrets/permissions/if/concurrency/name/strategy.
+    # timeout-minutes is a step-job key: GitHub rejects the job before creating
+    # ANY job, so the run is `failure` with zero jobs, zero logs and zero check
+    # runs — nothing to debug from. This workflow was dead that way. The called
+    # workflow sets its own per-job timeouts. Enforced estate-wide by
+    # hyperpolymath/standards tools/policy/check-workflows-parse.sh.

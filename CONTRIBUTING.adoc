@@ -13,16 +13,26 @@ add one to any new file.
 
 === Development environment
 
-A pinned dev shell is provided:
+Guix is the sole package manager estate-wide and *Nix is retired*:
+`+.github/workflows/guix-policy.yml+` hard-fails on any `+*.nix+` file in the
+tree, so there is no `+flake.nix+` here and `+nix develop+` is not a route into
+this repo. The dev shell is `+build/guix.scm+`:
 
 [source,sh]
 ----
-nix develop        # toolchain: just
+guix shell -D -f build/guix.scm
 ----
 
-Estate policy is Guix primary / Nix fallback; this repo currently ships
-the Nix fallback. A `+guix.scm+` is welcome if you prefer the primary
-tier.
+Or use https://mise.jdx.dev[`+mise+`], which reads `+mise.toml+` from the
+root:
+
+[source,sh]
+----
+mise install
+----
+
+The task runner is https://just.systems[`+just+`] either way. `+.envrc+` wires
+both for https://direnv.net/[direnv].
 
 === Build and test
 
@@ -66,8 +76,12 @@ add a `+.md+` duplicate of a doc that already exists as `+.adoc+`.
 === Pull requests
 
 [arabic]
-. Branch from `+main+` — do not push to `+main+` directly; branch
-protection requires review and passing checks.
+. Branch from `+main+` — do not push to `+main+` directly. (The
+`+Optimus-Branch+` ruleset that enforces review and required checks is
+currently *disabled* on this repository, so this is a convention contributors
+are asked to keep, not something the forge is stopping you from breaking.
+`.github/rulesets/Optimus-Branch.json` is the checked-in definition;
+re-enabling it is an owner decision.)
 . Keep the change focused, and explain _why_ in the PR body.
 . Make sure governance CI is green. It checks documentation presence,
 packaging policy, secrets, licence consistency and workflow security.

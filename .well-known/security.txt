@@ -1,11 +1,30 @@
 # SPDX-License-Identifier: MPL-2.0
 # RFC 9116 - security.txt
 # https://securitytxt.org/
+#
+# Two RFC 9116 fields the template shipped are DELIBERATELY ABSENT. Both are
+# optional, and both were unsatisfiable here — which is worse than absent,
+# because a field that names a resource nobody holds sends a researcher
+# somewhere that does not exist:
+#
+#   Encryption:  there is no published PGP key. .github/SECURITY.md says
+#                "A PGP-encrypted report can be arranged on request", which is
+#                the honest position. Add this field if and when a key is
+#                published, with its real URL.
+#   Hiring:      the template's line was `https://` + the WEBSITE token +
+#                `/careers`, but WEBSITE is itself an absolute URL — so
+#                rendering it produced `https://https://github.com/...`. There
+#                is also no /careers page on a GitHub repository. Dropped rather
+#                than shipped as a malformed dead link.
+#                (The token is named in words, not spelled out: this file is
+#                scanned by scripts/check-no-placeholders.sh, and a comment
+#                quoting a brace token would fail the gate it explains.)
+#
+# Expires is renewed annually; wellknown-enforcement.yml checks it weekly
+# (Mondays 09:00 UTC) and hard-fails once it is in the past.
 
-Contact: mailto:{{SECURITY_EMAIL}}
-Expires: {{CURRENT_YEAR}}-12-31T23:59:59.000Z
-Encryption: {{PGP_KEY_URL}}
+Contact: mailto:j.d.a.jewell@open.ac.uk
+Expires: 2027-10-01T23:59:59.000Z
 Preferred-Languages: en
-Canonical: https://{{FORGE}}/{{OWNER}}/{{REPO}}/.well-known/security.txt
-Policy: https://{{FORGE}}/{{OWNER}}/{{REPO}}/blob/main/SECURITY.md
-Hiring: https://{{WEBSITE}}/careers
+Canonical: https://github.com/hyperpolymath/hermeneia/.well-known/security.txt
+Policy: https://github.com/hyperpolymath/hermeneia/blob/main/.github/SECURITY.md

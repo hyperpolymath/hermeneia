@@ -115,29 +115,207 @@ composition, or licence state — which hermeneia owns.
   checker's own verdict type. Surfacing that list is an upstream contribution to
   `trope-checker` and is the highest-value small fix in the stack.
 
-| Guix Package Policy (CI red)
-| This repo still has a root `flake.nix` while Nix is retired estate-wide
-  (ruled 2026-05-18, hardened 2026-07-28). `build/guix.scm` is an
-  *uninstantiated template* — `{{PROJECT_NAME}}`, `{{AUTHOR}}` — and there is no
-  `Containerfile`, so removing the flake today would leave the repo with no
-  packaging at all. Retire the flake *and* make the Guix side real in the same
-  change.
+| Guix Package Policy (was CI red)
+| *Diagnosed and fixed 2026-10-03 — and the diagnosis in this row was wrong.*
+  It blamed a root `flake.nix`. There is no `flake.nix` in the tree and had not
+  been for some time; the gate was red because *its own YAML was invalid*. Nix is
+  retired estate-wide (ruled 2026-05-18, hardened 2026-07-28) and
+  `flake.nix` has now also been removed from `.machine_readable/root-allow.txt`,
+  so `estate-rules` enforces the ban alongside `guix-policy` instead of licensing
+  the one file it forbids. `build/guix.scm` is instantiated and its inputs match
+  ANCHOR's allowed languages (openjdk, go, node and python were inherited from
+  the template and appear nowhere in this repo). It is still a *dev-shell*
+  manifest, not a buildable package — `source #f`, no build phases — and
+  `idris2`/`just` are deliberately absent pending verification of their Guix
+  module names. Making it a real cargo-build-system package is still owed.
 
-| Estate Rules (CI red)
-| Root-shape allowlist. `Cargo.toml` and `Cargo.lock` arrived with the Rust
-  workspace and are not yet allowlisted; `ARCHITECTURE.md`, `GOVERNANCE.md`,
-  `MAINTAINERS` and `mise.toml` pre-date that work. One PR covering all six
-  clears it.
+| Estate Rules (was CI red)
+| *Fixed 2026-10-03.* This row blamed six unallowlisted root entries
+  (`Cargo.toml`, `Cargo.lock`, `ARCHITECTURE.md`, `GOVERNANCE.md`, `MAINTAINERS`,
+  `mise.toml`) and said "one PR covering all six clears it". Those six had
+  already been added; the gate stayed red because the allowlist had drifted in
+  *both* directions — `.mise.toml`, `ARCHITECTURE.adoc`, `CHANGELOG.adoc`,
+  `CONTRIBUTING.adoc`, `FUNDING` and `GEMINI.md` were at the root and not
+  permitted. Reconciled against the actual root; `scripts/check-root-shape.sh`
+  passes (52 entries, 61 permitted). `.mise.toml` was *deleted* rather than
+  allowlisted: its only live line, `rust = "nightly"`, overrode `mise.toml`
+  (mise reads the dotted form with precedence) while CI builds with
+  `toolchain: stable` and no source uses a nightly feature.
 
-| Dogfood Gate (CI red)
-| Not yet diagnosed.
+| Dogfood Gate (was CI red)
+| *"Not yet diagnosed" was the entry. It was never a Dogfood Gate defect* — the
+  workflow could not start. See the row below.
 
-| Placeholder debt
-| ~92 files still carry `{{PLACEHOLDER}}` tokens, including
-  `docs/status/READINESS.adoc` (the CRG assessment is still a blank template, so
-  this repo has *no* published readiness grade). Tracked as issue #8, which
-  undercounts at ~57.
+| Seven workflows dead for three weeks, with nothing to read
+| *The largest CI failure in this repository's history, and invisible.* From
+  2026-09-12 to 2026-10-01 every workflow that ran its own steps on a
+  GitHub-hosted runner concluded `startup_failure` in 0 seconds: zero jobs, zero
+  logs, zero annotations, zero check runs. CodeQL, Dogfood Gate, Estate Rules,
+  Code Quality, SonarQube, Slice and Static Analysis Gate. The workflows that
+  merely *call* a reusable workflow in `hyperpolymath/standards` ran fine, which
+  is what made it look like a runner or billing problem.
++
+The cause is recorded in this repository's own `labels.yml` header:
+`.github/workflows/actions.lock` is keyed by workflow path, and "a workflow the
+lock does not list is rejected before any step runs (`startup_failure`, and
+therefore no check run at all)". Five lock entries no longer matched the SHAs the
+workflows pinned — the pins had been bumped without regenerating the lock.
+`codeql-action` v4.37.8 vs v4.37.9, `deploy-pages` v5.0.0 vs v5.0.1,
+`action-editorconfig-checker` v2.2.0 vs v3.0.0, `action-gh-release` v3.0.2 vs
+v3.0.3, and `dtolnay/rust-toolchain@stable` at a different commit. Regenerated,
+resolving each ref from the pinned commit against the upstream tag list rather
+than trusting the inline comment.
++
+Four more workflows were dead for unrelated reasons, all found by executing the
+gates `hyperpolymath/standards` runs at the revision Governance pins:
+six had invalid YAML (a re-pin pass collapsed each one's `- name: Checkout` /
+`uses:` step pair into a single ` uses:` at one space of indent); `e2e.yml` had a
+duplicate `steps:` key (22 lines uncommented inside its commented-out example
+menu — and `yaml.safe_load` silently keeps the LAST duplicate, so every local
+lint passed); `scorecard.yml` declared `timeout-minutes` on a reusable-workflow
+call job, which GitHub rejects before creating any job.
+
+| Governance (CI red on two jobs)
+| *Fixed 2026-10-03.* `Workflow security linter` failed
+  `check-descriptile-policy.sh`, which rejects any executable file-existence test
+  naming `.machine_readable/(6a2/)?STATE.a2ml` and friends as a *retired
+  descriptile path*. `6a2/` is the pre-rename location; both `hermeneia`
+  and `standards` now carry `.machine_readable/descriptiles/`, so the directory
+  was moved to upstream canon and all 112 references across 40 files rewritten.
+  `Actions lockfile verify` was the stale lock again.
+
+| Placeholder debt (was ~92 files)
+| *Cleared 2026-10-03 — issue #8.* The count in this row (~92) and in the issue
+  (~57) were both undercounts: 122 files carried a `{{` and roughly 120 held a
+  real token. The root cause was not the tokens. The root `Justfile` has imported
+  `build/just/init.just` since the scaffold and *that file never existed*, and
+  `import?` is an OPTIONAL import, so `just init` was a silent no-op and no gate
+  noticed. `scripts/check-no-placeholders.sh` was meanwhile green the whole time
+  because `openssf-compliance.yml` grepped a hand-listed set of ~13 files — the
+  ones someone had already filled by hand to get CI passing. See
+  <<instantiation>> below.
+
+| Unsigned AFFIRMATION, no CRG grade
+| *Still owed, and deliberately not filled in.* `AFFIRMATION.adoc` is an unsigned
+  template that says so itself in a NOTE block; filling it honestly requires
+  RUNNING the project's checks in the session that signs it (`cargo test`,
+  `idris2 --typecheck abi.ipkg`, `zig build`), and none of those toolchains is
+  available in the environment this work was done in. Inventing an affirmation is
+  precisely the overclaim the file exists to prevent. `docs/status/READINESS.adoc`
+  is the same story: the CRG assessment is still blank, so this repo has no
+  published readiness grade.
+
+| ABI/FFI seam is scaffolding
+| `src/interface/` was inherited from the template and never instantiated.
+  `Foreign.idr` still declares `%foreign "C:rsr_init,librsr"` — the template's
+  symbol names against the template's library, and nothing named `librsr` exists
+  here. `src/interface/generated/abi/` holds only `.gitkeep` and a README, so no
+  C header has ever been generated and the Idris2 → C → Zig bridge is not wired.
+  `build.zig` calls itself a "Template FFI Build Configuration". The working
+  implementation is the Rust workspace. `docs/developer/ABI-FFI-README.adoc` now
+  opens with this, because it previously described the seam as though it worked.
 |===
+
+== Instantiation — what `just init` now means here [[instantiation]]
+
+This repository was scaffolded from
+https://github.com/hyperpolymath/hermeneia[hermeneia] and never
+rendered. Roughly 120 files shipped as an unrendered template: copyright headers
+reading `2026 Jonathan D.A. Jewell (hyperpolymath)`, `CITATION.cff` with no title,
+`ANCHOR.a2ml` with no `kind` or `domain`, the whole of `container/` addressed to
+a service nobody named, and a `Justfile` declaring `project :=
+"hermeneia"` — a repository asserting that it *was* the template, and
+failing its own `methodology-guard` drift check for it.
+
+*The root cause was not the tokens.* The root `Justfile` has imported
+`build/just/init.just` since the scaffold, and that file never existed. `import?`
+is an _optional_ import: just silently ignores a missing module. So the one
+command that would have rendered the tree had no body, and no gate noticed the
+body was missing. Filling tokens by hand once would have fixed the symptom and
+lost the decisions — nothing to re-run, nothing to check, no way to tell a
+rendered tree from a lucky one.
+
+So the machinery came first, and was then used:
+
+[cols="1,3"]
+|===
+| `.machine_readable/configs/instantiation.a2ml`
+| The canonical values, each with its SOURCE named (README.adoc, EXPLAINME.adoc,
+  the descriptiles, Cargo.toml, .github/SECURITY.md) — read out of this
+  repository, not guessed. The four that need human judgement (`PROJECT_KIND`,
+  `PROJECT_DOMAIN`, `PROJECT_UNIQUE_STRENGTH`, `LANG_STACK`) sit in a marked
+  JUDGEMENT block quoting the document each came from, because upstream
+  `repo-init` deliberately leaves those UNASSIGNED rather than write fiction into
+  `ANCHOR.a2ml` — the file the estate treats as semantic authority.
+
+| `scripts/instantiate.sh`
+| The engine. Idempotent by construction: a rendered tree holds no tokens, so a
+  second pass changes nothing (verified — two consecutive runs, zero files).
+  Substitution is _literal_ (awk `index`/`substr`), not `sed` or a regex, because
+  `{{` opens an interval quantifier in an ERE, `ugrep` on some estate machines
+  rejects a bare doubled brace as an "empty (sub)expression", and `&` in a `sed`
+  replacement means "the whole match". Derives what is derivable and never
+  guesses: `PROJECT`/`project` from `REPO`, author name parts from `AUTHOR`, and
+  `UUID` as UUIDv5(URL, `github.com/hyperpolymath/hermeneia`) — which reproduces
+  the value `CLADE.a2ml` already carries, so the two cannot drift.
+
+| `build/just/init.just`
+| The missing import target. Deliberately *not* a copy of upstream's 963-line
+  `repo-init.just`: that is a MINT recipe referencing `archetypes/`,
+  `build/docs-seed/`, `build/templates/` and `scripts/rust-tool.sh`, none of
+  which exist here, and every one of which would fail on first run. This is the
+  narrow equivalent for a repository that already exists. Recipes: `just init`,
+  `just init-check`, `just init-list`, `just placeholders`.
+
+| `scripts/check-no-placeholders.sh`
+| The estate's canonical gate, vendored VERBATIM from `hermeneia` so this
+  repo and the template cannot drift on what "unfilled" means, plus one
+  clearly-marked additive block for the template and example trees. Called from
+  `openssf-compliance.yml`, from `scripts/validate-template.sh` Phase 5, and from
+  the Mustfile's `no-placeholder-values` invariant — one implementation, three
+  callers, which is the point.
+|===
+
+Two exclusions a blanket `sed` gets wrong, both flagged in issue #8:
+
+* *Drift guards.* `methodology.a2ml`'s `reject-if-contains` and
+  `methodology-guard.k9.ncl`'s `reject_patterns` list the literal token as a
+  pattern to REJECT. Rendering them rewrites the guard into this repository's own
+  name and silently disables the check. Those _lines_ are protected; the rest of
+  both files renders normally.
+* *Justfiles.* just owns brace interpolation there: the lowercase `project`,
+  `args`, `tier` and uppercase `ARGS` tokens a recipe body carries are the
+  variables the `Justfile` itself defines, not template placeholders. A blanket
+  pass turns the recipe line that echoes the project variable into a literal and
+  breaks every interpolating recipe. Justfile _identity_ is fixed at the variable
+  definitions instead, which is where it was actually wrong.
++
+That is not a hypothetical. An earlier pass of the renderer over this very
+paragraph substituted the project token inside the sentence explaining why it must
+not be substituted, and this bullet read "just owns brace interpolation there —
+`hermeneia`". Tokens are named in words below for that reason.
+
+Two tokens had *no possible value*, which the gate's own header says is worse
+than absent, so the sections went rather than the gate staying red forever:
+`.well-known/security.txt`'s `Encryption:` (no PGP key is published —
+`.github/SECURITY.md` says one "can be arranged on request") and `Hiring:` (which
+rendered to `https://https://github.com/...`, because the template prefixed a
+value that is already an absolute URL, and there is no `/careers` page on a GitHub
+repository); and `TEMPLATE-STANDARDS-AUDIT.adoc`'s OpenSSF Best Practices project
+ID, which this project does not have. Both reasons are recorded in-file so nobody
+"restores" them.
+
+[NOTE]
+====
+Token names in this section are spelled out in *words*, not as brace tokens.
+Writing one here would trip `scripts/check-no-placeholders.sh` — the gate this
+section describes — because a real token is byte-identical to prose about a real
+token unless the prose declines to spell it. Same hazard, same answer, as
+`.machine_readable/self-validating/methodology-guard.k9.ncl` splitting its
+reject-pattern across a Nickel concat so the renderer cannot match it, and as
+upstream `repo-init` computing its brace delimiters with `printf` rather than
+typing them. A gate that fires on its own explanation gets switched off.
+====
 
 == Verification — how to check these claims yourself
 

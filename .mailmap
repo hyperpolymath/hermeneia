@@ -1,0 +1,12 @@
+# git reads .mailmap from the WORKTREE ROOT only (or via mailmap.file /
+# mailmap.blob, neither of which this repo configures). The copy that used to
+# live at .github/.mailmap was therefore inert and was never filled; it is
+# moved here and left empty on purpose.
+#
+# There is no alternate author address to map: one name, one address
+# (Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>). A mailmap entry with an
+# empty <> pair is a malformed mailmap rather than a harmless placeholder, so
+# nothing is declared until there is something to declare.
+#
+# Add a line here if that changes, in git's own format:
+#   Proper Name <proper@email> <commit@email>

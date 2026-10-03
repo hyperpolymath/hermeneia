@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-= TEST-NEEDS: rsr-template-repo
+= TEST-NEEDS: hermeneia
 
 == CRG Grade: C — ACHIEVED 2026-04-04
 
@@ -29,11 +29,19 @@
 ** Phase 2: Machine-readable metadata (`.machine_readable/`)
 ** Phase 3: GitHub Actions workflows (17 required + all present)
 ** Phase 4: Idris2 ABI and Zig FFI source files
-** Phase 5: Placeholder token replacement (skipped in template)
+** Phase 5: Placeholder token replacement (delegates to `scripts/check-no-placeholders.sh`)
 ** Phase 6: SPDX license headers (100% coverage, 6/6 files)
 ** Phase 7: Build system verification (`zig build` + `idris2` syntax check)
 ** Phase 8: Documentation requirements (TOPOLOGY, ABI-FFI-README, etc)
-* Status: *PASSING* (0 errors, 3 warnings about template placeholders)
+* Status: *PASSING* (0 errors). The "3 warnings about template placeholders" this
+  row used to record are gone: Phase 5 no longer carries its own copy of the rule.
+  It used to test `[ "$(basename "$REPO_ROOT")" = "hermeneia" ]` to decide
+  whether to skip the check — identity from a DIRECTORY NAME, wrong in any git
+  worktree or renamed clone, and a substitution pass rewrote the literal to
+  `hermeneia`, inverting the branch so this repo would have skipped its own
+  placeholder check while a real template checkout got checked. A gate that cannot
+  fail reads as coverage while changing no outcome. It now calls the canonical
+  script, which resolves identity from `GITHUB_REPOSITORY` or the git remote.
 
 === E2E Template Instantiation Test ✅
 
@@ -57,7 +65,7 @@
 === Zig FFI Tests ✅
 
 * [x] `src/interface/ffi/test/integration_test.zig` — template with examples
-** Converted from `{{project}}` placeholders to "template" namespace
+** Converted from `hermeneia` placeholders to "template" namespace
 ** Added comprehensive comments for how to instantiate
 ** Tests grouped by category (lifecycle, operations, strings, errors, version, memory safety, threading)
 ** Compiles and passes placeholder test

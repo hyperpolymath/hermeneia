@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright (c) {{CURRENT_YEAR}} {{AUTHOR}} ({{OWNER}}) <{{AUTHOR_EMAIL}}>
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
 # Canonical maintenance governance model
 
 [metadata]
 version = "1.0.0"
-last-updated = "{{CURRENT_DATE}}"
+last-updated = "2026-10-03"
 scope = "repo"
 
 [discovery]
@@ -18,7 +18,7 @@ machine-entrypoints = [
   ".machine_readable/policies/MAINTENANCE-AXES.a2ml",
   ".machine_readable/policies/MAINTENANCE-CHECKLIST.a2ml",
   ".machine_readable/policies/SOFTWARE-DEVELOPMENT-APPROACH.a2ml",
-  ".machine_readable/6a2/META.a2ml",
+  ".machine_readable/descriptiles/META.a2ml",
   ".machine_readable/ai/README.adoc",
   ".machine_readable/bot_directives/README.scm",
 ]

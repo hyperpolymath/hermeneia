@@ -1,5 +1,6 @@
 K9!
 # SPDX-License-Identifier: MPL-2.0
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 # K9 Yard-level template: Configuration with validation
 # Security Level: Yard (Nickel evaluation with contracts)
 # Signature recommended but not required
@@ -7,7 +8,6 @@ K9!
 {
   pedigree = {
     name = "template-yard.k9.ncl",
-    security = { leash = 'Yard },
     schema_version = "1.0.0",
     component_type = "TODO: describe component type (e.g., 'validated-config', 'schema')",
     security = {
@@ -21,7 +21,7 @@ K9!
       
       version = "1.0.0",
       description = "TODO: Brief description with validation details",
-      author = "{{AUTHOR}} <{{AUTHOR_EMAIL}}>",
+      author = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>",
     },
   },
 

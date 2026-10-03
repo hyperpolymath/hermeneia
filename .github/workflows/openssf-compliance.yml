@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
 # This workflow is managed by gh actions-lock.
-# This workflow is managed by gh actions-lock.
 # OpenSSF Best Practices compliance gate — blocks PRs and pushes that lack
 # required files or still contain unfilled placeholder tokens.
 name: OpenSSF Compliance
@@ -22,7 +21,8 @@ jobs:
     permissions:
       contents: read
     steps:
- uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Check SECURITY.md exists and has substance
@@ -72,11 +72,11 @@ jobs:
             exit 1
           fi
 
-          if [ ! -f ".machine_readable/6a2/STATE.a2ml" ]; then
-            echo "::error::.machine_readable/6a2/STATE.a2ml is required"
+          if [ ! -f ".machine_readable/descriptiles/STATE.a2ml" ]; then
+            echo "::error::.machine_readable/descriptiles/STATE.a2ml is required"
             exit 1
           fi
-          echo ".machine_readable/6a2/STATE.a2ml: OK"
+          echo ".machine_readable/descriptiles/STATE.a2ml: OK"
       - name: Check CHANGELOG exists
         run: |
           if [ ! -f "CHANGELOG.md" ] && [ ! -f "CHANGELOG.adoc" ] && [ ! -f "CHANGES.md" ]; then
@@ -84,35 +84,60 @@ jobs:
             exit 1
           fi
           echo "CHANGELOG: OK"
-      - name: Check no unfilled placeholder tokens in required files
+      # ─── The whole-tree placeholder gate ────────────────────────────────────
+      #
+      # This step used to check a HAND-LISTED set of ~13 files with an inline
+      # grep. That is the specific split scripts/check-no-placeholders.sh exists
+      # to end, in the words of its own header: "the previous split — a workflow
+      # that checked a hand-listed set of files, and an e2e test that
+      # re-implemented substitution with its own token list — let the two drift
+      # until the test passed while real instantiation leaked."
+      #
+      # It is not hypothetical here. This gate was GREEN while roughly 120 files
+      # in the tree carried unfilled tokens (issue #8), because the list covered
+      # only the files someone had already filled by hand to get CI passing.
+      # STATE.a2ml, ECOSYSTEM.a2ml and SECURITY.md were rendered; ANCHOR.a2ml,
+      # CITATION.cff, .github/settings.yml, the whole of container/, most of
+      # docs/ and every bot directive were not, and nothing looked at them.
+      # A gate that checks a list someone must remember to extend reports
+      # coverage while changing no outcome.
+      #
+      # So it now calls the canonical script, which scans EVERY text file and
+      # allow-lists the few legitimate carriers. One implementation, called from
+      # here and from tests/e2e/template_instantiation_test.sh, so the two
+      # cannot drift apart again.
+      - name: Check no unfilled placeholder tokens (whole tree)
         run: |
-          ERRORS=0
-          REQUIRED_FILES=""
-
-          # Collect all required files that exist
-          for f in SECURITY.md SECURITY.adoc .github/SECURITY.md LICENSE LICENSE.txt \
-                   CONTRIBUTING.md CONTRIBUTING.adoc README.md README.adoc \
-                   .machine_readable/6a2/STATE.a2ml .machine_readable/6a2/META.a2ml \
-                   .machine_readable/6a2/ECOSYSTEM.a2ml CHANGELOG.md CHANGELOG.adoc; do
-            [ -f "$f" ] && REQUIRED_FILES="$REQUIRED_FILES $f"
-          done
-
-          for f in $REQUIRED_FILES; do
-            # Match {{ANYTHING}} placeholder tokens
-            PLACEHOLDERS=$(grep -cE '\{\{[A-Z_]+\}\}' "$f" 2>/dev/null || true)
-            if [ "$PLACEHOLDERS" -gt 0 ]; then
-              echo "::error::$f contains $PLACEHOLDERS unfilled {{PLACEHOLDER}} tokens"
-              grep -nE '\{\{[A-Z_]+\}\}' "$f" | head -5
-              ERRORS=$((ERRORS + 1))
-            fi
-          done
-
-          if [ "$ERRORS" -gt 0 ]; then
-            echo ""
-            echo "::error::$ERRORS file(s) still contain placeholder tokens — run 'just init' to fill them"
+          if [ ! -f scripts/check-no-placeholders.sh ]; then
+            echo "::error::scripts/check-no-placeholders.sh is missing — the placeholder gate cannot run"
             exit 1
           fi
-          echo "Placeholder check: OK (no unfilled tokens in required files)"
+          bash scripts/check-no-placeholders.sh . || {
+            echo ""
+            echo "::error::unfilled placeholder tokens remain. Fix by editing"
+            echo "::error::.machine_readable/configs/instantiation.a2ml and running 'just init'"
+            echo "::error::(scripts/instantiate.sh) — not by hand-editing the rendered files."
+            exit 1
+          }
+      # ─── And that the rendered state is reproducible ────────────────────────
+      #
+      # The gate above proves no token SURVIVES. This proves the values that
+      # replaced them are the committed ones, so a hand edit that happens to
+      # remove a token cannot pass. --check re-renders from
+      # .machine_readable/configs/instantiation.a2ml into a scratch copy and
+      # compares; it writes nothing.
+      - name: Check the tree is rendered from the committed values
+        run: |
+          if [ ! -f scripts/instantiate.sh ]; then
+            echo "::warning::scripts/instantiate.sh is missing — skipping the reproducibility check"
+            exit 0
+          fi
+          bash scripts/instantiate.sh --check || {
+            echo ""
+            echo "::error::the tree does not match .machine_readable/configs/instantiation.a2ml."
+            echo "::error::Run 'just init' to re-render, or update the manifest if a value changed."
+            exit 1
+          }
       - name: Summary
         run: |
           echo "=== OpenSSF Best Practices Compliance: PASS ==="

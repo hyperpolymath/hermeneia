@@ -34,12 +34,12 @@
       { fact = "state.phase", op = 'present },
       { fact = "ecosystem.type", op = 'present },
     ],
-    note = "STATE.a2ml + ECOSYSTEM.a2ml were read from .machine_readable/6a2/",
+    note = "STATE.a2ml + ECOSYSTEM.a2ml were read from .machine_readable/descriptiles/",
   },
   "must.anchors-directory" = {
     kind = "descriptile",
     witnesses = [ { fact = "anchor.authority", op = 'present } ],
-    note = "ANCHOR.a2ml was read from .machine_readable/6a2/anchors/",
+    note = "ANCHOR.a2ml was read from .machine_readable/descriptiles/anchors/",
   },
 
   # --- TRUST: deliberately NO descriptile witness. ---
@@ -53,19 +53,30 @@
   # declared capability awaiting a descriptile that actually carries such evidence.
 
   # --- INTEND: a committed intent realised by the descriptive self-model ---
+  # Was: witness `ecosystem.type equals "repository-template"`, i.e. this clause
+  # was attested by ECOSYSTEM declaring that the repo IS the RSR template.
+  # hermeneia's ECOSYSTEM.a2ml says type = "query-language", so the witness was
+  # permanently REFUTED — the receipt grades intend.repo-initialization against a
+  # fact about a different project. Intentfile's clause was restated at
+  # instantiation (issue #8) to mean "this repo is rendered from its template and
+  # has not drifted back", which is what the anchor can actually attest: an
+  # un-substituted ANCHOR identity is the visible symptom of an un-instantiated
+  # repo, and a rendered one is the symptom of the intent being met.
   "intend.repo-initialization" = {
     kind = "descriptile",
-    witnesses = [ { fact = "ecosystem.type", op = 'equals, arg = "repository-template" } ],
-    note = "ECOSYSTEM declares this repo IS a template ⇒ the init intent is realised",
+    witnesses = [ { fact = "anchor.project", op = 'not_contains, arg = "{{" } ],
+    note = "ANCHOR.identity.project is rendered (no brace token) ⇒ the repo is instantiated, not a template",
   },
 
   # --- ADJUST: accessibility/hygiene posture (advisory; never gates) ---
-  # The ANCHOR identity block still carries {{PROJECT_NAME}}; for the template
-  # itself that is expected, but it is honestly a posture dip worth surfacing.
+  # The substitution pass rendered the NOTE's parenthetical, which left this
+  # saying "ANCHOR.identity.project is un-substituted (Hermeneia) ⇒ posture dip"
+  # — a witness that now HOLDS annotated as a dip. A note that contradicts its own
+  # predicate is how a green reading gets trusted for the wrong reason.
   "adjust.placeholder-drift" = {
     kind = "descriptile",
     witnesses = [ { fact = "anchor.project", op = 'not_contains, arg = "{{" } ],
-    note = "ANCHOR.identity.project is un-substituted ({{PROJECT_NAME}}) ⇒ posture dip",
+    note = "ANCHOR.identity.project carries no brace token ⇒ no placeholder drift; posture OK",
   },
 
   # --- BUST: recognised break. For bust, a HOLDING witness means ALARM (active

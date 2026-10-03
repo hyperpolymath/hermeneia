@@ -1,5 +1,6 @@
 K9!
 # SPDX-License-Identifier: MPL-2.0
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 # K9 Hunt-level template: Full execution with Just recipes
 # Security Level: Hunt (full system access)
 # ⚠️ SIGNATURE REQUIRED - Review carefully before use
@@ -7,7 +8,6 @@ K9!
 {
   pedigree = {
     name = "template-hunt.k9.ncl",
-    security = { leash = 'Yard },
     schema_version = "1.0.0",
     component_type = "TODO: describe component type (e.g., 'deployment', 'setup-script')",
     security = {
@@ -22,7 +22,7 @@ K9!
       
       version = "1.0.0",
       description = "TODO: Detailed description of what this component does",
-      author = "{{AUTHOR}} <{{AUTHOR_EMAIL}}>",
+      author = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>",
     },
     warnings = [
       "This component has full system access",

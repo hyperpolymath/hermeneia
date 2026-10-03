@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 // Template: QUICKSTART-DEV.adoc — clone → build → test → PR
-// Replace rsr-template-repo, {{BUILD_CMD}}, {{TEST_CMD}}, {{LANG_STACK}} with actuals
-= rsr-template-repo — Quick Start for Developers
+// Replace hermeneia, cargo build --workspace, cargo test --workspace, Rust 2021 workspace, deliberately dependency-free (std only, hand-written JSON): hermeneia-syntax, hermeneia-ir, hermeneia-store, hermeneia-core, hermeneia-cli. Plus Idris2 for the ABI seam (src/interface/Abi/) and Zig for the FFI (src/interface/ffi/). Build orchestration is Just + Bash; packaging is Guix (build/guix.scm). with actuals
+= hermeneia — Quick Start for Developers
 :toc:
 :toclevels: 2
 
 == Tech Stack
 
-{{LANG_STACK}}
+Rust 2021 workspace, deliberately dependency-free (std only, hand-written JSON): hermeneia-syntax, hermeneia-ir, hermeneia-store, hermeneia-core, hermeneia-cli. Plus Idris2 for the ABI seam (src/interface/Abi/) and Zig for the FFI (src/interface/ffi/). Build orchestration is Just + Bash; packaging is Guix (build/guix.scm).
 
 == Set Up Development Environment
 
@@ -23,8 +23,8 @@ guix shell
 
 [source,bash]
 ----
-git clone https://github.com/hyperpolymath/rsr-template-repo.git
-cd rsr-template-repo
+git clone https://github.com/hyperpolymath/hermeneia.git
+cd hermeneia
 just setup-dev
 ----
 
@@ -32,21 +32,21 @@ just setup-dev
 
 [source,bash]
 ----
-{{BUILD_CMD}}
+cargo build --workspace
 ----
 
 == Test
 
 [source,bash]
 ----
-{{TEST_CMD}}
+cargo test --workspace
 ----
 
 == Project Structure
 
 [source]
 ----
-rsr-template-repo/
+hermeneia/
 ├── src/                  # Source code
 ├── src/interface/Abi/              # Idris2 ABI definitions (if applicable)
 ├── ffi/zig/              # Zig FFI bridge (if applicable)
@@ -84,7 +84,7 @@ just panic-scan     # No new security issues
 Read `.machine_readable/MUST.contractile` before making changes.
 Key invariants that must never be violated:
 
-{{MUST_INVARIANTS}}
+LICENSE, README.adoc, 0-AI-MANIFEST.a2ml and the governance trio (GOVERNANCE.adoc, MAINTAINERS.adoc, .github/CODEOWNERS) must exist; .machine_readable/ and its contractiles/ + descriptiles/ trees must be intact. Source: .machine_readable/contractiles/must/Mustfile.a2ml — read it, it is the authority, this list is a summary.
 
 == LLM/AI Agent Development
 
@@ -100,5 +100,5 @@ Or read `0-AI-MANIFEST.a2ml` and `.claude/CLAUDE.md` directly.
 == Get Help
 
 * **Architecture**: link:EXPLAINME.adoc[EXPLAINME.adoc]
-* **Wiki**: https://github.com/hyperpolymath/rsr-template-repo/wiki
+* **Wiki**: https://github.com/hyperpolymath/hermeneia/wiki
 * **Report issue**: `just help-me`

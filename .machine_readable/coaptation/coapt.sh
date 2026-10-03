@@ -21,7 +21,7 @@ MODE="${1:---report}"
 
 # Kennel (sense) -> deterministic atomised inputs.
 bash "$CO/extract-clauses.sh" "$ROOT/.machine_readable/contractiles" > "$CO/clauses.json"
-bash "$CO/extract-facts.sh"   "$ROOT/.machine_readable/6a2"           > "$CO/facts.json"
+bash "$CO/extract-facts.sh"   "$ROOT/.machine_readable/descriptiles"           > "$CO/facts.json"
 
 # Yard (compare, pure) -> receipt text.
 receipt="$(nickel export --format raw "$CO/coapt.ncl")"
@@ -53,7 +53,7 @@ case "$MODE" in
         echo ""
         echo "[reanchor-basis]"
         echo "schema = \"hyperpolymath.reanchor-basis/0\""
-        echo "repo = \"rsr-template-repo\""
+        echo "repo = \"hermeneia\""
         echo "occasioned-by = \"band=red in the coaptation receipt\""
         echo ""
         echo "[carnage]"

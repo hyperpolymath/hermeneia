@@ -1,0 +1,129 @@
+# SPDX-License-Identifier: MPL-2.0
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# instantiation.a2ml — the canonical substitution values for THIS repository.
+#
+# This repo was scaffolded from hyperpolymath/rsr-template-repo and `just init`
+# was never run, so ~120 files shipped with unfilled {{PLACEHOLDER}} tokens
+# (issue #8). Filling them by hand once is how the estate acquired 12
+# permanently-red OpenSSF builds: there is no record of what was decided, so
+# nothing can re-run it, check it, or notice when a re-sync from the template
+# reintroduces a token.
+#
+# So the values live here, and scripts/instantiate.sh renders them. The pass is
+# IDEMPOTENT: running it on an already-instantiated tree changes nothing, and
+# running it after a template re-sync repairs exactly the tokens that came back.
+#
+#   just init            # render + verify (build/just/init.just)
+#   bash scripts/instantiate.sh --check     # verify only, exit 1 on drift
+#
+# Provenance of every value: README.adoc, EXPLAINME.adoc,
+# .machine_readable/descriptiles/{STATE,ECOSYSTEM,CLADE}.a2ml, Cargo.toml and
+# .github/SECURITY.md — i.e. read out of this repo, not guessed. Anything that
+# could not be sourced is absent rather than invented; see the JUDGEMENT block
+# at the bottom for the four that needed a human decision.
+#
+# Format: the [tokens] section is KEY = "value", one per line, '#' comments and
+# blank lines ignored. Parsed by awk in scripts/instantiate.sh — the same reader
+# build/just/repo-init.just uses for an archetype's [tokens] upstream. A value
+# must not contain '|', '&' or '\': those are sed metacharacters in the
+# substitution the values feed.
+
+[metadata]
+version = "1.0.0"
+last-updated = "2026-10-03"
+spec = "https://github.com/hyperpolymath/rsr-template-repo/blob/main/build/just/repo-init.just"
+instantiated-at = "2026-10-03"
+instantiated-from = "hyperpolymath/rsr-template-repo"
+
+[tokens]
+# ─── Project identity ────────────────────────────────────────────────────────
+PROJECT_NAME = "Hermeneia"
+REPO = "hermeneia"
+OWNER = "hyperpolymath"
+FORGE = "github.com"
+VERSION = "0.1.0"
+
+# README.adoc, line 1 of the pitch; ECOSYSTEM.a2ml [position] purpose agrees.
+PROJECT_DESCRIPTION = "An experimental voking / imminence query language for Vocarium"
+
+# ANCHOR.a2ml [identity] one-sentence. Condensed from STATE.a2ml
+# [project-context] purpose, which is the longer form of the same claim.
+PROJECT_PURPOSE = "Hermeneia calls trope-shaped particulars stored in Vocarium into a declared use-relation and reports what is preserved, lost, licensed, or insufficient under a use-model."
+
+# ─── Authorship ──────────────────────────────────────────────────────────────
+AUTHOR = "Jonathan D.A. Jewell"
+AUTHOR_EMAIL = "j.d.a.jewell@open.ac.uk"
+AUTHOR_ORG = "hyperpolymath"
+# CITATION.cff carries this already; it is the same iD the last commit on main
+# added, and it passes the ISO 7064 MOD 11-2 check digit.
+AUTHOR_ORCID = "0000-0002-3078-6652"
+# No previous/secondary address to map. scripts/instantiate.sh writes an inert
+# root .mailmap rather than shipping an entry with an empty angle-bracket pair,
+# which would be a malformed mailmap rather than a harmless leftover.
+AUTHOR_EMAIL_ALT = ""
+
+# ─── Contact, conduct, security ──────────────────────────────────────────────
+# .github/SECURITY.md names this address as the only reporting contact and says
+# "A PGP-encrypted report can be arranged on request" — there is no published
+# key, so no PGP_FINGERPRINT / PGP_KEY_URL value exists to fill. The
+# Encryption: field is dropped from .well-known/security.txt instead of being
+# left pointing at a key nobody holds. RFC 9116 makes it optional.
+SECURITY_EMAIL = "j.d.a.jewell@open.ac.uk"
+CONDUCT_EMAIL = "j.d.a.jewell@open.ac.uk"
+CONDUCT_TEAM = "Code of Conduct Committee"
+RESPONSE_TIME = "48 hours"
+MAIN_BRANCH = "main"
+LICENSE = "MPL-2.0"
+WEBSITE = "https://github.com/hyperpolymath/hermeneia"
+
+# ─── Container module (container/, .machine_readable/configs/stapeln.toml) ───
+# Hermeneia is a CLI, not a service; it has no listening port and no published
+# image. These values render the container module's templates into something
+# coherent rather than leaving brace tokens in a Containerfile, and are the
+# defaults build/just/repo-init.just derives upstream (SERVICE_NAME = REPO,
+# PORT = 8080, REGISTRY = ghcr.io/OWNER). container-build.yml is off unless
+# CONTAINER_CI=true is set, so nothing here is load-bearing yet.
+SERVICE_NAME = "hermeneia"
+PORT = "8080"
+REGISTRY = "ghcr.io/hyperpolymath"
+
+# ─── JUDGEMENT ───────────────────────────────────────────────────────────────
+# Upstream repo-init deliberately leaves these UNASSIGNED, on the reasoning that
+# "init cannot know a project's unique strength or its language stack, and
+# guessing would write fiction into ANCHOR.a2ml — the file the estate treats as
+# semantic authority". Issue #8 asks for them by hand. Each value below is
+# therefore quoted from this repo's own documents, with the source named, so a
+# reader can check it rather than trust it.
+
+# ANCHOR.a2ml [identity] kind — the file's own inline enum, and issue #8 states
+# it: hermeneia is a query *language*, not a library.
+PROJECT_KIND = "language"
+
+# ANCHOR.a2ml [identity] domain. README.adoc's closing status paragraph: "an
+# experimental query language for trope-aware, loss-aware, warrant-aware
+# databases ... particularity-preserving computation, interpretive databases".
+PROJECT_DOMAIN = "trope-aware, loss-aware, warrant-aware query over interpretive databases"
+
+# methodology.a2ml [methodology.unique-strength] — what divergent mode should
+# DEEPEN rather than broaden. EXPLAINME.adoc §5 names this as "central to the
+# system"; the receipts it lists are verdict / loss-shape / failed floor /
+# reason / missing warrant.
+PROJECT_UNIQUE_STRENGTH = "It refuses to collapse retrieved, interpretable and licensed into one answer: a voke returns verdict, loss-shape, failed floor, reason and missing warrant, not a ranked list of matches."
+
+# docs/onboarding/QUICKSTART-DEV.adoc. Cargo.toml (the workspace and its five
+# member crates), src/interface/Abi/*.idr, src/interface/ffi/*.zig.
+LANG_STACK = "Rust 2021 workspace, deliberately dependency-free (std only, hand-written JSON): hermeneia-syntax, hermeneia-ir, hermeneia-store, hermeneia-core, hermeneia-cli. Plus Idris2 for the ABI seam (src/interface/Abi/) and Zig for the FFI (src/interface/ffi/). Build orchestration is Just + Bash; packaging is Guix (build/guix.scm)."
+
+BUILD_CMD = "cargo build --workspace"
+TEST_CMD = "cargo test --workspace"
+PACKAGE_NAME = "hermeneia"
+
+# Cargo.toml's own header comment: "DELIBERATELY DEPENDENCY-FREE (std only,
+# hand-written JSON) ... it builds offline with no crates.io access".
+DEPS = "No crates.io dependencies at all — the workspace is std-only by design and builds offline. The end-to-end suite additionally needs the trope-checker oracle (see tests/e2e.sh and docs/status/STATE-OF-PLAY.adoc), and the ABI seam needs idris2 + zig from mise.toml."
+
+BUILD_OUTPUT_PATH = "target/release/hermeneia"
+
+# Mustfile.a2ml, the invariants marked severity: critical.
+MUST_INVARIANTS = "LICENSE, README.adoc, 0-AI-MANIFEST.a2ml and the governance trio (GOVERNANCE.adoc, MAINTAINERS.adoc, .github/CODEOWNERS) must exist; .machine_readable/ and its contractiles/ + descriptiles/ trees must be intact. Source: .machine_readable/contractiles/must/Mustfile.a2ml — read it, it is the authority, this list is a summary."
