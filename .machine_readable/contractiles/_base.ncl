@@ -7,8 +7,8 @@
 #
 #   pedigree_schema   — canonical pedigree block shape
 #   status_core_doc   — documentation of the shared status trio (String list)
-#   probe_schema      — target structured probe form (spec only; verb files
-#                       still use probe | String with TODO comments)
+#   probe_schema      — proposed structured probe form (current runner schemas
+#                       still declare shell probes as Strings)
 #   run_defaults      — default runner behaviour
 #
 # Usage in a verb runner:
@@ -37,7 +37,7 @@
 #     run = base.run_defaults & { on_any_fail = "exit-nonzero" },
 #   }
 #
-# See: docs/CONTRACTILE-SPEC.adoc §Shared Base
+# See: .machine_readable/contractiles/README.adoc (local status and limitations)
 
 {
   # -------------------------------------------------------------------------
@@ -90,21 +90,20 @@
   #            (the wishes schema was absorbed from the deprecated `lust`
   #             verb 2026-04-18; lust/ dir removed estate-wide)
   #
-  # See: docs/CONTRACTILE-SPEC.adoc §Per-Verb Extension
+  # See: .machine_readable/contractiles/README.adoc for local runtime status.
   # -------------------------------------------------------------------------
   status_core_doc = "status_core values: declared | verified | failing — extended per verb",
 
   # -------------------------------------------------------------------------
   # probe_schema
   #
-  # The TARGET structured probe form. See: docs/CONTRACTILE-SPEC.adoc §Probe
+  # Structured probe form reserved for a later, compatible runner integration.
   #
-  # IMPORTANT: This is a spec-only definition. Existing verb runner files still
-  # use `probe | String` with a `# TODO: migrate to probe_schema` comment.
-  # This is a breaking change; migration happens when the CLI supports both
-  # forms.
+  # IMPORTANT: This is a proposed structured-probe form only. The current
+  # Hermeneia runner schemas use `probe | String`; the compatible contractile
+  # runtime is not bundled, so migration and validation are deferred.
   #
-  # Adopters writing new xfiles should prefer the structured form:
+  # A future approved xfile migration could use the structured form:
   #   probe = {
   #     command = "test -f my-file",
   #     timeout_seconds = 60,
@@ -127,10 +126,12 @@
   # Default runner behaviour. Verb runners merge this with verb-specific
   # overrides using Nickel's `&` (right-priority merge).
   #
-  # Most verbs override on_any_fail:
-  #   "exit-nonzero"          : hard gate  (must, trust, bust, adjust-gating)
-  #   "continue-with-warnings": advisory   (dust, adjust)
-  #   "continue"              : never gate (intend — covers both intents and wishes)
+  # Project authority split:
+  #   "exit-nonzero"          : intended hard gate (must, trust, bust)
+  #   "continue-with-warnings": advisory (adjust, dust)
+  #   "continue"              : reporting only (intend)
+  # These are declarations for a future compatible runner; only the separately
+  # named GitHub workflow probes are currently wired.
   # -------------------------------------------------------------------------
   run_defaults = {
     on_pass = "continue",

@@ -4,34 +4,30 @@ K9!
 # Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 #
 # Pairs with: Intentfile.a2ml (declaration) + intend.ncl (runner).
-# Trident completeness is a hard precondition — a repo shipping
-# Intentfile without this file AND its runner is an invalid trident;
-# the contractile CLI's verify gate refuses partial publication.
+# The manifest and scripts/verify-contractiles.sh check the three paired files
+# and their hashes. This validates structure only; the contractile CLI is not
+# bundled and no probe execution or owner approval is implied.
 #
 # Verb:       intend          (north star — commitments + aspirations)
 # Tier:       Hunt            (capability: subprocess probes may shell out)
 # Authority:  reporting       (never blocks; drift-log only)
 #
-# Cardinality: ONE intend trident per repo (see feedback_contractile_
-# layout_rules.md). ANCHOR.a2ml is the sole multi-instance exception —
-# it is NOT a verb contractile.
+# Cardinality: one intend trident per repository. This repository's
+# machine-readable contractile runtime is not yet integrated, so the K9 policy
+# below is a declared target profile rather than evidence of executed hooks.
 #
-# Design commitments baked in (see memory trail 2026-04-18 for full
-# context; key files referenced by name in annotations below):
-# * α two-axis (tier × authority) — structurally separate capability
-#   from authority so "Hunt tier = can override" is impossible.
-# * Variance schema first-class, not comment markers
-#   (feedback_audit_tool_suppression_design.md — structural > markers).
-# * Sessional drift detection hooks (on_close, on_open).
-# * Ratification at session open; drift log at session close.
-# * Evidence sinks: VeriSimDB (queryable) + descriptiles/DRIFT.a2ml (repo-local).
-# * Failure-mode defenses cross-referenced to the AI failure catalog.
+# Project-specific policy: reporting authority only; distinguish the single
+# implemented invoke slice from planned store/operation work; retain proposed
+# sessional review and scoped-variance concepts without claiming an active
+# external evidence database or an owner-signed ratification.
 
-let base_k9 = import "../k9/template-hunt.k9.ncl" in
 let base    = import "../_base.ncl" in
 
 {
-  pedigree = base_k9.pedigree_schema & {
+  pedigree = base.pedigree_schema & {
+    name = "intend.k9.ncl",
+    component_type = "hermeneia-contractile",
+    schema_version = "1.0.0",
     contractile_verb = "intend",
     paired_xfile     = "../intend/Intentfile.a2ml",
     paired_runner    = "../intend/intend.ncl",
@@ -47,12 +43,8 @@ let base    = import "../_base.ncl" in
 
     metadata = {
       name = "intend-k9",
-      version = "2.0.0",             # 1.0.0 (2026-04-18 AM): initial trident.
-                                     # 2.0.0 (2026-04-18 PM): negotiation +
-                                     # accountability + plain-language-translation
-                                     # schema baked into on_open — prerequisite for
-                                     # the adversarial Gemini+Copilot drift pilot.
-      description = "Executes Intentfile probes + emits drift log. Non-gating; reporting authority only. on_open hook implements negotiation-ratification-accountability protocol.",
+      version = "2.1.0",
+      description = "Declares a non-gating reporting profile for Hermeneia intents and wishes. The compatible runner and session hooks are not bundled.",
       paired_xfile = "Intentfile.a2ml",
       paired_runner = "intend.ncl",
       author = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>",
@@ -60,6 +52,7 @@ let base    = import "../_base.ncl" in
 
     security = {
       leash = 'Hunt,
+      signature_required = true,
       trust_level = "subprocess + filesystem-read",
       allow_network = false,
       allow_filesystem_write = false,   # evidence sinks are indirected
@@ -110,10 +103,8 @@ let base    = import "../_base.ncl" in
       check_alignment_with_META = true,
     },
 
-    # Evidence sinks — BOTH written, every execution.
-    # VeriSimDB = queryable machine record (feedback_verisimdb_policy.md).
-    # descriptiles/DRIFT.a2ml = repo-local append-only drift log (feedback_sessional_
-    # drift_detection.md + user_6a2_is_contractile_ought.md descriptive role).
+    # Declared target sinks for a future compatible runner. No external
+    # evidence database or append-only DRIFT.a2ml writer is installed here.
     evidence_sinks = [
       {
         kind   = 'verisimdb,
@@ -167,7 +158,7 @@ let base    = import "../_base.ncl" in
         # accountability_pledge.md for the domain-language-rendering rule.
         ai_required_inputs = [
           'timeline_realism,           # "this will take X; not Y"
-          'industry_standards,         # WCAG, ISO, OWASP, GDPR, licensing …
+          'industry_standards,         # cite only standards that actually apply to Hermeneia
           'audience_feasibility,       # real addressable user set
           'resulting_invariants,       # what must/trust/adjust entries follow
           'ecosystem_dependencies,     # libs, licences, threat-model implications
@@ -234,9 +225,9 @@ let base    = import "../_base.ncl" in
   },
 
   # -------------------------------------------------------------------
-  # Failure-mode defenses — explicit cross-reference to the catalog
-  # (feedback_ai_failure_mode_catalog.md). New catalog entries that
-  # shift this verb's defenses must update this list, not narrative.
+  # Failure-mode categories preserved as declared policy labels. The local
+  # project-specific defenses are the explicit operation/status boundaries
+  # above; this list is not backed by a separate executable catalog.
   # -------------------------------------------------------------------
   failure_mode_defenses = [
     'A1_enthusiasm_capture,            # scope breach → drift log

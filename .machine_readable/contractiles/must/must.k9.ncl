@@ -4,9 +4,9 @@ K9!
 # Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 #
 # Pairs with: Mustfile.a2ml (declaration) + must.ncl (runner).
-# Trident completeness is a hard precondition — a repo shipping
-# Mustfile without this file AND its runner is an invalid trident;
-# the contractile CLI's verify gate refuses partial publication.
+# This three-part trident is structurally checked by
+# scripts/verify-contractiles.sh. The compatible contractile CLI is not
+# bundled, so no `must check` runtime gate is claimed.
 #
 # Verb:       must            (invariant assertion — release-blocking)
 # Tier:       Hunt-read-only  (capability: subprocess probes shell out
@@ -20,19 +20,18 @@ K9!
 #
 # Cardinality: ONE must trident per repo.
 #
-# Failure-mode focus: must is the primary catchment for subtle
-# invariant-erosion drift. Where trust catches "turn off the firewall"
-# (outrageous), must catches "this file that was required is now
-# missing" / "this forbidden pattern has reappeared" / "this schema
-# version regressed" (subtle). Key defense against A5 (commercial
-# fabrication of success "facts" — invariants ground truth against
-# marketing copy) and D1 (lore fabrication about what the repo contains).
+# Hermeneia-specific invariants cover the actual workspace, rendered
+# instantiation, pinned trident files, unit tests, and the oracle-backed invoke
+# slice. They distinguish wired CI checks from probes declared for a future
+# runner; the contractile declaration itself is not proof of passing CI.
 
-let base_k9 = import "../k9/template-hunt.k9.ncl" in
 let base    = import "../_base.ncl" in
 
 {
-  pedigree = base_k9.pedigree_schema & {
+  pedigree = base.pedigree_schema & {
+    name = "must.k9.ncl",
+    component_type = "hermeneia-contractile",
+    schema_version = "1.0.0",
     contractile_verb = "must",
     paired_xfile     = "../must/Mustfile.a2ml",
     paired_runner    = "../must/must.ncl",
@@ -45,8 +44,8 @@ let base    = import "../_base.ncl" in
 
     metadata = {
       name = "must-k9",
-      version = "1.0.0",
-      description = "Evaluates release-blocking invariants as a hard gate. Third trident instance. Complements trust (ephemeral blocking) with persistent invariant blocking.",
+      version = "1.1.0",
+      description = "Declares Hermeneia repository, test, and evidence-boundary invariants. Intended blocking policy; only named GitHub workflow probes are wired today.",
       paired_xfile = "Mustfile.a2ml",
       paired_runner = "must.ncl",
       author = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>",
@@ -54,6 +53,7 @@ let base    = import "../_base.ncl" in
 
     security = {
       leash = 'Hunt,
+      signature_required = true,
       trust_level = "read-only invariant verification with subprocess",
       allow_network = false,
       allow_filesystem_write = false,

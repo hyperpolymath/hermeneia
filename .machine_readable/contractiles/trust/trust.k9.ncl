@@ -4,67 +4,47 @@ K9!
 # Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 #
 # Pairs with: Trustfile.a2ml (declaration) + trust.ncl (runner).
-# Trident completeness is a hard precondition — a repo shipping
-# Trustfile without this file AND its runner is an invalid trident;
-# the contractile CLI's verify gate refuses partial publication.
+# The trust boundary in this project is a local command-line program, not a
+# web service. Query text, JSONL records, IR, and checker output are untrusted;
+# grades/warrants do not establish semantic truth. The external tropecheck
+# executable is the sole grade-algebra oracle.
 #
-# Verb:       trust           (security + provenance + safe-hacking)
-# Tier:       Hunt            (capability: subprocess probes may shell out,
-#                              active probes in safe_hacking section)
-# Authority:  blocking        (HARD GATE — opposite of intend's reporting)
+# Verb:       trust           (security boundary + provenance + fail-closed)
+# Tier:       Hunt            (repository-local subprocess checks only)
+# Authority:  blocking        (intended hard gate; runtime integration pending)
 #
-# trust is the concrete + ephemeral + transactional verb per user
-# 2026-04-18: port use, BLAKE3 hashing, auth challenges, TLS state,
-# session tokens. Every probe has instant binary ground truth.
-# This is the α two-axis complement to intend: both Hunt-tier, opposite
-# authority poles. Validating the architecture on both exercises the
-# full (tier, authority) surface.
+# Cardinality: one trust trident per repository. The project-specific trust
+# clauses below are provisional until maintainer review. The hooks, variance
+# workflow, and evidence-sink configuration describe a future compatible
+# runner profile; they are not claims that this checkout executes them.
 #
-# Cardinality: ONE trust trident per repo (see feedback_contractile_
-# layout_rules.md). ANCHOR.a2ml is the sole multi-instance exception —
-# it is NOT a verb contractile.
-#
-# Design commitments baked in (full memory trail under
-# ~/.claude/projects/-var-mnt-eclipse-repos/memory/ 2026-04-18):
-# * α two-axis (Hunt, blocking) — trust is where the contractile system
-#   grows teeth. Failed verification = failed CI = blocked merge.
-# * Variance schema first-class — scoped exceptions structural, not
-#   comment markers.
-# * Sessional drift detection hooks — re-verify every close.
-# * Ratification negotiation with threat-model foregrounded
-#   (feedback_ai_failure_mode_catalog.md B1 — threat-model
-#   misclassification is the PRIMARY defense trust provides).
-# * Accountability pledge — both parties sign before security-affecting
-#   work proceeds.
-# * Plain-language translation — user never authors a Nickel schema for
-#   a cipher suite; AI does the spec work, user reviews in domain
-#   language ("TLS 1.3 with PQ key exchange, HSTS preload, 1yr").
-# * Evidence sinks: VeriSimDB (queryable) + descriptiles/DRIFT.a2ml (repo-local).
-# * Failure-mode defenses cross-referenced — trust carries the most
-#   defenses of any verb because the threat surface is widest.
+# No network-facing target or active safe-hacking probe is authorized by the
+# current Trustfile. An optional VeriSimDB feed declaration exists elsewhere
+# in .machine_readable/ but no writer was found; decide before enabling it.
+# The separate K9 validator failure remains untouched.
 
-let base_k9 = import "../k9/template-hunt.k9.ncl" in
 let base    = import "../_base.ncl" in
 
 {
-  pedigree = base_k9.pedigree_schema & {
+  pedigree = base.pedigree_schema & {
+    name = "trust.k9.ncl",
+    component_type = "hermeneia-contractile",
+    schema_version = "1.0.0",
     contractile_verb = "trust",
     paired_xfile     = "../trust/Trustfile.a2ml",
     paired_runner    = "../trust/trust.ncl",
 
-    # α two-axis declaration — capability × authority.
-    # trust is Hunt-capable (active probes shell out, safe-hacking section
-    # runs real fuzz/injection/auth-bypass attempts scoped to the repo)
-    # AND blocking-authority (failed verification = failed CI).
-    # Contrast with intend = (Hunt, reporting). The two verbs exercise
-    # the full α surface.
+    # Capability and authority remain separate axes. Hunt permits the
+    # declared local subprocess checks; it does not authorize network or
+    # external probes. Blocking is the intended policy for trust failures,
+    # while the compatible contractile runtime is still absent.
     tier      = 'Hunt,
     authority = 'blocking,
 
     metadata = {
       name = "trust-k9",
-      version = "1.0.0",
-      description = "Executes security verifications + authorised safe-hacking probes. HARD GATE: failed verification blocks merge. Catches the 'turn off the firewall' class of drift directly. Implements negotiation-ratification-accountability protocol inherited from intend.k9.ncl v2.0.0.",
+      version = "1.1.0",
+      description = "Declares Hermeneia's local-input, provenance, and fail-closed trust policy. Intended blocking authority; no active external probe or bundled contractile runtime.",
       paired_xfile = "Trustfile.a2ml",
       paired_runner = "trust.ncl",
       author = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>",
@@ -72,7 +52,8 @@ let base    = import "../_base.ncl" in
 
     security = {
       leash = 'Hunt,
-      trust_level = "verification + authorised-probe + hard-gate",
+      signature_required = true,
+      trust_level = "repository-local read-only checks; intended hard-gate authority",
       allow_network = false,            # verifications offline by default
       allow_filesystem_write = false,   # evidence sinks are indirected
       allow_subprocess = true,
@@ -119,10 +100,9 @@ let base    = import "../_base.ncl" in
       severity_escalation = 'honour,  # critical > high > medium > low in gate decisions
     },
 
-    # Per-safe-hacking-probe execution.
-    # If a probe FINDS what it was supposed to prevent finding
-    # (e.g. injection succeeds, auth-bypass works), that's an EXPLOIT
-    # demonstration — hard fail, regardless of other status.
+  # Per-safe-hacking-probe policy for a future explicitly approved local
+  # test plan. The current Trustfile declares no active probes. If probes
+  # are later approved, only their expected outcome and local scope apply.
     per_probe = {
       run_probe = true,
       record_outcome = true,
@@ -132,7 +112,9 @@ let base    = import "../_base.ncl" in
       timeout_honouring = 'strict,
     },
 
-    # Evidence sinks — BOTH written, every execution.
+    # Target evidence sinks for a future compatible runner. Neither is
+    # currently written here. In particular, the VeriSimDB target must remain
+    # inactive until the optional feed is explicitly owner-approved.
     evidence_sinks = [
       {
         kind   = 'verisimdb,
@@ -148,9 +130,9 @@ let base    = import "../_base.ncl" in
       },
     ],
 
-    # Session-close hook — re-verify EVERYTHING, re-run probes, diff
-    # against last ratification. The "turn off the firewall" scenario
-    # must be caught here if it wasn't caught at pre-push.
+    # Proposed session-close review: repeat the declared local checks and
+    # compare them with the reviewed baseline. This hook is not currently
+    # connected to an installed runner or GitHub session lifecycle.
     on_close = {
       re_execute_all_verifications = true,
       re_run_all_safe_hacking_probes = true,
@@ -176,13 +158,13 @@ let base    = import "../_base.ncl" in
       include_recent_anchors = true,
       anchor_lookback_weeks = 8,
 
-      # trust-specific: the threat model is rendered FIRST, before any
-      # negotiation, so the adversary and stakes are fresh in both minds.
-      # This directly defends against B1 (threat-model misclassification)
-      # — the "war reporter, generic personal-website priors" scenario.
+      # Render the project boundary before any proposed trust-policy change:
+      # local CLI, untrusted query/data/IR/oracle inputs, and no approved
+      # network-facing target. This avoids importing unrelated web-service
+      # assumptions into a trust decision.
       threat_model_foregrounding = {
         required = true,
-        render_adversaries = true,   # from Trustfile [THREAT_MODEL]
+        render_adversaries = true,   # from the Trustfile Threat Model section
         render_stakes = true,
         render_compliance_regimes = true,
         render_audience_sensitivity = true,
@@ -196,10 +178,10 @@ let base    = import "../_base.ncl" in
         required = true,
         ai_required_inputs = [
           'timeline_realism,
-          'industry_standards,        # especially relevant for trust: OWASP, NIST, PCI-DSS, GDPR
+          'industry_standards,        # identify only standards that actually apply; do not invent regimes for a local CLI
           'audience_feasibility,      # who is the adversary? who is protected?
           'resulting_invariants,      # what trust entries the work creates/amends
-          'ecosystem_dependencies,    # TLS libs, crypto primitives, signing infra
+          'ecosystem_dependencies,    # local JSONL store and the external tropecheck executable
         ],
         user_engagement_required = true,
         user_engagement_mode = 'per_input_response,
@@ -208,10 +190,9 @@ let base    = import "../_base.ncl" in
           user_reviews_in_domain_language = true,
           schema_authoring_is_ai_responsibility = true,
           translation_faithfulness_auditable = true,
-          # trust-specific: the AI's translation includes rendering
-          # cipher suites, key exchange choices, rate-limit numbers in
-          # domain language ("strong encryption, PQ-resistant, 60 req/min")
-          # rather than forcing the user into Nickel-schema authoring.
+          # Trust-specific translation should explain the local data flow,
+          # parser/IR validation, checker failure behavior, and limits of the
+          # supplied grades without requiring the maintainer to author Nickel.
         },
       },
 
@@ -224,12 +205,12 @@ let base    = import "../_base.ncl" in
         parties = [
           {
             role = 'user,
-            pledge = "I have reviewed the threat model, the declared trust obligations, and the audience/stakes consequences. I accept accountability for meeting these obligations and understand that failed verification will block merges until resolved or varied. I will not attempt to disable verification to unblock a merge; I will raise a variance or amendment instead.",
+            pledge = "I have reviewed the local CLI trust boundary, the untrusted query/data/IR/oracle inputs, and the stated limits on grades and warrants. I understand the proposed blocking authority and will approve any expansion to network, remote-store, credential, or destructive scope explicitly rather than by implication.",
             signature_required = true,
           },
           {
             role = 'ai_agent,
-            pledge = "I will hold the line on declared trust obligations. I will refuse to 'disable' verifications to unblock merges; I will refuse security-weakening suggestions that contradict the threat model even when the user is enthusiastic; I will surface drift at session close; I will re-render the threat model before proposing any weakening action. If a legitimate scope shift demands security reduction, I will require a variance with severity acknowledgement or an amendment, not silent acceptance.",
+            pledge = "I will treat Hermeneia's query text, JSONL, IR, and checker output as untrusted; preserve the checker as the sole grade-algebra oracle; and refuse to turn a missing checker or malformed evidence into a successful verdict. I will not add network, remote-store, credential, or destructive behavior without explicit maintainer approval and a reviewed amendment.",
             signature_required = true,
           },
         ],
@@ -250,8 +231,8 @@ let base    = import "../_base.ncl" in
   },
 
   # -------------------------------------------------------------------
-  # Failure-mode defenses — trust is the widest-coverage verb.
-  # See feedback_ai_failure_mode_catalog.md for the full catalog.
+  # Project-specific failure-mode categories retained as policy labels. They
+  # are not a reference to an external executable catalog.
   # -------------------------------------------------------------------
   failure_mode_defenses = [
     # Category A — enthusiasm / narrative capture
@@ -261,10 +242,10 @@ let base    = import "../_base.ncl" in
     'B1_threat_model_misclass,         # threat_model_foregrounding = required
     'B2_audience_sensitivity_collapse, # audience_feasibility in negotiation
     'B3_compliance_prior_drift,        # industry_standards in negotiation
-    # Category C — scope/capability erosion (the "firewall off" scenario)
-    'C2_capability_collapse,           # blocking gate prevents silent capability drop
+    # Category C — unauthorized capability/scope expansion
+    'C2_capability_collapse,           # intended gate prevents silent boundary changes
     'C3_helpfulness_inflation,         # trust-affecting changes need variance/amendment
-    'C4_modernization_drift,           # unrequested crypto-lib upgrade caught
+    'C4_modernization_drift,           # dependency changes require an explicit project reason
     # Category D — epistemic failures
     'D4_error_hiding,                  # on_unmet = 'fail makes hiding impossible
     'D5_sycophancy,                    # pledge forces AI to hold line against enthusiasm

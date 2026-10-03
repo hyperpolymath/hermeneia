@@ -1,35 +1,35 @@
 # SPDX-License-Identifier: MPL-2.0
-# Adjust — accessibility runner
+# Adjust — advisory accessibility, clarity, and drift-tolerance runner
 #
 # Pairs with: Adjustfile.a2ml (same directory)
 # Verb:       adjust
-# Semantics:  accessibility compliance (WCAG 2.1 AA baseline). Gating where
-#             a deterministic fix exists; advisory where human review needed.
-# CLI:        `contractile adjust check` → run all probes, list violations
-#             `contractile adjust fix`   → apply deterministic fixes where defined
+# Semantics:  advisory tolerance review for the current text CLI and its
+#             implementation-status claims. It is not a WCAG checker.
 #
-# Anything else in this directory is human-only notes/archive; machines ignore.
+# The declaration schema uses tolerance/corrective language. Corrective
+# actions are recommendations; no file-writing fix is authorized by default.
+# The compatible contractile CLI is not bundled in this repository.
 #
 # Base: ../_base.ncl provides pedigree_schema, run_defaults, probe_schema.
-# See: docs/CONTRACTILE-SPEC.adoc
+# See: .machine_readable/contractiles/README.adoc
 
 let base = import "../_base.ncl" in
 
 {
   pedigree = base.pedigree_schema & {
     contractile_verb = "adjust",
-    semantics = "accessibility compliance",
+    semantics = "advisory accessibility, diagnostic clarity, and evidence-boundary tolerances",
     security = {
       leash = 'Kennel,
-      trust_level = "fixes allowed where deterministic",
+      trust_level = "read-only evaluation; human-reviewed recommendations",
       allow_network = false,
-      allow_filesystem_write = true,    # `adjust fix` may write (deterministic patches only)
+      allow_filesystem_write = false,
       allow_subprocess = true,
     },
     metadata = {
       name = "adjust-runner",
-      version = "1.0.0",
-      description = "Evaluates accessibility requirements from Adjustfile.a2ml. Fixes deterministic items; flags the rest for human review.",
+      version = "1.1.0",
+      description = "Measures advisory Hermeneia text-CLI and documentation tolerances; proposes, but does not automatically apply, corrective actions.",
       paired_xfile = "Adjustfile.a2ml",
       author = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>",
     },
@@ -40,23 +40,22 @@ let base = import "../_base.ncl" in
       | Array {
           id | String,
           description | String,
-          # TODO: migrate to base.probe_schema (structured probe) when CLI supports it
-          probe | String,
-          # status_core values: 'declared, 'verified, 'failing; adjust adds 'partial
+          tolerance | String,
+          corrective | String,
+          probe | String | optional,
           status | [| 'declared, 'partial, 'verified, 'failing |] | default = 'declared,
-          compliance | String | optional,       # e.g. "WCAG 2.1 AA"
+          severity | [| 'critical, 'high, 'medium, 'low, 'advisory |] | default = 'advisory,
           notes | String | optional,
-          fix | String | optional,              # deterministic fix command (optional)
+          fix | String | optional,
         },
   },
 
-  # Runner behaviour — inherits from base.run_defaults.
-  # adjust is advisory (continue-with-warnings) not a hard gate.
-  # auto_fix_when_available is adjust-specific.
+  # Adjust is advisory. Corrective commands remain human-reviewed; the runner
+  # does not write to the worktree in this project-specific draft.
   run = base.run_defaults & {
-    on_any_fail = "continue-with-warnings",   # accessibility is progress-tracked, not a hard gate by default
+    on_any_fail = "continue-with-warnings",
     report_format = "a2ml",
     emit_summary = true,
-    auto_fix_when_available = true,
+    auto_fix_when_available = false,
   },
 }

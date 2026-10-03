@@ -1,48 +1,47 @@
 # SPDX-License-Identifier: MPL-2.0
-# bust.manifest.a2ml — Trident coherence manifest for the bust verb.
-# Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-#
-# Fourth trident instance. Completes the blocking-authority triple:
-# must (persistent invariants), trust (ephemeral transactions),
-# bust (hard-stop / expiry / must-not-run). Between them, every
-# release-blocking contractile concern is covered.
+# bust.manifest.a2ml — Hermeneia trident integrity manifest.
 
 ---
-trident_version = "1.0.0"
+trident_version = "1.1.0"
 verb = "bust"
-semantics = "hard-stop / expiry / must-not-run declarations"
+semantics = "fail-closed stop conditions for unsupported operations, malformed data, oracle faults, and fabricated output"
 cardinality = "one per repo"
-authority = "blocking (hard gate)"
+authority = "blocking (intended hard stop)"
 
 [[files]]
 role = "declaration"
 path = "Bustfile.a2ml"
-sha256 = "pending-first-verify"
-size_bytes = "pending-first-verify"
+sha256 = "e5dcef8e3e65209eea93ce2296e6a6c0196a8242a1baffa8a3dd39e321cd24c5"
+size_bytes = "3120"
 
 [[files]]
 role = "runner"
 path = "bust.ncl"
-sha256 = "pending-first-verify"
-size_bytes = "pending-first-verify"
+sha256 = "1e859e4838442dbbe56cb5e009e564f3eed16434dddd5dcfcd0505f19583a9fb"
+size_bytes = "2157"
 
 [[files]]
 role = "k9_component"
 path = "bust.k9.ncl"
-sha256 = "pending-first-verify"
-size_bytes = "pending-first-verify"
+sha256 = "4dc0f3d4151b29cc71e862c840aed700a6c77698c0b79f75d107dbb53d817fd3"
+size_bytes = "5916"
 
 [cross_refs]
 runner_paired_xfile = "Bustfile.a2ml"
-k9_paired_xfile     = "../bust/Bustfile.a2ml"
-k9_paired_runner    = "../bust/bust.ncl"
+k9_paired_xfile = "../bust/Bustfile.a2ml"
+k9_paired_runner = "../bust/bust.ncl"
 
 [signed_by]
-user    = "Jonathan D.A. Jewell"
-date    = "2026-04-18"
-context = "bust trident — canonical template in hermeneia. Completes the blocking-authority triple (must + trust + bust). Specialises in deprecated-path-reintroduction catchment. Declares hard-stop / expiry / must-not-run conditions. Copy this trident into a new repo and declare its real breakage / expiry conditions."
+user = "Jonathan D.A. Jewell"
+date = "2026-04-18"
+context = "Original trident structure authored 2026-04-18. The Hermeneia-specific content drafted 2026-10-03 is provisional and is not owner-ratified by this historical author/date entry."
 
 [[history]]
 date = "2026-04-18"
 event = "trident-born"
-note = "Bustfile.a2ml and bust.ncl pre-existed. This manifest + bust.k9.ncl complete the trident. Inherits the full negotiation+accountability schema from intend.k9.ncl v2.0.0 + trust/must extensions; adds flag_deprecated_reintroduction for C2-defense specificity."
+note = "Initial generic runner/declaration shape; the old template-distribution failure modes have been replaced by Hermeneia-local fail-closed cases."
+
+[[history]]
+date = "2026-10-03"
+event = "hermeneia-specialization-draft"
+note = "Adds synthetic local tests for unsupported vokes, missing checker, malformed/deceptive store data, and unsupported loss/warrant output. Owner ratification and generated Coaptation receipt remain pending."

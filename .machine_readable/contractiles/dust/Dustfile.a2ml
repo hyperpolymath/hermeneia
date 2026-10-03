@@ -1,62 +1,47 @@
 # SPDX-License-Identifier: MPL-2.0
-# Dustfile — Cleanup and hygiene contract for hermeneia
+# Dustfile — safe cleanup and exnovation policy for Hermeneia
 # Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 #
 # Paired runner: dust.ncl
-# Verb:          dust
-# Semantics:     What should be cleaned up. Housekeeping, not blockers.
-#
-# This repository: hermeneia is the canonical template.
-# Cleanup items here ensure the template itself remains pristine.
+# Dust proposes retirement/cleanup; it is advisory and destructive actions
+# remain dry-run by default with explicit per-item maintainer approval.
 
 @abstract:
-Cleanup and hygiene items for hermeneia. These are maintenance tasks
-that ensure the template repository remains clean and ready for distribution
-to new repositories.
+Dust covers removable build outputs and future retirement of Hermeneia behavior.
+It must preserve source history, tests, evidence, and rollback paths. No source,
+query operation, schema, or test is approved for deletion by this draft; there
+are no age/access-recency rules and no destructive action is authorized.
+
+The repository intentionally tracks `build/` configuration (including Guix
+and Just modules). Do not treat that directory as a generated build artifact.
+Generated Coaptation atoms and Rust build outputs are disposable and are already
+excluded by .gitignore.
 @end
 
-## Stale Files
+## Removal Candidates
 
-### no-template-artifacts
-- description: No generated files from template testing in root
-- run: test -z "$(ls template-test-* 2>/dev/null)"
-- severity: info
-- notes: Template testing should use /tmp or dedicated test directories
+### ignored-build-output
+- description: Rust build outputs and conventional generated output directories should not be committed
+- target: target/, _build/, dist/, out/
+- reason: These are reproducible outputs, not Hermeneia source or policy.
+- probe: test -z "$(git ls-files -- target/ _build/ dist/ out/)"
+- status: declared
+- notes: Root build/ is intentionally tracked and is not in this candidate set.
 
-### no-example-placeholders
-- description: No example placeholder files (EXAMPLE-, SAMPLE-) in contractiles/
-- run: test -z "$(find .machine_readable/contractiles/ -name 'EXAMPLE-*' -o -name 'SAMPLE-*' 2>/dev/null)"
-- severity: warning
-- notes: All placeholders should be replaced with actual content or removed
+### generated-coaptation-atoms
+- description: Machine-generated Coaptation clause and fact JSON remains disposable and untracked
+- target: .machine_readable/coaptation/clauses.json, .machine_readable/coaptation/facts.json
+- reason: Both files are regenerated from the contractiles and descriptiles; the committed receipt is the reviewed baseline, not these intermediates.
+- probe: test -f .gitignore && grep -Fq '.machine_readable/coaptation/clauses.json' .gitignore && grep -Fq '.machine_readable/coaptation/facts.json' .gitignore
+- status: declared
+- notes: Never remove receipts/latest.a2ml as cleanup; it is the drift baseline and must be regenerated, not hand-edited.
 
-### no-old-contractile-formats
-- description: No old .contractile or .hs files remaining
-- run: test -z "$(find .machine_readable/contractiles/ \( -name '*.contractile' -o -name '*.hs' \) 2>/dev/null)"
-- severity: warning
-- notes: All contractiles should be .a2ml format
+## Retirement and Rollback Rules
 
-## Format Duplicates
-
-### no-duplicate-justfile
-- description: Only one Justfile (hardlinked from root to .machine_readable/contractiles/)
-- run: test $(stat -c '%i' Justfile) = $(stat -c '%i' .machine_readable/contractiles/Justfile 2>/dev/null)
-- severity: warning
-- notes: Justfile should be hardlinked, not copied
-
-### no-duplicate-readme-format
-- description: Only one README format in contractiles/ (.adoc canonical)
-- run: test ! -f .machine_readable/contractiles/README.md
-- severity: info
-
-## Template Hygiene
-
-### no-stale-template-references
-- description: No references to hermeneia in generic template files
-- run: test -z "$(grep -r 'hermeneia' machine-readable-design/ 2>/dev/null)"
-- severity: warning
-- notes: Generic templates should use Hermeneia or similar placeholders
-
-### version-sync-checked
-- description: Version in canonical-directory-structure matches .machine_readable/contractiles
-- verification: compare version identifiers in both locations
-- severity: info
+- Retirement of a voke operation, IR field, store behavior, or documented claim
+  requires an owner-reviewed decision and corresponding tests/docs updates.
+- Preserve `git` history and a documented recovery path; deleting a file is not
+  itself a rollback strategy.
+- Dry-run is the default. A future `--apply` must name each target, show the
+  planned diff, require explicit per-item approval, and refuse untracked paths
+  outside the declared repository scope.

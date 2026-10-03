@@ -1,43 +1,36 @@
 # SPDX-License-Identifier: MPL-2.0
-# Intend — north-star runner (verb is `intend`, file is `Intentfile.a2ml`)
+# Intend — Hermeneia north-star, commitments, and aspirations runner schema
 #
 # Pairs with: Intentfile.a2ml (same directory)
 # Verb:       intend
-# Semantics:  Declares BOTH concrete committed next-actions ([[intents]]) and
-#             horizon aspirations ([[wishes]]). Not a gate — reports progress
-#             toward declared intents and lists wishes by horizon.
-#             Status progressions:
-#               intents: 'declared → 'in_progress → 'done | 'deferred | 'retired
-#               wishes:  'declared → 'in_progress → 'achieved | 'abandoned
-# CLI:        `contractile intend run`       → print status table (both sections)
-#             `contractile intend progress`  → diff declared-vs-observed (intents)
-#             `contractile intend horizon`   → group wishes by near/mid/far
+# Semantics:  reports committed-action status and groups non-probeable wishes
+#             by horizon. Reporting authority only; never blocks a build.
 #
-# History:    Absorbed the deprecated `lust` contractile's [[wishes]] schema
-#             2026-04-18. `lust/` dir removed estate-wide.
-#
-# Anything else in this directory is human-only notes/archive; machines ignore.
+# The compatible contractile CLI is not bundled in this repository. This is a
+# declaration of the intended runner schema, not evidence that probes execute.
+# The historical `lust` schema was absorbed into `intend`; there is no current
+# `lust/` trident.
 #
 # Base: ../_base.ncl provides pedigree_schema, run_defaults, probe_schema.
-# See: docs/CONTRACTILE-SPEC.adoc
+# See: .machine_readable/contractiles/README.adoc
 
 let base = import "../_base.ncl" in
 
 {
   pedigree = base.pedigree_schema & {
     contractile_verb = "intend",
-    semantics = "north-star (commitments + aspirations)",
+    semantics = "Hermeneia purpose, implemented scope, committed actions, and wishes",
     security = {
       leash = 'Kennel,
       trust_level = "read-only reporting",
       allow_network = false,
       allow_filesystem_write = false,
-      allow_subprocess = true,      # probe commands may shell out (intents only; wishes never probe)
+      allow_subprocess = true,
     },
     metadata = {
       name = "intend-runner",
-      version = "2.0.0",
-      description = "Reports progress toward committed next-actions and lists horizon aspirations. Non-gating. Absorbed `lust` semantics 2026-04-18.",
+      version = "2.1.0",
+      description = "Reports progress toward Hermeneia's declared project actions and groups future wishes. Non-gating; compatible runner CLI is not bundled.",
       paired_xfile = "Intentfile.a2ml",
       author = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>",
     },
@@ -48,8 +41,7 @@ let base = import "../_base.ncl" in
       | Array {
           id | String,
           description | String,
-          # TODO: migrate to base.probe_schema (structured probe) when CLI supports it
-          probe | String | optional,     # shell command that indicates done-ness
+          probe | String | optional,
           status | [| 'declared, 'in_progress, 'done, 'deferred, 'retired |] | default = 'declared,
           notes | String | optional,
           target_date | String | optional,
@@ -66,16 +58,12 @@ let base = import "../_base.ncl" in
       | optional,
   },
 
-  # Runner behaviour — inherits from base.run_defaults.
-  # intend never blocks; it is a report only.
-  # emit_diff is intent-specific (declared vs observed probes).
-  # emit_grouped_by_horizon renders wishes grouped by near/mid/far.
   run = base.run_defaults & {
     on_pass = "continue",
-    on_any_fail = "continue",         # never blocks; it's a report
+    on_any_fail = "continue",
     report_format = "a2ml",
     emit_summary = true,
-    emit_diff = true,                 # declared vs observed (intents)
-    emit_grouped_by_horizon = true,   # wishes grouped by horizon (absorbed from lust)
+    emit_diff = true,
+    emit_grouped_by_horizon = true,
   },
 }
