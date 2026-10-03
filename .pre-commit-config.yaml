@@ -60,3 +60,23 @@ repos:
         language: system
         pass_filenames: false
         files: '^(\.machine_readable/descriptiles/.*|CLAUDE\.md)$'
+
+      # --- Coaptation identity: the receipt must name THIS repository (issue #11) ---
+      #
+      # Runs on every commit and needs NO toolchain, which is the whole point.
+      # Issue #11 re-pointed the coaptation identity from the scaffold's name to
+      # hermeneia's; this is the executable form of its acceptance criterion, so
+      # that re-pointing cannot silently revert on a re-scaffold or a bad merge.
+      #
+      # Deliberately NOT paired with a `validate-coapt` hook here, even though
+      # the arrival-pack drift hook above is nickel-dependent and sets the
+      # precedent: the drift gate re-evaluates the comparator, so it needs
+      # nickel, and a hook that fails on every commit for a contributor without
+      # it teaches people to pass --no-verify. Drift is enforced in CI, where
+      # nickel is provisioned; identity is enforced here, where it is free.
+      - id: check-coapt-identity
+        name: Coaptation receipt declares this repository's identity
+        entry: bash .machine_readable/coaptation/check-identity.sh
+        language: system
+        pass_filenames: false
+        files: '^(\.machine_readable/(coaptation/.*|descriptiles/CLADE\.a2ml))$'

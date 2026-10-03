@@ -89,7 +89,8 @@ the "how far is too far" that proposes a re-anchor: `green` (nothing) /
 | `grades.ncl`         | Grade type per verb + aggregation tolerances.
 | `coapt.ncl`          | The Yard comparator. Imports the atoms + map + grades; emits the receipt (`nickel export --format raw`).
 | `coapt.sh`           | The runner/controller. `--report` (SITREP) / `--reanchor` (assemble basis).
-| `verify.sh`          | Yard drift gate. Regenerates the receipt and byte-compares the committed one.
+| `verify.sh`          | Yard drift gate. Regenerates the receipt and byte-compares the committed one. Needs nickel.
+| `check-identity.sh`  | Identity gate. Asserts the pack declares THIS repository. Needs nothing — see below.
 | `coapt.k9.ncl`       | k9 contract (Yard) documenting + validating the drift check. Sibling of `arrival-pack/claude-md.k9.ncl`.
 | `receipts/latest.a2ml` | The committed coaptation receipt — the drift baseline.
 | `core/Coaptation.idr`  | Skeleton of the dependent-typed sound core (build-path step 6; not yet wired).
@@ -102,7 +103,69 @@ the "how far is too far" that proposes a re-anchor: `green` (nothing) /
 just coapt              # --report: emit the coaptation receipt (decides nothing)
 just coapt-reanchor     # --reanchor: assemble a re-anchor basis IF the band is red
 just validate-coapt     # Yard drift gate: fail if the committed receipt is stale
+just check-coapt-identity   # identity gate: no toolchain required
 ----
+
+== Two gates, and why there are two
+
+`validate-coapt` and `check-coapt-identity` answer different questions, and
+conflating them is how the identity defect below survived.
+
+[cols="1,3,3"]
+|===
+| | `validate-coapt` (`verify.sh`) | `check-coapt-identity`
+
+| Asks
+| Does the committed receipt still equal what the comparator emits?
+| Does this pack describe THIS repository?
+
+| Needs
+| nickel — it must re-evaluate `coapt.ncl` to know the answer
+| nothing
+
+| Runs
+| CI (nickel provisioned there)
+| CI *and* pre-commit, on every commit
+|===
+
+The second gate is cheap enough to run everywhere, which is the point. Issue
+#11 re-pointed this pack's identity from the scaffold's name
+(`rsr-template-repo`) to hermeneia's; the gate is that acceptance criterion in
+executable form, so the re-pointing cannot silently revert on a re-scaffold, a
+bad merge, or a copy-paste from upstream.
+
+== The identity is derived, never written down
+
+The receipt's `repo` used to be a literal in the comparator's template. A
+literal inside a generated artifact is a drift seam, and this one was cut
+twice:
+
+. The template's own name survived instantiation (issue #8).
+. When it was finally changed, the *receipt* was hand-substituted rather than
+  regenerated (issue #11) — so the committed receipt stopped being a projection
+  of any committed tree, and `just validate-coapt` went permanently red.
+
+A repository's identity is declared once, in `CLADE.a2ml`
+`[identity] canonical-name`. Both tiers read it from there: the Yard
+comparator as a fact (`lookup "clade.canonical-name"`), the Hunt writer by the
+same grep. If CLADE ever stops declaring it, the receipt declares
+`repo = ""` — a visible hole, which is the intended failure mode, rather than a
+plausible-looking name nobody can trace to a source.
+
+== Portable awk, or: how this pack silently read zero clauses
+
+`extract-clauses.sh` matched clause headers with the interval expression
+`/^#{3,4} /`. Intervals (`{n,m}`) are not supported by mawk before 1.3.4 — the
+default `awk` on Debian and Ubuntu, and therefore on every GitHub Actions
+`ubuntu-*` runner. awk does not *error* on an unsupported regex; the pattern
+just never matches. So `just coapt` exited 0 while emitting a perfectly
+well-formed receipt reporting `clauses-total = 0`.
+
+The headers are now spelled out (`/^### / || /^#### /`) and stripped with
+`sub(/^#+[[:space:]]+/, "")`, both plain ERE. `verify.sh` additionally refuses
+to accept a zero-clause reading at all: a coaptation of an empty clause set is
+not a reading of anything, and a drift gate that accepted one would have
+laundered the failure into a baseline.
 
 == Honest gaps (do not paper over these)
 

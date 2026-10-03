@@ -7,3 +7,38 @@ Changelog], and this project adheres to
 https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 === [Unreleased]
+
+==== Added
+
+- `coaptation`: `just check-coapt-identity` (`.machine_readable/coaptation/check-identity.sh`)
+  — a toolchain-free identity gate enforcing issue #11's acceptance criterion:
+  no template identity in the coaptation pack, and the committed receipt's `repo`
+  must equal the `canonical-name` `CLADE.a2ml` declares. Runs in pre-commit and CI.
+- CI: a `coaptation` job in `quality.yml` running both coaptation gates. Neither
+  ran anywhere before, which is how the defects below went unnoticed.
+
+==== Changed
+
+- `coaptation`: the receipt's `repo` is DERIVED from `CLADE.a2ml`
+  `[identity] canonical-name` rather than being a literal in the comparator, so
+  it cannot silently revert to the scaffold's identity (issues #8, #11). If
+  CLADE stops declaring a canonical-name the receipt says `repo = ""` — a
+  visible hole rather than a plausible fiction.
+
+==== Fixed
+
+- `coaptation`: `extract-clauses.sh` matched clause headers with the interval
+  expression `/^#{3,4} /`, which mawk — the default `awk` on Debian/Ubuntu, and
+  therefore on every GitHub Actions `ubuntu-*` runner — does not support. awk
+  does not error on an unsupported regex, it simply never matches, so `just
+  coapt` exited 0 while emitting a well-formed receipt reading
+  `clauses-total = 0`. Headers are now spelled out as portable ERE, and
+  `verify.sh` refuses to accept a zero-clause reading at all.
+- `coaptation`: the committed receipt was stale. Instantiation hand-substituted
+  its identity line instead of regenerating it, so its provenance hashes named
+  pre-instantiation contractiles and no committed state could reproduce it.
+  Regenerated; the honest band is now `green`, not the stale `amber`.
+- `self-validating/README.adoc`: the documented nickel download URL named a
+  release asset (`nickel-linux-x86_64`) that no longer exists; `releases/latest`
+  returned 200 with a "Not Found" body, installing a 9-byte shell script that
+  failed later for an apparently unrelated reason. Now pinned to a version.
