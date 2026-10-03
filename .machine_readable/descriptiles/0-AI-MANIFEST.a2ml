@@ -1,8 +1,11 @@
-# AI Manifest for 6a2 Directory
+# AI Manifest for the Descriptiles Directory
 
 ## Purpose
 
-This manifest declares the AI-assistant context for the 6a2 machine-readable metadata directory.
+This manifest declares the AI-assistant context for the descriptiles machine-readable
+metadata directory: the descriptive half of the 6A2 format family (what-IS).
+Formerly shipped as `.machine_readable/6a2/`; renamed to the estate-canonical
+`.machine_readable/descriptiles/`, the path `check-descriptile-policy.sh` requires.
 
 ## Canonical Locations
 
