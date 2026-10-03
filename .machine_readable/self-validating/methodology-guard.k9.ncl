@@ -4,7 +4,7 @@ K9!
   pedigree = {
     name = "methodology-guard.k9.ncl",
     security = { leash = 'Yard },
-     schema_version = "1.0.0",  },{CURRENT_YEAR}} {{AUTHOR}} ({{OWNER}}) <{{AUTHOR_EMAIL}}>
+     schema_version = "1.0.0",  },{CURRENT_YEAR}} Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
 # K9 Validator: Methodology Guard
 # Checks that agent work respects methodology constraints declared in

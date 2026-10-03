@@ -99,14 +99,6 @@ has_spdx_header() {
     return 1
 }
 
-has_placeholder() {
-    local file="$1"
-    if grep -q "{{REPO\|{{OWNER\|{{FORGE\|{{PROJECT\|{{project\|{{AUTHOR" "$file" 2>/dev/null; then
-        return 0
-    fi
-    return 1
-}
-
 #==============================================================================
 # VALIDATION PHASE 1: CORE STRUCTURE
 #==============================================================================
@@ -226,22 +218,37 @@ check_file_exists "src/interface/ffi/test/integration_test.zig" "Integration tes
 #==============================================================================
 
 echo ""
-log_info "Phase 5: Placeholder token replacement (skipped in template repo)"
+log_info "Phase 5: Placeholder token replacement"
 echo ""
 
-# Note: Template repo is allowed to have placeholders
-# For derived repos, we'd check that placeholders are replaced
-if [ "$(basename "$REPO_ROOT")" = "rsr-template-repo" ]; then
-    log_pass "Skipping placeholder check for template repo"
+# Delegated to scripts/check-no-placeholders.sh — the single estate
+# implementation of this rule, vendored from rsr-template-repo. It already
+# handles the two things this phase used to get wrong:
+#
+#   * WHICH REPOS ARE EXEMPT. The old test was
+#         [ "$(basename "$REPO_ROOT")" = "rsr-template-repo" ]
+#     Identity from a directory name is wrong in any git worktree or renamed
+#     clone, and a self-name substitution pass rewrote the literal here once
+#     already — silently inverting the branch, so this repo skipped its own
+#     placeholder check while a real template checkout got checked. The
+#     canonical gate resolves identity from GITHUB_REPOSITORY / the git remote.
+#   * WHICH TOKENS ARE REAL. The old has_placeholder() grepped for `{{REPO`,
+#     `{{OWNER`, `{{PROJECT`, ... with no closing brace, so it also matched
+#     just's own {{args}} interpolation and prose ABOUT tokens. The gate matches
+#     upper-snake tokens only, exempts metasyntactic ones, and allow-lists the
+#     template/example trees by path.
+#
+# It exits 0 in a template repo, so no special case is needed here.
+if [ -f "$REPO_ROOT/scripts/check-no-placeholders.sh" ]; then
+    if bash "$REPO_ROOT/scripts/check-no-placeholders.sh" "$REPO_ROOT" >/dev/null 2>&1; then
+        log_pass "No unfilled placeholder tokens"
+    else
+        bash "$REPO_ROOT/scripts/check-no-placeholders.sh" "$REPO_ROOT" 2>&1 \
+            | sed 's/^/    /' >&2 || true
+        log_error "Unfilled placeholder tokens remain (run: scripts/instantiate.sh)"
+    fi
 else
-    # Check that key files don't have unresolved placeholders
-    for file in "$REPO_ROOT/README.adoc" "$REPO_ROOT/Justfile" "$REPO_ROOT/.machine_readable/descriptiles/STATE.a2ml"; do
-        if [ -f "$file" ]; then
-            if has_placeholder "$file"; then
-                log_warning "File contains unresolved placeholders: $(basename "$file")"
-            fi
-        fi
-    done
+    log_warning "scripts/check-no-placeholders.sh missing - placeholder check skipped"
 fi
 
 #==============================================================================

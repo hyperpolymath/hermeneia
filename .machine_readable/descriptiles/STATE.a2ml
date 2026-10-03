@@ -57,7 +57,7 @@ issues = [
 # CI red on main as at 2026-07-29. Recorded so a green-looking board is not
 # mistaken for a healthy one.
 ci-failing-on-main = [
-  "Guix Package Policy — root flake.nix present while Nix is retired estate-wide (ruled 2026-05-18, hardened 2026-07-28). CANNOT simply delete it: build/guix.scm is an UNINSTANTIATED template ({{PROJECT_NAME}}, {{AUTHOR}}) and there is no Containerfile, so removal would leave the repo with no packaging. Retire the flake AND make the Guix side real in the same change.",
+  "Guix Package Policy — root flake.nix present while Nix is retired estate-wide (ruled 2026-05-18, hardened 2026-07-28). CANNOT simply delete it: build/guix.scm is an UNINSTANTIATED template (Hermeneia, Jonathan D.A. Jewell) and there is no Containerfile, so removal would leave the repo with no packaging. Retire the flake AND make the Guix side real in the same change.",
   "Estate Rules — root-shape allowlist: Cargo.toml + Cargo.lock (from the Rust workspace) plus pre-existing ARCHITECTURE.md, GOVERNANCE.md, MAINTAINERS, mise.toml. One PR covering all six clears it.",
   "Dogfood Gate — not yet diagnosed.",
 ]

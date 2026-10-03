@@ -53,7 +53,7 @@ case "$MODE" in
         echo ""
         echo "[reanchor-basis]"
         echo "schema = \"hyperpolymath.reanchor-basis/0\""
-        echo "repo = \"rsr-template-repo\""
+        echo "repo = \"hermeneia\""
         echo "occasioned-by = \"band=red in the coaptation receipt\""
         echo ""
         echo "[carnage]"
