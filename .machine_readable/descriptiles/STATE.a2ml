@@ -91,6 +91,40 @@ ci-verified-green = [
   "Descriptile policy — check-descriptile-policy.sh executed locally at the pinned revision; exit 0.",
 ]
 
+# ─── BLOCKING, ACCOUNT-WIDE, AND NOT FIXABLE FROM THIS REPOSITORY ────────────
+# Recorded first because it is the reason none of the repairs below can be
+# CONFIRMED by a CI run, and because diagnosing it from scratch is expensive:
+# the symptom is designed to look like a repository defect.
+#
+# As at 2026-10-03 every GitHub Actions job in this account is rejected with:
+#
+#   "The job was not started because recent account payments have failed or your
+#    spending limit needs to be increased. Please check the 'Billing & plans'
+#    section in your settings"
+#
+# How it presents, and why it misleads:
+#   * Workflows that run their OWN steps conclude `startup_failure` in 0 seconds
+#     with ZERO jobs, ZERO logs, ZERO annotations and ZERO check runs. There is
+#     literally nothing to read, so the natural conclusion is a broken workflow
+#     file — and for three weeks (2026-09-12 to 2026-10-01) that is what this
+#     repository concluded. See ci-dead-workflows below: there were ALSO real
+#     file defects, which is what made the billing wall so hard to separate out.
+#   * Workflows that CALL a reusable workflow do create jobs, and those jobs fail
+#     in 3-4 seconds at "Set up job" carrying the billing message. The billing
+#     text is only visible there, on the check-run ANNOTATIONS — not in any log,
+#     because no log is produced.
+#   * It is account-wide, not private-repo-minutes: hyperpolymath/affinescript is
+#     PUBLIC (hosted minutes free and unlimited) and its runs were failing the
+#     same way 34 minutes BEFORE this repository's PR #68 was pushed.
+#
+# ACTION REQUIRED: hyperpolymath account -> Settings -> Billing & plans. No change
+# to any file in any repository can clear it. Until it is cleared, "is CI green?"
+# is unanswerable for every repo in the estate, and a red board here means
+# nothing at all.
+ci-blocked-account-billing = [
+  "GitHub Actions is rejecting every job in the hyperpolymath account: payments failed or the spending limit needs raising. Owner action in Settings -> Billing & plans. Diagnosed 2026-10-03 from check-run annotations on PR #68.",
+]
+
 # Still owed. Recorded rather than fixed, because each needs either a toolchain
 # this checkout does not have or an owner decision.
 ci-still-owed = [
@@ -123,10 +157,13 @@ last-run-utc = "2026-10-03"
 last-result = "warn"  # unknown | pass | warn | fail
 # The three gates recorded as red on 2026-07-29 are diagnosed and repaired — see
 # ci-fixed-2026-10-03 and ci-dead-workflows above. What keeps this at "warn" and
-# not "pass" is that NONE of it has yet been confirmed by a CI run: the workflows
-# in question had not executed in three weeks, so every gate above was verified by
-# running the check locally against this tree, which is weaker evidence. It
-# becomes "pass" when a push to main shows them green.
+# not "pass" is that NONE of it can be confirmed by a CI run, for a reason that
+# has nothing to do with this repository: the account's GitHub Actions billing is
+# rejecting every job (ci-blocked-account-billing above). Every gate here was
+# verified by running the check LOCALLY against this tree — 13/13, including the
+# standards gates fetched at the exact revision Governance pins — which is real
+# evidence but weaker than a green run, and it is labelled as such. This becomes
+# "pass" when billing is restored and a push to main shows them green.
 #
 # Also still open, and the reason this is not "pass" on content either: the items
 # in ci-still-owed — above all AFFIRMATION.adoc (unsigned template) and
