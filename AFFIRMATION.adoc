@@ -38,12 +38,14 @@ hermeneia-syntax 9 (the fifth crate, hermeneia-cli, has no unit tests of its own
 | affirmed
 | `cargo test --workspace` at the anchor → 39 passed, 0 failed, 4 s.
 
-| `invoke` works end to end against the reference checker: the README example's
+| `invoke` works end to end against the trope-checker — its Rust fast core
+`tropecheck-rs`, conformance-validated against the Idris2 reference, not the
+reference binary itself: the README example's
 query, reduced to `show verdict` (the README's `show verdict, loss, warrant` is
 refused at `show loss`), yields `p-insufficient` with the expected witness edge;
 the same particular is licensed (`p-sufficient`) under the permissive use-model;
-the emitted IR carries the required top-level keys and is accepted by the
-reference validator.
+the emitted IR carries the required top-level keys and is accepted as well-formed
+by that checker (schema validation at the trust boundary).
 | affirmed
 | `HERMENEIA_TROPECHECK=/path/to/tropecheck-rs cargo test -p hermeneia-cli --features e2e --test slice`
 → 7 passed (`src/hermeneia-cli/tests/slice.rs`).
@@ -66,8 +68,9 @@ drives the Rust fast core, and the verdict semantics are the checker's.
 
 == What we do NOT claim
 
-* `evoke`, `convoke`, `transvoke`, `provoke`, `intervoke`, `revoke` — parsed and
-  refused as unimplemented; the refusal is what is tested (`docs/SPEC.adoc`).
+* `evoke`, `convoke`, `transvoke`, `provoke`, `intervoke`, `revoke` — recognised by
+  keyword and refused as unimplemented (their bodies are not parsed); the refusal is
+  what is tested (`docs/SPEC.adoc`).
 * `show loss` and `show warrant` — refused (`hermeneia-core::plan_invoke`); the first
   needs the checker's loss vector, the second the warrant graph. `show failure_points`
   is parsed but *not* refused by the planner — the request proceeds to the checker —
