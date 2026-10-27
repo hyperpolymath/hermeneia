@@ -89,12 +89,12 @@ drives the Rust fast core, and the verdict semantics are the checker's.
 | Project | Hermeneia
 | Repository | https://github.com/hyperpolymath/hermeneia
 | Commit (SHA) tested | 21b15931b3b93c6de9e5b536e20401336825f26b (`main` at the time; the tree the commands ran against)
-| Landing commit | the signed commit that introduces this file, identified with `git log --show-signature -- AFFIRMATION.adoc`; a file cannot record its own commit's SHA
+| Landing commit | the signed commit that lands this snapshot on `main` (the file itself predates it as a template); after landing, `git log --first-parent --show-signature -1 main -- AFFIRMATION.adoc` selects it. A file cannot record its own commit's SHA
 | Timestamp (UTC) | 2026-10-27T07:50Z
 | Toolchain | rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0; checker `tropecheck-rs` built with `cargo build --release` from trope-checker 44020f9 (= `main` 216f23b plus the two Phase 0 spec/CI patches, which do not touch `src/rust`); Ubuntu 24.04 cloud container
 | Affirmed by | Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk> (owner signs on landing; run by the Phase 0 agent)
 |===
 
 _To be landed by a signed git commit. The "Commit (SHA) tested" row is the base the
-checks ran on; verify the introducing commit and its signature with
-`git log --show-signature -- AFFIRMATION.adoc`._
+checks ran on; verify the landing commit and its signature with
+`git log --first-parent --show-signature -1 main -- AFFIRMATION.adoc`._
