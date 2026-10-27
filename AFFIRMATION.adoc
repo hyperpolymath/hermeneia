@@ -15,7 +15,8 @@ claim about *Hermeneia* at one exact commit. Nothing here is marketing or a
 promise; those live in the README. This file is the receipt. Every claim below
 was produced by running the project's own checks in the session that wrote this
 file; the anchor (<<verifiable-anchor>>) names the commit, time and toolchain, so
-"true" means "true at this point". It is landed by a signed commit.
+"true" means "true at this point". It is to be landed by a signed commit — the
+owner signs on landing.
 
 == The epistemic contract
 
@@ -31,23 +32,27 @@ a failing run, or a contradicting source.
 |===
 | Claim | Status | Evidence (command / file)
 
-| The workspace builds and its unit tests pass: 39 tests across the five crates
-(hermeneia-gate 4, hermeneia-store 7, hermeneia-ir 11, hermeneia-core 8,
-hermeneia-syntax 9).
+| The workspace builds and its tests pass: 39 tests — hermeneia-cli's `gate`
+integration target 4, hermeneia-store 8, hermeneia-ir 11, hermeneia-core 7,
+hermeneia-syntax 9 (the fifth crate, hermeneia-cli, has no unit tests of its own).
 | affirmed
 | `cargo test --workspace` at the anchor → 39 passed, 0 failed, 4 s.
 
-| `invoke` works end to end against the reference checker: the README example
-`p-insufficient` with the expected witness edge; the same particular licensed
-(`p-sufficient`) under the permissive use-model; the emitted IR carries the
-required top-level keys and is accepted by the reference validator.
+| `invoke` works end to end against the reference checker: the README example's
+query, reduced to `show verdict` (the README's `show verdict, loss, warrant` is
+refused at `show loss`), yields `p-insufficient` with the expected witness edge;
+the same particular is licensed (`p-sufficient`) under the permissive use-model;
+the emitted IR carries the required top-level keys and is accepted by the
+reference validator.
 | affirmed
-| `HERMENEIA_TROPECHECK=<tropecheck-rs> cargo test -p hermeneia-cli --features e2e --test slice`
+| `HERMENEIA_TROPECHECK=/path/to/tropecheck-rs cargo test -p hermeneia-cli --features e2e --test slice`
 → 7 passed (`src/hermeneia-cli/tests/slice.rs`).
 
 | Refusals are honest, not fabricated: `show loss` is refused rather than
-invented; the six unimplemented vokes are reported as unimplemented, distinct
-from syntax errors; a missing checker exits 3 with instructions.
+invented; the unimplemented vokes are reported as unimplemented, distinct from
+syntax errors (`evoke` through the CLI in the slice; all six keywords at the
+parser in `hermeneia-syntax::other_vokes_are_unimplemented_not_syntax_errors`,
+part of the workspace run); a missing checker exits 3 with instructions.
 | affirmed
 | the same slice run (`show_loss_is_refused_rather_than_fabricated`,
 `unimplemented_vokes_are_distinguished_from_syntax_errors`,
@@ -63,8 +68,11 @@ drives the Rust fast core, and the verdict semantics are the checker's.
 
 * `evoke`, `convoke`, `transvoke`, `provoke`, `intervoke`, `revoke` — parsed and
   refused as unimplemented; the refusal is what is tested (`docs/SPEC.adoc`).
-* `show loss` and `show warrant` / `show failure_points` — refused; the first
-  needs the checker's loss vector, the others the warrant graph.
+* `show loss` and `show warrant` — refused (`hermeneia-core::plan_invoke`); the first
+  needs the checker's loss vector, the second the warrant graph. `show failure_points`
+  is parsed but *not* refused by the planner — the request proceeds to the checker —
+  although `docs/SPEC.adoc` lists it as refused; that line is stale (finding, not fixed
+  here).
 * Nothing is Integrated: the store is a stub (`hermeneia-store`), the Vocarium
   `StoreProvider` adapter (M2) does not exist yet.
 * No proofs of our own: the grade algebra is the checker's, machine-checked
@@ -77,11 +85,13 @@ drives the Rust fast core, and the verdict semantics are the checker's.
 |===
 | Project | Hermeneia
 | Repository | https://github.com/hyperpolymath/hermeneia
-| Commit (SHA) | 21b15931b3b93c6de9e5b536e20401336825f26b (`main` at the time; this file lands on the Phase 0 branch)
+| Commit (SHA) tested | 21b15931b3b93c6de9e5b536e20401336825f26b (`main` at the time; the tree the commands ran against)
+| Landing commit | the signed commit that introduces this file, identified with `git log --show-signature -- AFFIRMATION.adoc`; a file cannot record its own commit's SHA
 | Timestamp (UTC) | 2026-10-27T07:50Z
 | Toolchain | rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0; checker `tropecheck-rs` built with `cargo build --release` from trope-checker 44020f9 (= `main` 216f23b plus the two Phase 0 spec/CI patches, which do not touch `src/rust`); Ubuntu 24.04 cloud container
 | Affirmed by | Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk> (owner signs on landing; run by the Phase 0 agent)
 |===
 
-_Landed by a signed git commit. Verify with `git log --show-signature` that the
-anchor SHA above matches the commit that introduced this affirmation._
+_To be landed by a signed git commit. The "Commit (SHA) tested" row is the base the
+checks ran on; verify the introducing commit and its signature with
+`git log --show-signature -- AFFIRMATION.adoc`._

@@ -51,7 +51,7 @@ To **voke** is to call a stored particular into a use-relation.
 | `intervoke` | call between trope paths or candidates                   |
 | `revoke`    | call back or withdraw a previous licence                 |
 
-Implemented end-to-end and tested: `invoke`. The other six parse and are refused as unimplemented — status table in `docs/SPEC.adoc`.
+Implemented end-to-end and tested: `invoke`. The other six are recognised by keyword and refused as unimplemented (their bodies are not parsed) — status table in `docs/SPEC.adoc`.
 
 Hermeneia does not select rows.
 Hermeneia vokes tropes.
