@@ -51,6 +51,8 @@ To **voke** is to call a stored particular into a use-relation.
 | `intervoke` | call between trope paths or candidates                   |
 | `revoke`    | call back or withdraw a previous licence                 |
 
+Implemented end-to-end and tested: `invoke`. The other six are recognised by keyword and refused as unimplemented (their bodies are not parsed) — status table in `docs/SPEC.adoc`.
+
 Hermeneia does not select rows.
 Hermeneia vokes tropes.
 
@@ -133,6 +135,10 @@ because warrant "source_check_failed"
 ```
 
 This withdraws a previously licensed answer when its warrant, evidence, or use-model no longer holds.
+
+## Where this repo sits
+
+Vocabulary track: trope-particularity-workbench → haec → trope-checker (verdict). Store/query track: haec → vocarium → hermeneia → trope-checker (verdict). trope-checker depends on nothing (HC-1); the workbench depends on nothing; vocarium and hermeneia meet at the M2 StoreProvider adapter (vocarium ADR-0002: wire, do not link).
 
 ## Relationship to Vocarium
 

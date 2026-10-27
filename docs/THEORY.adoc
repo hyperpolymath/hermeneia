@@ -8,7 +8,7 @@
 [abstract]
 == Abstract
 
-Every deployed query language answers one question — _which stored items match?_ — and leaves two others unasked: _can this item be meaningfully read in the present context?_ and _is the use licensed, given what has been lost between the original record and the item in hand?_ In practice the three collapse into one, and the collapse has a cost: in evidential reasoning and AI-assisted scholarship, "the system retrieved it" is routinely treated as "the system licensed it." This paper presents the theory of Hermeneia, an experimental query language in which the three questions are kept formally distinct. Its semantic core is a small, machine-checked algebra: every transformation of a stored particular carries a six-coordinate _grade_ recording what kind of loss it inflicted; grades compose associatively along transformation paths, the fidelity coordinate by tropical addition over stem:[\mathbb{N}\cup\{\infty,\top\}]; a declared _use-model_ is a partial demand vector — a _floor_ — over the same coordinates; and an answer is _licensed_ (p-sufficient) exactly when the floor lies below the accumulated grade in a componentwise retention order. Licensing thereby becomes a decidable order-theoretic question rather than a matter of judgement. Around this core sit seven _voking_ operations, of which one — `revoke`, licence withdrawal as contraction over a warrant graph — has no analogue in any existing query language known to us. The contribution claimed is the conjunction, not any single ingredient: the trichotomy of retrieved, interpretable, and licensed, made operational in one small algebra.
+Every deployed query language answers one question — _which stored items match?_ — and leaves two others unasked: _can this item be meaningfully read in the present context?_ and _is the use licensed, given what has been lost between the original record and the item in hand?_ In practice the three collapse into one, and the collapse has a cost: in evidential reasoning and AI-assisted scholarship, "the system retrieved it" is routinely treated as "the system licensed it." This paper presents the theory of Hermeneia, an experimental query language in which the three questions are kept formally distinct. Its semantic core is a small, machine-checked algebra: every transformation of a stored particular carries a _grade_ — three coordinate kinds, fate (per field), bond, merge, over six slots — recording what kind of loss it inflicted; grades compose associatively along transformation paths, the fidelity coordinate by tropical addition over stem:[\mathbb{N}\cup\{\infty,\top\}]; a declared _use-model_ is a partial demand vector — a _floor_ — over the same coordinates; and an answer is _licensed_ (p-sufficient) exactly when the floor lies below the accumulated grade in a componentwise retention order. Licensing thereby becomes a decidable order-theoretic question rather than a matter of judgement. Around this core sit seven _voking_ operations, of which one — `revoke`, licence withdrawal as contraction over a warrant graph — has no analogue in any existing query language known to us. The contribution claimed is the conjunction, not any single ingredient: the trichotomy of retrieved, interpretable, and licensed, made operational in one small algebra.
 
 == Introduction
 
@@ -72,7 +72,7 @@ The stored objects are _particulars_: property-instances in the trope-theoretic 
 
 carrying respectively the situated quality itself, the entity it is a quality of, the situation individuating it, and an honest provenance of how the record came to be.
 
-Particulars are transformed — paraphrased, projected, compressed, merged — and every transformation carries a _grade_: a record of what it did, in kind and not merely in amount. A grade has six coordinates:
+Particulars are transformed — paraphrased, projected, compressed, merged — and every transformation carries a _grade_: a record of what it did, in kind and not merely in amount. A grade has three coordinate kinds — fate (per field), bond, merge — over six slots:
 
 [stem]
 ++++
@@ -134,7 +134,7 @@ The order is decidable: every coordinate is finite except fidelity, which is a d
 
 === Use-models, floors, and licensing
 
-Here is the paper's spine. _A use-model is a partial demand vector over the grade coordinates._ Formally a use-model stem:[U] declares a _floor_: a record assigning to each of the six coordinates an _optional_ minimum,
+Here is the paper's spine. _A use-model is a partial demand vector over the grade coordinates._ Formally a use-model stem:[U] declares a _floor_: a record assigning to each of the six slots — the four field fates, bond, merge — an _optional_ minimum,
 
 [stem]
 ++++
@@ -260,11 +260,11 @@ Honesty about scope is part of the design, and several limits are structural.
 
 *Use-models do not yet revise in time.* `revoke` handles withdrawal of warrants under a fixed population of use-models. It does not address temporal revision of the use-models themselves: what becomes of standing licences when a floor is tightened or a use-model deprecated. The warrant graph gives an obvious purchase — a use-model is a warrant element of every verdict issued under it, so tightening it is a mass degradation — but the semantics of versioned use-models, and of grandfathering versus wholesale re-examination, is open.
 
-Beyond these: whether the six coordinates are complete for particularity-loss is an open question rather than a theorem, and the operational cost of warrant graphs at archive scale is unmeasured.
+Beyond these: whether the three coordinate kinds — fate, bond, merge — are complete for particularity-loss is an open question rather than a theorem (calculus O1-coord), and the operational cost of warrant graphs at archive scale is unmeasured.
 
 == Conclusion
 
-The argument of this paper is that "the system found it" and "the system licensed it" are different claims, that the difference is precisely the failure mode of AI-assisted evidential work, and that it can be made computable at small formal cost: a six-coordinate graded monoid with a tropical fidelity dimension, a componentwise retention order, and one comparison — stem:[\mathrm{floor}(U) \sqsubseteq \mathrm{acc}(v)] — with a witness on failure. Around that core, a query vocabulary in which retrieval (`evoke`, `convoke`, `transvoke`), licensing (`invoke`, `provoke`, `intervoke`), and withdrawal (`revoke`) are distinct verbs, so that no result carries an endorsement it was never given and no withdrawn licence disappears without trace. None of the ingredients is new. The instrument they assemble — a query language whose answers know what they are licensed to become — is, we believe, new; the experiment worth running is whether practices that adopt the trichotomy stop mistaking retrieval for warrant.
+The argument of this paper is that "the system found it" and "the system licensed it" are different claims, that the difference is precisely the failure mode of AI-assisted evidential work, and that it can be made computable at small formal cost: a graded monoid of three coordinate kinds — fate (per field), bond, merge — over six slots, with a tropical fidelity dimension, a componentwise retention order, and one comparison — stem:[\mathrm{floor}(U) \sqsubseteq \mathrm{acc}(v)] — with a witness on failure. Around that core, a query vocabulary in which retrieval (`evoke`, `convoke`, `transvoke`), licensing (`invoke`, `provoke`, `intervoke`), and withdrawal (`revoke`) are distinct verbs, so that no result carries an endorsement it was never given and no withdrawn licence disappears without trace. None of the ingredients is new. The instrument they assemble — a query language whose answers know what they are licensed to become — is, we believe, new; the experiment worth running is whether practices that adopt the trichotomy stop mistaking retrieval for warrant.
 
 [bibliography]
 == References

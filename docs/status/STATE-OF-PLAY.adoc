@@ -195,15 +195,15 @@ call job, which GitHub rejects before creating any job.
   ones someone had already filled by hand to get CI passing. See
   <<instantiation>> below.
 
-| Unsigned AFFIRMATION, no CRG grade
-| *Still owed, and deliberately not filled in.* `AFFIRMATION.adoc` is an unsigned
-  template that says so itself in a NOTE block; filling it honestly requires
-  RUNNING the project's checks in the session that signs it (`cargo test`,
-  `idris2 --typecheck abi.ipkg`, `zig build`), and none of those toolchains is
-  available in the environment this work was done in. Inventing an affirmation is
-  precisely the overclaim the file exists to prevent. `docs/status/READINESS.adoc`
-  is the same story: the CRG assessment is still blank, so this repo has no
-  published readiness grade.
+| AFFIRMATION filled, unsigned until landing; no CRG grade
+| *Update 2026-10-27 (Phase 0, PR #76).* `AFFIRMATION.adoc` is no longer a template:
+  it was filled from a real run (`cargo test --workspace` 39 passed; the e2e slice
+  7 passed against `tropecheck-rs`) at commit 21b1593, with a verifiable anchor and
+  a do-not-claim list. It is unsigned until the owner signs the landing commit —
+  that is the owner's act, not this pass's. The earlier state (an unsigned template
+  that said so in a NOTE block, no toolchain to run the checks) is historical.
+  `docs/status/READINESS.adoc` is unchanged: the CRG assessment is still blank, so
+  this repo has no published readiness grade.
 
 | ABI/FFI seam is scaffolding
 | `src/interface/` was inherited from the template and never instantiated.
