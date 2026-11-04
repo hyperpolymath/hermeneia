@@ -16,4 +16,4 @@ permissions:
   contents: read
 jobs:
   rust-ci:
-    uses: hyperpolymath/standards/.github/workflows/rust-ci-reusable.yml@da2c748aad55c1a1dcba00b60fe4a35017bc6540
+    uses: metadatastician/standards/.github/workflows/rust-ci-reusable.yml@857ff096af11451841fb10488fed1438523973a1
