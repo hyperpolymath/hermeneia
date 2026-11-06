@@ -76,7 +76,7 @@ Deny: **Nix, Node/npm, TypeScript, Python, Go, AGPL**. (Guix, not Nix.)
 
 # This repo: `%{data.canonical_name}`  ·  clade `%{data.prefixed_name}`
 
-- **Identity** — uuid `%{data.uuid}`; clade `%{data.clade_primary}` (secondary `%{data.clade_secondary}`); born %{data.born}; forge `%{data.forge_gh}`.
+- **Identity** — UUID declared in `CLADE.a2ml`; clade `%{data.clade_primary}` (secondary `%{data.clade_secondary}`); born %{data.born}; forge `%{data.forge_gh}`.
 - **IS** — %{data.purpose}
 - **IS-NOT** — %{data.isnot}
 - **Where it sits** — pipeline position **%{data.pipeline_pos}**; chain `%{data.chain}`; coordination = `%{data.coordination}`.

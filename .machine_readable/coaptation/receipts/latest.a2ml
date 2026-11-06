@@ -10,28 +10,28 @@ band = "green"
 proposed-action = "none — the descriptile self-model coapts with the contractile set-point within tolerance."
 
 [coverage]
-clauses-total = 50
-descriptile-witnessed = 4
-probe-deferred-to-hunt = 22
+clauses-total = 30
+descriptile-witnessed = 0
+probe-deferred-to-hunt = 18
 must-trust-unmeasured-gaps = 0
 note = "Yard sees descriptile evidence only; probe-deferred obligations need a Hunt-tier run for a full hard-gate."
 
 [reading.must-trust]
 grade = "boolean_gate / boolean_gate_provenance"
-witnessed = 3
+witnessed = 0
 refuted = 0
 unmeasured-gaps = 0
-probe-deferred = 22
+probe-deferred = 14
 gate = "pass"
 
 [reading.adjust]
 grade = "posture (advisory; accessibility / inclusive design)"
-satisfied = "1/1"
+satisfied = "0/0"
 posture-ok = true
 
 [reading.intend]
 grade = "tropical (min-plus distance-to-north-star; wishes excluded)"
-committed-intents = 3
+committed-intents = 1
 distance = 1
 within-tolerance = true
 
@@ -41,60 +41,40 @@ alarms = 0
 
 [reading.dust]
 grade = "expected (planned exnovation)"
-items = 7
+items = 2
 
 [clauses]
-intend.repo-initialization = intent:done
-intend.contractile-completeness = intent:done
-intend.automation-scripts = intent:in_progress
-intend.cross-repo-validation = wish:declared
-intend.automated-substitution = wish:achieved
-intend.formal-verification = wish:declared
-intend.ecosystem-visualization = wish:declared
-must.license-present = probe-deferred
-must.readme-present = probe-deferred
-must.security-policy = probe-deferred
-must.ai-manifest = probe-deferred
-must.governance-docs = probe-deferred
-must.machine-readable-dir = witnessed
-must.contractiles-complete = probe-deferred
-must.contractiles-files-present = probe-deferred
-must.bust-dust-files-present = probe-deferred
-must.six-directory-present = witnessed
-must.anchors-directory = witnessed
-must.self-validating-structure = probe-deferred
-must.no-placeholder-values = probe-deferred
-must.instantiation-rendered = probe-deferred
-must.no-untracked-contractiles = probe-deferred
-must.signed-commits = probe-deferred
-trust.no-secrets-committed = probe-deferred
-trust.no-private-keys = probe-deferred
-trust.no-tokens-in-source = probe-deferred
-trust.author-correct = probe-deferred
-trust.license-content = probe-deferred
-trust.template-files-readonly = probe-deferred
-trust.trust-deny-areas = probe-deferred
-trust.container-images-pinned = probe-deferred
-trust.no-dockerfile = probe-deferred
-adjust.placeholder-drift = witnessed
-adjust.template-version-drift = unmeasured
-adjust.readme-completeness = unmeasured
-adjust.example-accuracy = unmeasured
-adjust.contractile-sync = unmeasured
-adjust.no-broken-symlinks = unmeasured
-adjust.adoc-not-md = unmeasured
-adjust.spdx-header-consistency = unmeasured
-dust.no-template-artifacts = expected
-dust.no-example-placeholders = expected
-dust.no-old-contractile-formats = expected
-dust.no-duplicate-justfile = expected
-dust.no-duplicate-readme-format = expected
-dust.no-stale-template-references = expected
-dust.version-sync-checked = expected
-bust.template-substitution-failure = latent
-bust.sync-drift-between-repos = latent
-bust.contractile-parse-error = latent
+intend.contractile-specialization = intent:in_progress
+intend.vocarium-store-provider = wish:declared
+intend.voke-family-implementation = wish:declared
+intend.warrant-aware-revocation = wish:declared
+intend.loss-vector-from-oracle = wish:declared
+must.project-entry-points = probe-deferred
+must.workspace-crates-present = probe-deferred
+must.contractile-tridents-complete = probe-deferred
+must.rendered-instantiation = probe-deferred
+must.no-unfilled-project-placeholders = probe-deferred
+must.coaptation-clause-extraction = probe-deferred
+must.workspace-tests = probe-deferred
+must.oracle-backed-invoke-slice = probe-deferred
+must.no-fabricated-loss-or-verdict = probe-deferred
+trust.no-tracked-secret-material = probe-deferred
+trust.malformed-and-deceptive-store-data-rejected = probe-deferred
+trust.unsupported-store-operation-not-empty-success = probe-deferred
+trust.missing-oracle-fails-closed = probe-deferred
+trust.secret-scanning-workflow-present = probe-deferred
+adjust.explicit-text-status = probe-deferred
+adjust.unsupported-operation-disclosure = probe-deferred
+adjust.accessible-documentation-format = probe-deferred
+adjust.implementation-status-honesty = probe-deferred
+adjust.accessibility-standard-not-overclaimed = unmeasured
+dust.ignored-build-output = expected
+dust.generated-coaptation-atoms = expected
+bust.unsupported-voke-must-stop = latent
+bust.missing-checker-must-not-pass = latent
+bust.malformed-store-data-must-stop = latent
+bust.loss-or-warrant-must-not-be-fabricated = latent
 
 [provenance]
-contractiles = "intend@f4df69e20535 must@b447af375bc5 trust@c9735926e5fa adjust@d57214f4c4d6 dust@d90e319a9334 bust@45227787e7fd"
-descriptiles = "clade@5e54010c7c2a state@7a197d9f7f62 ecosystem@c0167c7142d3 agentic@f1102d5cb5ba anchor@dc513d91d3ae"
+contractiles = "intend@0927cb3ffb67 must@326c6d756363 trust@7f30f444e8fa adjust@a4805d512fd6 dust@2935a10de4e4 bust@e5dcef8e3e65"
+descriptiles = "clade@5e54010c7c2a state@29d1fda0702c ecosystem@c0167c7142d3 agentic@f1102d5cb5ba anchor@dc513d91d3ae"
