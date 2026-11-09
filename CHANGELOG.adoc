@@ -8,6 +8,27 @@ https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 === [Unreleased]
 
+==== Fixed
+
+* *`+docs/status/PROOF-STATUS.adoc+` published a percentage, which PROOF-POLICY
+forbids (2026-11-09).* The summary read `+*Overall*: 0% proven+`. §8.4 rule 7 is
+explicit — "Never publish 'X% proved', an average grade, or a single confidence
+score" — and asks for a count per category with the denominator instead. The
+figure was accurate; the form was the forbidden one. It now reads as a census,
+with a note recording why. The same line ships in `+rsr-template-repo+`'s
+`+PROOF-STATUS.adoc+`, so every repository minted from it carries the same
+breach; fixing it there is the solution at source.
+
+==== Added
+
+* *A note saying what `+verification/proofs/+` actually contains (2026-11-09).*
+`+docs/status/PROOF-STATUS.adoc+` now records that the directory is the unmodified
+mint set, that none of it states a property of HERMENEIA, and that the 0%-proven summary
+is therefore the accurate count rather than a backlog against those files. Also
+records that nothing there supports a Proof Witness Grade under PROOF-POLICY §8.1,
+and that removing the templates (as trope-checker did under ADR 0005 D5) is an
+owner decision.
+
 ==== Added
 
 - `coaptation`: `just check-coapt-identity` (`.machine_readable/coaptation/check-identity.sh`)
