@@ -68,6 +68,39 @@
 | TP-2 | Public API type safety | TP | Lean4 | P2 | 4h
 |===
 
+== What `verification/proofs/` currently contains
+
+NOTE: as of 2026-11-09 the whole of `verification/proofs/` is the *unmodified mint
+set*. Five files still carry an explicit marker — `coq/TypeSafety.v`,
+`agda/Properties.agda`, `lean4/ApiTypes.lean`, `idris2/Types.idr` and
+`tlaplus/StateMachine.tla` all say "Replace with your project's …" — and the
+`idris2/ABI/` modules are from the same mint (`ABI/Pointers.idr`: "Template proof
+— customise for your project's pointer types"). None of them states a property of
+HERMENEIA: the Agda proves `length (xs ++ ys) ≡ length xs + length ys`, the Lean proves
+the functor laws for a template `ApiResult`, the Coq is a toy expression language,
+and the TLA+ models a placeholder request pipeline.
+
+They are therefore not evidence for anything, which is why the summary above
+correctly reads 0% proven: that figure is the accurate count, not a backlog against
+these files. No escape hatch is present either: no `believe_me`, `assert_total`,
+`postulate`, `sorry`, `Axiom` or `Admitted` occurs in any body — verified by
+`hyperpolymath/mathesis`, `scripts/census/proof-holes.sh`, run over this tree on
+2026-11-09, which reports no hole, axiom or unsafe record.
+
+One policy finding does come back from that same scan, and it is real:
+`verification/proofs/agda/Properties.agda` carries *no* `OPTIONS` pragma at all, so
+it does not set `--safe`, let alone the PROOF-POLICY §2.1 invocation
+`--safe --without-K --cubical-compatible`. Since §2.1 binds first-party Agda theory
+entrypoints and this file is not a theory entrypoint of this repository but mint
+boilerplate, the defensible fix is removal rather than adding flags to a template —
+which is the owner decision noted below. Until then the finding stands.
+
+Under PROOF-POLICY §8.1 none of this supports a Proof Witness Grade, because none of
+it is a theory obligation of this repository. `hyperpolymath/trope-checker` removed
+the identical never-instantiated templates under ADR 0005 D5; whether HERMENEIA does the
+same is an owner decision (doctrine 7: cold is not disposable), so nothing is
+deleted here. The real obligations are the ones named in `PROOF-NEEDS.adoc`.
+
 == Verification Commands
 
 [source,bash]
