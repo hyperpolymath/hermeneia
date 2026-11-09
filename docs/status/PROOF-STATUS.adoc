@@ -20,7 +20,16 @@
 | *Total* | *7* | *0* | *0* | *0* | *7*
 |===
 
-*Overall*: 0% proven
+*Census.* Of 7 recorded obligations: 0 done, 0 in progress, 0 blocked, 7
+remaining. No obligation here carries a Proof Witness Grade, because none is a
+theory obligation of this repository under PROOF-POLICY §8.1.
+
+NOTE: this line used to read "*Overall*: 0% proven". PROOF-POLICY §8.4 rule 7 is
+explicit — "Never publish 'X% proved', an average grade, or a single confidence
+score" — and requires a count per category with the denominator instead. The
+figure was accurate; the *form* was the one the policy forbids. The same line
+ships in `rsr-template-repo`'s `PROOF-STATUS.adoc`, so every repository minted
+from it carries it; fixing it there is the solution at source.
 
 == Proofs Done
 
@@ -80,9 +89,9 @@ HERMENEIA: the Agda proves `length (xs ++ ys) ≡ length xs + length ys`, the Le
 the functor laws for a template `ApiResult`, the Coq is a toy expression language,
 and the TLA+ models a placeholder request pipeline.
 
-They are therefore not evidence for anything, which is why the summary above
-correctly reads 0% proven: that figure is the accurate count, not a backlog against
-these files. No escape hatch is present either: no `believe_me`, `assert_total`,
+They are therefore not evidence for anything, which is why the census above
+correctly reads 0 done of 7: that count is accurate, not a backlog against these
+files. No escape hatch is present either: no `believe_me`, `assert_total`,
 `postulate`, `sorry`, `Axiom` or `Admitted` occurs in any body — verified by
 `hyperpolymath/mathesis`, `scripts/census/proof-holes.sh`, run over this tree on
 2026-11-09, which reports no hole, axiom or unsafe record.
