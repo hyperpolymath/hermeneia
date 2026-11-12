@@ -46,6 +46,9 @@ If you are unsure what something is, **read the canon; do not guess** (guessing 
 11. **Stop-first** when an action is costly to undo or outward-facing.
 12. **Boundaries are real** — respect IS / IS-NOT; never assimilate or rename across them.
 13. **Equivalence as identity** — the estate's intellectual through-line.
+14. **Solutions at source** — fix the canonical/upstream origin, never patch the downstream symptom; trace and respect every up- and down-stream before you act.
+15. **Elegance by default** — treat the most elegant and correct long-term option as the default arm; when you put a choice to the owner, LABEL which option that is, and if you recommend another, name both arms and say why you depart. Binds unasked design calls too: report the departure, never absorb it.
+16. **Cheap models for upkeep**: CI/CD, workflow, template-drift and status-file work does not get a top-tier model. If it needs real effort, stop and say so, then open a thread on cheaper models (Sonnet and Haiku, or Opus, Sonnet and Haiku). Keep top-tier models for proof work and hard design.
 
 ## The machine-readable substrate (read in this order on arrival)
 **CLADE** → **ANCHOR** → **AGENTIC** → **ECOSYSTEM** → **STATE**
