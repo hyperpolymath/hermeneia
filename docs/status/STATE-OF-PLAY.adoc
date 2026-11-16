@@ -100,8 +100,8 @@ fails if it regresses:
 
 *Hermeneia does not implement the grade algebra.* It lives in
 `trope-checker`, whose graded proof record is Agda. Most of its obligations are
-graded `PWG-3` on the Agda leg alone; some (for example parts of L4 and A2) have
-no gradeable theory leg yet and are ungraded. Lean statements exist for many
+graded `PWG-3` on the Agda leg alone; some have no gradeable theory leg yet
+and are ungraded. Lean statements exist for many
 results but do not count toward the grade (they are bridge-pending), and the
 Idris2 code is an engineering restatement that PROOF-POLICY §8.1 keeps off the
 ladder. trope-checker's `docs/status/PROOF-STATUS.adoc` gives the per-result
