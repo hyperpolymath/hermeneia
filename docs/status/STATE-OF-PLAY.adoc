@@ -98,12 +98,15 @@ fails if it regresses:
 
 == Architecture in one rule
 
-*Hermeneia does not implement the grade algebra.* It is proved inside
-`trope-checker`, in Agda (the graded record), with Lean legs and an Idris2
-engineering restatement; trope-checker's `docs/status/PROOF-STATUS.adoc` says
-which result carries which. (Corrected 2026-11-16; this line used to credit
-Idris2 alone.) a second implementation here would fork the exact semantics the
-design exists to protect. Hermeneia emits Trope IR v0.2 and delegates verdicts.
+*Hermeneia does not implement the grade algebra.* It lives in
+`trope-checker`, whose graded proof record is Agda. Most of its obligations are
+graded `PWG-3` on the Agda leg alone; some (for example parts of L4 and A2) have
+no gradeable theory leg yet and are ungraded. Lean statements exist for many
+results but do not count toward the grade (they are bridge-pending), and the
+Idris2 code is an engineering restatement that PROOF-POLICY §8.1 keeps off the
+ladder. trope-checker's `docs/status/PROOF-STATUS.adoc` gives the per-result
+record. (Corrected 2026-11-16; this line used to credit Idris2 alone.) A second
+implementation here would fork the exact semantics the design exists to protect. Hermeneia emits Trope IR v0.2 and delegates verdicts.
 
 It is not a wrapper, though: only three of seven operations need a verdict at
 all (`invoke`, `provoke`, `intervoke`). The rest are store traversal, path
