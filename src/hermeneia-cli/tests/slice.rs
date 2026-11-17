@@ -37,14 +37,12 @@ fn checker() -> PathBuf {
 }
 
 fn hermeneia() -> PathBuf {
-    // The integration test binary lives in target/<profile>/deps/; the CLI is
-    // two levels up.
-    let mut p = std::env::current_exe().expect("test exe path");
-    p.pop();
-    if p.ends_with("deps") {
-        p.pop();
-    }
-    p.join("hermeneia")
+    // Cargo builds the `hermeneia` binary for this integration test and tells
+    // us where it put it. The earlier form walked up from the test executable,
+    // assuming target/<profile>/deps/. Newer cargo puts test executables under
+    // target/<profile>/build/<pkg>/<hash>/out/, so that guess pointed at a file
+    // that does not exist and every test here failed to spawn.
+    PathBuf::from(env!("CARGO_BIN_EXE_hermeneia"))
 }
 
 struct Run {
