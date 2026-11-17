@@ -5,7 +5,7 @@
 :toclevels: 2
 :sectnums:
 
-*As at:* 2026-07-29
+*As at:* 2026-07-29 (two lines corrected 2026-11-16; see below)
 
 [abstract]
 What is actually built, what is deliberately not, and what is known to be
@@ -68,8 +68,10 @@ workflow.
 | `revoke`    | recognised, reports unimplemented | no | the refusal is tested | no
 |===
 
-*Nothing is Integrated.* Vocarium does not exist; every result above is against
-the in-repo JSONL stub and its seed corpus.
+*Nothing is Integrated.* Hermeneia does not depend on Vocarium: the repository
+exists (`hyperpolymath/vocarium`) but is not yet usable as this store, so every
+result above is against the in-repo JSONL stub and its seed corpus. (Corrected
+2026-11-16; this line used to say Vocarium does not exist.)
 
 Output surfaces:
 
@@ -96,9 +98,15 @@ fails if it regresses:
 
 == Architecture in one rule
 
-*Hermeneia does not implement the grade algebra.* It is proved in Idris2 inside
-`trope-checker`; a second implementation here would fork the exact semantics the
-design exists to protect. Hermeneia emits Trope IR v0.2 and delegates verdicts.
+*Hermeneia does not implement the grade algebra.* It lives in
+`trope-checker`, whose graded proof record is Agda. Most of its obligations are
+graded `PWG-3` on the Agda leg alone; some have no gradeable theory leg yet
+and are ungraded. Lean statements exist for many
+results but do not count toward the grade (they are bridge-pending), and the
+Idris2 code is an engineering restatement that PROOF-POLICY §8.1 keeps off the
+ladder. trope-checker's `docs/status/PROOF-STATUS.adoc` gives the per-result
+record. (Corrected 2026-11-16; this line used to credit Idris2 alone.) A second
+implementation here would fork the exact semantics the design exists to protect. Hermeneia emits Trope IR v0.2 and delegates verdicts.
 
 It is not a wrapper, though: only three of seven operations need a verdict at
 all (`invoke`, `provoke`, `intervoke`). The rest are store traversal, path
