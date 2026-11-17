@@ -10,12 +10,20 @@ https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 ==== Fixed
 
-* *Three more places said Vocarium does not exist (2026-11-17).* Vocarium's
-store engine is built and gated in its own repository; what does not exist is
-the adapter to it (Vocarium's M2). `+src/hermeneia-store/src/lib.rs+`,
-`+ARCHITECTURE.adoc+` and `+docs/SPEC.adoc+` now say that, as
-`+AFFIRMATION.adoc+` and `+docs/status/STATE-OF-PLAY.adoc+` already did. The
-same sentence in `+.machine_readable/+` is the owner's (#88).
+* *Three more places said Vocarium does not exist (2026-11-17).* What does not
+exist is the adapter to it (Vocarium's M2). `+ARCHITECTURE.adoc+` and
+`+docs/SPEC.adoc+` (two places) now say the adapter is missing, and the header
+of `+src/hermeneia-store/src/lib.rs+` adds that Vocarium's store engine is
+built and gated in its own repository. The same sentence in
+`+.machine_readable/+` is the owner's (#88).
+* *Two documents credited the grade algebra's proof to Idris2 (2026-11-17).*
+`+docs/SPEC.adoc+` and `+ARCHITECTURE.adoc+` now say what
+`+docs/status/STATE-OF-PLAY.adoc+` says: the graded proof record is Agda, and
+the Idris2 code is an engineering restatement outside the grade ladder.
+* *The conformance step did not compare verdicts (2026-11-17).* It failed only
+when the checker exited 2 or more, so a wrong verdict passed. It now reads each
+fixture's expected verdict from `+cases.json+` and fails on a mismatch, on a
+fixture with no expectation, and on an empty corpus.
 * *The slice workflow tracked trope-checker's default branch (2026-11-17).* It
 now pins the commit haec and vocarium pin, `+0dceab6+`. Between the siblings'
 previous pin and that commit, trope-checker's `+src/+`, `+schemas/+`, `+spec/+`

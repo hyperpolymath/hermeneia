@@ -55,14 +55,39 @@ jobs:
           TC="$GITHUB_WORKSPACE/.trope-checker/src/rust/target/release/tropecheck-rs"
           fail=0
           # Every fixture must produce the verdict cases.json declares.
+          # Until 2026-11-17 this loop failed only on exit 2 or more, so a
+          # checker that answered p-sufficient where cases.json says
+          # p-insufficient passed. Exit 0 is p-sufficient and exit 1 is
+          # p-insufficient; anything else is a fault. A fixture with no
+          # expectation fails, and so does an empty corpus.
+          n=0
           for ir in fixtures/*.ir.json; do
+            [ -e "$ir" ] || continue
+            n=$((n+1))
+            name=$(basename "$ir")
+            expect=$(jq -r --arg ir "$name" '.cases[] | select(.ir == $ir) | .expect' cases.json)
+            if [ -z "$expect" ]; then
+              echo "::error::$name has no expected verdict in cases.json"
+              fail=1
+              continue
+            fi
             set +e; "$TC" "$ir" >/dev/null 2>&1; code=$?; set -e
-            if [ "$code" -ge 2 ]; then
-              echo "::error::$ir produced exit $code (validation/io fault)"
+            case "$code" in
+              0) got=p-sufficient ;;
+              1) got=p-insufficient ;;
+              *) got=fault ;;
+            esac
+            if [ "$got" != "$expect" ]; then
+              echo "::error::$name: the checker gave $got (exit $code), cases.json expects $expect"
               fail=1
             fi
           done
+          if [ "$n" -eq 0 ]; then
+            echo "::error::no conformance fixture found: nothing was checked"
+            fail=1
+          fi
           [ "$fail" -eq 0 ] || exit 1
+          echo "conformance corpus: $n fixtures, each gave the verdict cases.json declares"
 
       - name: Format
         run: cargo fmt --all -- --check

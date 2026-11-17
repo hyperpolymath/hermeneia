@@ -136,8 +136,11 @@ and the verdict is the single comparison `floor ⊑ acc(output)`.
 ====
 *Hermeneia must not reimplement the grade algebra.*
 
-The algebra is proved in Idris2 (with Lean and Agda artefacts alongside) inside
-`trope-checker`. A fresh Rust reimplementation would fork the exact semantics
+The algebra lives inside `trope-checker`, whose graded proof record is Agda,
+with Lean developments alongside. Its Idris2 code is an engineering restatement
+that PROOF-POLICY §8.1 keeps off the grade ladder
+(link:status/STATE-OF-PLAY.adoc[`status/STATE-OF-PLAY.adoc`] has the detail). A
+fresh Rust reimplementation would fork the exact semantics
 the whole design exists to protect, and no test suite would reliably catch the
 drift. This is ruled out permanently, not deferred.
 ====
@@ -225,9 +228,11 @@ state. `trope-checker` owns the grade algebra and nothing else.
 
 == The store seam
 
-No trope corpus exists anywhere yet — `vocarium` is scaffolding, as is `haec`.
-Hermeneia therefore ships its own store behind a narrow trait, so that Vocarium
-can be substituted without the planner changing.
+Vocarium's store engine exists in its own repository, but the adapter that
+would let Hermeneia drive it (Vocarium's M2) does not, and `haec` has no
+compiler yet. Hermeneia therefore ships its own store, with a seed corpus,
+behind a narrow trait, so that the adapter can be substituted without the
+planner changing.
 
 [source,rust]
 ----

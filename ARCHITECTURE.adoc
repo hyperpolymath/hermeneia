@@ -27,8 +27,9 @@ Chain: `+Vocarium (store) → Hermeneia (voke)+`, and
 
 === The central rule
 
-*Hermeneia does not implement the grade algebra.* That algebra is proved
-in Idris2 inside `+trope-checker+`; a second implementation here would
+*Hermeneia does not implement the grade algebra.* That algebra lives in
+`+trope-checker+`, whose graded proof record is Agda; its Idris2 code is an
+engineering restatement outside the grade ladder. A second implementation here would
 fork the exact semantics the design exists to protect. Hermeneia emits
 Trope IR v0.2 and reads back a verdict.
 
