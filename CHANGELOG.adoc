@@ -10,6 +10,20 @@ https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 ==== Fixed
 
+* *Three more places said Vocarium does not exist (2026-11-17).* Vocarium's
+store engine is built and gated in its own repository; what does not exist is
+the adapter to it (Vocarium's M2). `+src/hermeneia-store/src/lib.rs+`,
+`+ARCHITECTURE.adoc+` and `+docs/SPEC.adoc+` now say that, as
+`+AFFIRMATION.adoc+` and `+docs/status/STATE-OF-PLAY.adoc+` already did. The
+same sentence in `+.machine_readable/+` is the owner's (#88).
+* *The slice workflow tracked trope-checker's default branch (2026-11-17).* It
+now pins the commit haec and vocarium pin, `+0dceab6+`. Between the siblings'
+previous pin and that commit, trope-checker's `+src/+`, `+schemas/+`, `+spec/+`
+and conformance fixtures are unchanged.
+* *The scan workflow pin installed an Erlang version that crashes the scanner
+on some trees (2026-11-17).* It moves to the revision trope-checker uses, which
+installs OTP 27.3.4.19 (hypatia#1061).
+
 * *`+docs/status/PROOF-STATUS.adoc+` published a percentage, which PROOF-POLICY
 forbids (2026-11-09).* The summary read `+*Overall*: 0% proven+`. §8.4 rule 7 is
 explicit — "Never publish 'X% proved', an average grade, or a single confidence

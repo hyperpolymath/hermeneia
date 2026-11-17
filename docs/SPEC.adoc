@@ -341,7 +341,7 @@ Other surfaces:
 * `show loss` — *refused*, not implemented. The checker CLI does not emit the
   per-dimension vector, and fabricating one would be dishonest.
 * `show warrant` / `show failure_points` — refused; they need the warrant graph.
-* Nothing is Integrated. Vocarium does not exist yet; every result above is
+* Nothing is Integrated. The adapter to Vocarium (its M2) does not exist yet; every result above is
   against the JSONL stub and its seed corpus.
 
 == Open questions

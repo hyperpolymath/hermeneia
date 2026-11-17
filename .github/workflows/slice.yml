@@ -32,6 +32,9 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: hyperpolymath/trope-checker
+          # One checker commit across the stack: haec and vocarium pin the same
+          # one. Until 2026-11-17 this step tracked the default branch.
+          ref: 0dceab68459d46b2cda22137c261023223c30e9a # main @ 2026-11-16
           path: .trope-checker
           persist-credentials: false
 

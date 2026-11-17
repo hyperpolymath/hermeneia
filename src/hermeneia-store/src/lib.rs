@@ -3,9 +3,11 @@
 //
 // The store seam.
 //
-// Vocarium does not exist yet. Hermeneia therefore ships its own JSONL store
-// behind a narrow trait so that Vocarium can be substituted without the planner
-// changing. See docs/SPEC.adoc §"The store seam".
+// The adapter to Vocarium (its M2) does not exist yet. Vocarium itself does: its
+// store engine `voc` is built and gated in its own repository. Hermeneia
+// therefore ships its own JSONL store behind a narrow trait, so that the adapter
+// can be substituted without the planner changing. See docs/SPEC.adoc
+// §"The store seam".
 //
 // Note which side of the seam the grade algebra falls on: `neighbours` takes a
 // bound in the retention order, so any implementation that supports it owns the
