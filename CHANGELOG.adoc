@@ -13,9 +13,8 @@ https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 * *Caller for the estate `CI/gate` commit status (2026-11-23).* The Branch-Floor
 ruleset requires `CI/gate` but nothing in this repository produced it, so every
 pull request was blocked. `+.github/workflows/ci-gate.yml+` is the suite's thin
-caller, pinned to `+a0760ce+` of proven-cicd-and-workflows. The pin is a
-placeholder: the required-check profile is not in the suite yet, so the gate
-fails closed ("no CI/gate profile") until it lands and the caller is re-pinned.
+caller, pinned to `+d28d73e+` of proven-cicd-and-workflows, which carries this
+repository's required-check profile.
 
 ==== Fixed
 
