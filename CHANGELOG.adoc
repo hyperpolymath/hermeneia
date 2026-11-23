@@ -8,6 +8,15 @@ https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 === [Unreleased]
 
+==== Added
+
+* *Caller for the estate `CI/gate` commit status (2026-11-23).* The Branch-Floor
+ruleset requires `CI/gate` but nothing in this repository produced it, so every
+pull request was blocked. `+.github/workflows/ci-gate.yml+` is the suite's thin
+caller, pinned to `+a0760ce+` of proven-cicd-and-workflows. The pin is a
+placeholder: the required-check profile is not in the suite yet, so the gate
+fails closed ("no CI/gate profile") until it lands and the caller is re-pinned.
+
 ==== Fixed
 
 * *Three more places said Vocarium does not exist (2026-11-17).* What does not
