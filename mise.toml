@@ -57,8 +57,7 @@ ninja = "latest"
 #     task  = "go-task"
 #     build = "cargo build --release || npm run build || go build"
 #     test  = "cargo test || npm test || go test ./..."
-#     lint  = "ruff check . || bunx --bun prettier@3.10.1 --check . || black --check ."
-#     fmt   = "ruff format . || bunx --bun prettier@3.10.1 --write . || black ."
+#     (lint/fmt entries elided: they chained ruff/black fallbacks.)
 #
 # mise's `[alias]` maps an alias to a TOOL PLUGIN — it does not define tasks,
 # so none of these ever ran. mise also warns that `[alias]` is deprecated in
